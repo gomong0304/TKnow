@@ -4,7 +4,7 @@
 
 # TKnow Git Flow Guide
 <p/>프로젝트명: <TicketNow>
-<p/>구조: 단일 모듈(Spring Boot) + 도메인 단위 패키지 + Core 공용 모듈
+<p/>구조: 단일 모듈(Spring legacy) + 도메인 단위 패키지 + Core 공용 모듈
 <p/>목표: 도메인별 독립 개발 / Core 중심 단방향 구조 / 중앙 통합 관리
 
 # 프로젝트 패키지 구조

@@ -9,11 +9,11 @@
 
 # 역할 분담
 <p/> <b>이재은</b>
-<p/> - Database·VO 설계, 공통(Image,Paging), Auth(JWT), Board , Order,Pay 모듈
+<p/> - Database·VO 설계, 공통(Image,Paging)· Auth(JWT)· Board · Order · Pay 모듈
 <p/> <b>전혜진</b>
 <p/> - 프론트엔드 전 영역 (UI/UX 포함) 
 <p/> <b>박희진</b>
-<p/> - Member, Ticket, GitHub (충돌 병합 및 버전관리)
+<p/> - Member·Ticket 모듈, GitHub (충돌 병합 및 버전관리)
   
 # 프로젝트 패키지 구조
 <p/>com.tknow.ticketnow

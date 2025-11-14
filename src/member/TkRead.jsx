@@ -12,7 +12,7 @@ export default function TickRead() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-	// ✅ 마운트 시 API 호출 (토큰 포함)
+	// 마운트 시 API 호출 (토큰 포함)
 	useEffect(() => {
 		const token = localStorage.getItem("accessToken");
 
@@ -116,7 +116,7 @@ export default function TickRead() {
 											<tr><th>예매자</th><td>{data.memberName}</td></tr>
 											<tr><th>예매번호</th><td>{data.orderNumber}</td></tr>
 											<tr><th>이용일</th><td>{data.ticketDate}</td></tr>
-											<tr><th>장소</th><td>{data.venue}</td></tr>
+											<tr><th>장소</th><td>{data.ticketVenue || '정보 없음'}</td></tr>
 											<tr><th>좌석</th><td>{data.seatCode}</td></tr>
 											<tr><th>티켓 수령 방법</th><td>모바일 티켓</td></tr>
 											<tr><th>받으시는 분</th><td>{data.memberName}</td></tr>
@@ -143,9 +143,9 @@ export default function TickRead() {
 
 									<table className="ticket-buy6-table">
 										<tr><th>예매 번호</th><td>｜</td><td>{data.ordersNumber}</td></tr>
-										<tr><th>좌석 번호</th><td>｜</td><td>{data.seatInfo}</td></tr>
+										<tr><th>좌석 번호</th><td>｜</td><td>{data.seatCode}</td></tr>
 										<tr><th>날짜</th><td>｜</td><td>{data.ticketDate}</td></tr>
-										<tr><th>장소</th><td>｜</td><td>{data.venue}</td></tr>
+										<tr><th>장소</th><td>｜</td><td>{data.venue || '정보 없음'}</td></tr>
 									</table>
 									<div className="ticket-qr-box">
 										<QRCodeCanvas

@@ -1,13 +1,15 @@
 import React from "react";
 import "../css/style.css";
-import { Link, useNavigate } from "react-router-dom"; // ✅ navigate 추가
+import { Link, useNavigate, useParams } from "react-router-dom"; // ✅ navigate 추가
 import LogoImg from "../images/TKNOW.png";
 
 export default function Header() {
   const navigate = useNavigate();
+  const memberId = useParams();
 
   // 로그인 상태 확인: 토큰이 있으면 true
   const isLoggedIn = !!localStorage.getItem("accessToken");
+  
 
   // 로그아웃 함수
   const handleLogout = () => {
@@ -37,7 +39,7 @@ export default function Header() {
               LOGOUT
             </Link>
 
-            <Link className="myPage" to="/member/Member">
+            <Link className="myPage" to={`/member/Member/${localStorage.getItem("memberId")}`}>
               MY PAGE
             </Link>
           </>

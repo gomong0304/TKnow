@@ -1087,26 +1087,26 @@ map {
 
 .zone-f1 {
 	top: 168px;
-	left: 104px;
+	left: 80px;
 	width: 210px;
 	height: 175px;
 }
 
 .zone-f1:hover {
-	background: rgba(255, 0, 0, 0.2);
-	border: 2px solid red;
+	background: rgba(0, 0, 0, 0.1);
+	border: 0px solid white;
 }
 
 .zone-f2 {
 	top: 168px;
-	left: 548px;
+	left: 523px;
 	width: 208px;
 	height: 175px;
 }
 
 .zone-f2:hover {
-	background: rgba(0, 0, 255, 0.2);
-	border: 2px solid blue;
+	background: rgba(0, 0, 0, 0.1);
+	border: 0px solid white;
 }
 
 .ticket-stage-next {
@@ -1782,6 +1782,7 @@ map {
 .member-Member-box2 {
 	position: inherit;
 	width: 100%;
+
 }
 
 .member-Member-box1 strong {
@@ -2228,6 +2229,11 @@ map {
 	display: flex;
 	align-items: center;
 	text-decoration: none;
+	margin-bottom: 20px;
+}
+
+.member-Member-conBox:nth-child(2) { /* 공부 색상 차이 */
+  border-left-color: #D9D9D9; /* 두 번째 파랑 */
 }
 
 .member-Member-conBox1 {
@@ -2285,7 +2291,7 @@ map {
 	font-weight: bold;
 	position: relative;
 	place-content: center;
-	top: -21px;
+	top: 10px;
 	left: 250px;
 }
 
@@ -2311,8 +2317,8 @@ map {
 	text-align: left;
 	line-height: 40px;
 	right: 170px;
-	bottom: 370px;
-	left: 260px;
+	bottom: 300px;
+	left: 300px;
 }
 
 .member-tkRead-my {
@@ -2358,6 +2364,8 @@ map {
 
 .member-tkRead-consImg {
 	width: 180px;
+	left: 40px;
+	position: relative;
 }
 
 .member-tkRead-conBox {
@@ -2792,6 +2800,7 @@ map {
 	display: flex;
 	align-items: center;
 	text-decoration: none;
+	margin-bottom: 20px;
 }
 
 .admin-Member-Box1 span {
@@ -2852,6 +2861,7 @@ table td:first-child { /* 공부 테이블값 고정*/
 	display: flex;
 	align-items: center;
 	text-decoration: none;
+	margin-bottom: 20px;
 }
 
 .admin-member-plus {
@@ -3019,6 +3029,8 @@ table td:first-child { /* 공부 테이블값 고정*/
 	margin-top: 5px;
 	text-align: center;
 	font-size: 28px;
+	left: 40px;
+	position: relative;
 }
 
 .member-tkRead-my {
@@ -3053,7 +3065,7 @@ table td:first-child { /* 공부 테이블값 고정*/
 	background: #FFA6C9;
 	text-align-last: center;
 	color: white;
-	font-size: 16px;
+	font-size: 12px;
 	padding: 0px 15px 0px 15px;
 	line-height: 20px;
 	vertical-align: middle;
@@ -3064,7 +3076,7 @@ table td:first-child { /* 공부 테이블값 고정*/
 	background: #D9D9D9;
 	text-align-last: center;
 	color: white;
-	font-size: 16px;
+	font-size: 12px;
 	padding: 0px 15px 0px 15px;
 	line-height: 20px;
 	vertical-align: middle;
@@ -3124,6 +3136,8 @@ table td:first-child { /* 공부 테이블값 고정*/
 	font-weight: bold;
 	text-align: center;
 	margin-top: 8px;
+	padding: 10px 10px 10px 10px; 
+	border: 0px solid;
 }
 
 .admin-levelBox1-text {
@@ -3132,6 +3146,11 @@ table td:first-child { /* 공부 테이블값 고정*/
 	left: 30px;
 }
 
+
+.admin-levelBox1-text strong{
+	color: #FFA6C9;
+	font-size: 40px;
+} 
 .admin-levelBox1-text span {
 	font-size: 20px;
 }
@@ -3149,14 +3168,14 @@ table td:first-child { /* 공부 테이블값 고정*/
 
 .admin-cons-list td {
 	font-size: 13px;
-	padding: 2px 4px;
+
 }
 
 .admin-member-refund {
 	background: #FFA6C9;
 	color: white !important;
-	padding: 0px 30px 0px 30px;
-	font-size: 15px;
+	padding: 0px 20px 0px 30px;
+	font-size: 12px;
 	border-radius: 10px;
 }
 
@@ -3228,18 +3247,19 @@ table td:first-child { /* 공부 테이블값 고정*/
 	width: 250px !important;
 	justify-content: center;
 	gap: 30px;
-	text-align: left;
+	text-align: center;
 	padding: 15px;
 	border-radius: 10px;
 	line-height: 10px;
 	border: 1px solid #D9D9D9;
+	
 }
 
 .admin-cont-phone2 {
 	width: 250px !important;
 	justify-content: center;
 	gap: 30px;
-	text-align: left;
+	text-align: center;
 	padding: 15px;
 	border-radius: 10px;
 	line-height: 10px;
@@ -3319,7 +3339,7 @@ table td:first-child { /* 공부 테이블값 고정*/
 }
 
 .admin-inven-phone1 {
-	width: 172px !important;
+	width: 99.6px !important;
 	justify-content: center;
 	gap: 30px;
 	text-align: left;
@@ -3329,27 +3349,7 @@ table td:first-child { /* 공부 테이블값 고정*/
 	border: 1px solid #D9D9D9;
 }
 
-.admin-inven-phone2 {
-	width: 164px !important;
-	justify-content: center;
-	gap: 30px;
-	text-align: left;
-	padding: 15px;
-	border-radius: 10px;
-	line-height: 10px;
-	border: 1px solid #D9D9D9;
-}
 
-.admin-inven-phone3 {
-	width: 164px !important;
-	justify-content: center;
-	gap: 30px;
-	text-align: left;
-	padding: 15px;
-	border-radius: 10px;
-	line-height: 10px;
-	border: 1px solid #D9D9D9;
-}
 
 .logoutBtn {
 	background-color: white;

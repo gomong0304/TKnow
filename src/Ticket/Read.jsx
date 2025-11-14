@@ -1,134 +1,334 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/style.css";
-import { Link } from "react-router-dom";
-import Cons from "../images/cons.png";
-import ConsRead from "../images/Consread.png";
-import Girl from "../images/girl.png";
-import Boy from "../images/boy.png";
-
+import axios from "axios";
+import { Link, useParams } from "react-router-dom";
+import Boy from "../images/boy.png"; 
+import Girl from "../images/girl.png"; 
 
 export default function Read() {
-    const [selectedDate, setSelectedDate] = useState(null);
+	const { id } = useParams();
+	const [ticket, setTicket] = useState(null);
+	const [selectedDate, setSelectedDate] = useState("");
+	const [currentMonth, setCurrentMonth] = useState(new Date());
 
-    const schedule = {
-        "2025-12-05": [{ round: "1회", time: "14:00" }],
-    };
+	// YYYY.MM.DD 포맷
+	const formatDate = (dateArr, fallback = "") => {
+	  if (!dateArr || !Array.isArray(dateArr)) return fallback;
+	  const [year, month, day] = dateArr;
+	  if (!year || !month || !day) return fallback;
+	  const date = new Date(year, month - 1, day);
+	  if (isNaN(date.getTime())) return fallback;
+	  const mm = String(date.getMonth() + 1).padStart(2, "0");
+	  const dd = String(date.getDate()).padStart(2, "0");
+	  return `${date.getFullYear()}.${mm}.${dd}`;
+	};
 
-    const handleDateClick = (date) => {
-        setSelectedDate(date);
-    };
+	// 날짜 클릭 핸들러
+	const handleDateClick = (dateStr) => {
+	  setSelectedDate(dateStr);
+	};
 
-    return (
-        <div className="read-top">
-            <div className="read-page">
-                
-                <div className="read-content">
-                    
-                    <div className="read-main">
-                        <section className="read-right">
-                            <h2>2025 투모로우바이투게더 단독 콘서트〈#: 유화〉</h2>
-                            <h3>콘서트 주간 1위</h3>
+	// 달 변경
+	const changeMonth = (direction) => {
+	  const newMonth = new Date(currentMonth);
+	  newMonth.setMonth(currentMonth.getMonth() + direction);
+	  setCurrentMonth(newMonth);
+	};
 
-                            <div className="read-set">
-                                <div className="cons-img">
-                                    <img src={Cons} alt="콘서트_썸네일" />
-                                </div>
+	// 달력 생성
+	const generateCalendar = () => {
+	  const year = currentMonth.getFullYear();
+	  const month = currentMonth.getMonth();
+	  
+	  const firstDay = new Date(year, month, 1);
+	  const lastDay = new Date(year, month + 1, 0);
+	  const startDate = new Date(firstDay);
+	  startDate.setDate(startDate.getDate() - firstDay.getDay());
+	  
+	  const calendar = [];
+	  const currentDate = new Date(startDate);
+	  
+	  for (let week = 0; week < 6; week++) {
+	    const weekDays = [];
+	    for (let day = 0; day < 7; day++) {
+	      const dateStr = `${currentDate.getFullYear()}.${String(currentDate.getMonth() + 1).padStart(2, '0')}.${String(currentDate.getDate()).padStart(2, '0')}`;
+	      const isCurrentMonth = currentDate.getMonth() === month;
+	      const hasSchedule = ticket?.schedule?.some(s => formatDate(s.date) === dateStr);
+	      const isSelected = selectedDate === dateStr;
+	      
+	      weekDays.push({
+	        date: new Date(currentDate),
+	        dateStr,
+	        day: currentDate.getDate(),
+	        isCurrentMonth,
+	        hasSchedule,
+	        isSelected
+	      });
+	      
+	      currentDate.setDate(currentDate.getDate() + 1);
+	    }
+	    calendar.push(weekDays);
+	  }
+	  
+	  return calendar;
+	};
 
-                                <div className="read-table">
-                                    <table>
-                                        <tbody>
-                                            <tr><th>장소</th><td>잠실 올림픽경기장</td></tr>
-                                            <tr><th>날짜</th><td>2025. 12. 05 ~ 2025. 12. 07</td></tr>
-                                            <tr><th>공연 시간</th><td>300 분</td></tr>
-                                            <tr><th>관람 연령</th><td>미취학 아동 입장 불가</td></tr>
-                                            <tr><th>가격</th><td>전체 가격 보기 ▶</td></tr>
-                                            <tr><th></th><td>R 석 143,000 원</td></tr>
-                                            <tr><th></th><td>S 석 132,000 원</td></tr>
-                                            <tr><th>혜택</th><td>무이자할부 ▶</td></tr>
-                                            <tr><th></th><td>위버스 멤버십 가입자 10 % 할인 받기</td></tr>
-                                            <tr><th></th><td>웨이크원 멤버십 가입자 15 % 할인 받기</td></tr>
-                                            <tr><th>프로모션</th><td>일 선착순 200 명 5만 원 결제시 5천 원 할인</td></tr>
-                                            <tr><th></th><td>2026 년 01 월 15 일에 배송되는 상품입니다.</td></tr>
-                                            <tr><th>배송</th><td>일괄배송일: 10 월 30 일 (목)~ 31 일 (금), 2 일간</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+	useEffect(() => {
+	  axios
+	    .get(`http://localhost:9090/ticketnow/tickets/${id}`)
+	    .then((res) => {
+	      console.log("ticket data:", res.data);
+	      
+	      // schedule이 비어있으면 startAt/endAt으로 생성
+	      if (!res.data.schedule || res.data.schedule.length === 0) {
+	        const [sYear, sMonth, sDay] = res.data.startAt;
+	        const [eYear, eMonth, eDay] = res.data.endAt;
+	        
+	        const start = new Date(sYear, sMonth - 1, sDay);
+	        const end = new Date(eYear, eMonth - 1, eDay);
+	        
+	        const generatedSchedule = [];
+	        const currentDate = new Date(start);
+	        
+	        while (currentDate <= end) {
+	          generatedSchedule.push({
+	            date: [
+	              currentDate.getFullYear(),
+	              currentDate.getMonth() + 1,
+	              currentDate.getDate()
+	            ],
+	            weekday: ['일', '월', '화', '수', '목', '금', '토'][currentDate.getDay()],
+	            time: "19:00",
+	            round: "1회차"
+	          });
+	          currentDate.setDate(currentDate.getDate() + 1);
+	        }
+	        
+	        res.data.schedule = generatedSchedule;
+	      }
+	      
+	      setTicket(res.data);
+	      
+	      if (res.data.schedule && res.data.schedule.length > 0) {
+	        const firstDate = formatDate(res.data.schedule[0].date);
+	        setSelectedDate(firstDate);
+	        // 첫 공연 날짜의 월로 이동
+	        const [year, month] = res.data.schedule[0].date;
+	        setCurrentMonth(new Date(year, month - 1, 1));
+	      }
+	    })
+	    .catch((err) => console.error(err));
+	}, [id]);
 
-                            <div className="read-particular">
-                                <div className="button-class">
-                                    <button className="read-button2">공연정보</button>
-                                    <button className="read-button1">판매정보</button>
-									<Link to="/Ticket/Review">
-									        <button className="read-button1">공연후기</button>
-									    </Link>
-                                    <button className="read-button1">기대평</button>
-                                    <button className="read-button1">QNA</button>
-                                </div>
-                            </div><br/><br/><br/>
+	if (!ticket) return <div>로딩 중...</div>;
 
-                            <div className="concert-particular">
-                                <strong className="concert-particular-1">공연 시간 정보</strong><br/><br/>
-                                <p>2025 년 12 월 5 일 (금) 오후 2 시</p>
-                                <p>2025 년 12 월 6 일 (토) 오후 2 시</p>
-                                <p>2025 년 12 월 7 일 (일) 오후 2 시</p><br/><br/><br/>
+	const hasSchedule = ticket.schedule && ticket.schedule.length > 0;
+	const calendar = generateCalendar();
+	const selectedSchedules = ticket.schedule?.filter(s => formatDate(s.date) === selectedDate) || [];
+  return (
+    <div className="read-top">
+      <div className="read-page">
+        <div className="read-content">
+          <div className="read-main">
+            <section className="read-right">
+              <h2>{ticket.title}</h2>
+              <h3>{ticket.rank || "콘서트 주간 순위 없음"}</h3>
 
-                                <strong className="concert-particular-1">공연 상세 / 출연진 정보</strong><br/><br/>
-                                <img src={ConsRead} className="Consread-img" alt="콘서트_상세" />
-                            </div><br/><br/><br/><br/><br/>
-				
-							 <strong className="concert-particular-1">예매자 통계</strong><br/><br/>
-							<div className="sex-ratio">
-							<p className="ratio-text1">97 %</p>
-							<img src={Girl} alt="여성_썸네일" />
-							<p className="ratio-text2">3 %</p>
-							<img src={Boy} alt="남성_썸네일" />
-							</div>
-                        </section>
-                    </div>
-
-                    <div className="reservation-setting">
-                        <div className="reservation">
-                            <div className="calendar-section">
-                                <h2>날짜 선택</h2>
-                                <div className="calendar">
-                                    {Array.from({ length: 31 }, (_, i) => {
-                                        const day = i + 1;
-                                        const dateStr = `2025-12-${day.toString().padStart(2, "0")}`;
-                                        const isSelected = selectedDate === dateStr;
-                                        return (
-                                            <button
-                                                key={day}
-                                                className={`calendar-day ${isSelected ? "selected" : ""}`}
-                                                onClick={() => handleDateClick(dateStr)}
-                                            >
-                                                {day}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                <div className={`schedule ${selectedDate && schedule[selectedDate] ? "show-note" : ""}`}>
-                                    {schedule[selectedDate]?.map((item, idx) => (
-                                        <div key={idx} className="round">
-                                            <span className="round-num">{item.round}</span>&nbsp;
-                                            <span className="round-time">{item.time}</span>
-                                        </div>
-                                    ))}<br/>
-                                    <p className="note">잔여석 안내 서비스를 제공하지 않습니다.</p>
-                                </div>
-                            </div>
-
-							<button className="reserve-btn" onClick={() => window.open("/Ticket/Buy2", "TicketBuy2", "width=1450, height=1024, scrollbars=yes")}
-							>예매하기</button>
-                            <p className="bottom-note">
-                                위버스 멤버십 가입자 10% 적립 &gt; <br />
-                                <span>이 공연이 궁금하다면</span>
-                            </p>
-                        </div>
-                    </div>
+              <div className="read-set">
+                <div className="cons-img">
+                  <img src={ticket.Boy || Boy}  alt={ticket.title} />
                 </div>
+
+                <div className="read-table">
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>장소</th>
+                        <td>{ticket.venueName || "장소 미정"}</td>
+                      </tr>
+					  
+                      <tr>
+                        <th>날짜</th>
+                        <td>
+                          {formatDate(ticket.startAt)} ~ {formatDate(ticket.endAt, formatDate(ticket.startAt))}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>공연 시간</th>
+                        <td>{ticket.duration || "정보 없음"}</td>
+                      </tr>
+                      <tr>
+                        <th>관람 연령</th>
+                        <td>{ticket.ageLimit || "미취학 아동 입장 불가"}</td>
+                      </tr>
+                      <tr>
+                        <th>가격</th>
+                        <td>{ticket.price ? `${ticket.price} 원` : "정보 없음"}</td>
+                      </tr>
+                      <tr>
+                        <th>혜택</th>
+                        <td>{ticket.benefit || "없음"}</td>
+                      </tr>
+                      <tr>
+                        <th>프로모션</th>
+                        <td>{ticket.promotion || "없음"}</td>
+                      </tr>
+                      <tr>
+                        <th>배송</th>
+                        <td>{ticket.delivery || "배송 정보 없음"}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="read-particular">
+                <div className="button-class">
+                  <button className="read-button2">공연정보</button>
+                  <button className="read-button1">판매정보</button>
+                  <Link to="/Ticket/Review">
+                    <button className="read-button1">공연후기</button>
+                  </Link>
+                  <button className="read-button1">기대평</button>
+                  <button className="read-button1">QNA</button>
+                </div>
+              </div>
+
+              <div className="concert-particular">
+                <strong className="concert-particular-1">공연 시간 정보</strong>
+                <br /><br />
+                {hasSchedule ? (
+                  ticket.schedule
+                    .filter((item) => formatDate(item.date) === selectedDate)
+                    .map((item, idx) => (
+                      <p key={idx}>
+                        {formatDate(item.date)} ({item.weekday}) {item.time}
+                      </p>
+                    ))
+                ) : (
+                  <p>공연 일정 정보가 없습니다.</p>
+                )}
+
+                <br /><br />
+
+                <strong className="concert-particular-1">공연 상세 / 출연진 정보</strong>
+                <br /><br />
+                <img
+                  src={ticket.Boy || Boy} 
+                  className="Consread-img"
+                  alt="콘서트_상세"
+                />
+              </div>
+
+              <strong className="concert-particular-1">예매자 통계</strong>
+              <br /><br />
+              <div className="sex-ratio">
+                <p className="ratio-text1">{ticket.femaleRatio || "0"} %</p>
+                <img src={ticket.Girl || Girl} alt="여성_썸네일" />
+                <p className="ratio-text2">{ticket.maleRatio || "0"} %</p>
+                <img src={ticket.Boy || Boy} alt="남성_썸네일" />
+              </div>
+            </section>
+          </div>
+
+          <div className="reservation-setting">
+            <div className="reservation">
+              <div className="calendar-section">
+                <h2>날짜 선택</h2>
+
+				{hasSchedule ? (
+				  <>
+				    {/* 월 네비게이션 */}
+				    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px'}}>
+				      <button onClick={() => changeMonth(-1)} style={{border: 'none', background: 'none', fontSize: '18px', cursor: 'pointer', padding: '5px'}}>
+				        ◀
+				      </button>
+				      <span style={{fontSize: '14px', fontWeight: 'bold'}}>
+				        {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
+				      </span>
+				      <button onClick={() => changeMonth(1)} style={{border: 'none', background: 'none', fontSize: '18px', cursor: 'pointer', padding: '5px'}}>
+				        ▶
+				      </button>
+				    </div>
+
+				    {/* 요일 */}
+				    <div style={{display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '3px', marginBottom: '5px', textAlign: 'center', fontSize: '11px'}}>
+				      {['일', '월', '화', '수', '목', '금', '토'].map(day => (
+				        <div key={day}>{day}</div>
+				      ))}
+				    </div>
+
+				    {/* 달력 */}
+				    <div className="calendar">
+				      {calendar.map((week, weekIdx) => (
+				        <React.Fragment key={weekIdx}>
+				          {week.map((dayInfo, dayIdx) => (
+				            <button
+				              key={dayIdx}
+				              onClick={() => handleDateClick(dayInfo.dateStr)}
+				              disabled={!dayInfo.hasSchedule}
+				              className={`calendar-day ${dayInfo.isSelected ? 'selected' : ''}`}
+				              style={{
+				                opacity: dayInfo.isCurrentMonth ? 1 : 0.3,
+				                background: dayInfo.hasSchedule ? (dayInfo.isSelected ? undefined : '#fff') : '#fff',
+				                cursor: dayInfo.hasSchedule ? 'pointer' : 'not-allowed'
+				              }}
+				            >
+				              {dayInfo.day}
+				            </button>
+				          ))}
+				        </React.Fragment>
+				      ))}
+				    </div>
+
+				    <div className={`schedule ${selectedDate ? "show-note" : ""}`}>
+				      {selectedSchedules.length > 0 ? (
+				        <>
+				          {selectedSchedules.map((item, idx) => (
+				            <div key={idx} className="round">
+				              <span className="round-num">{item.round}</span>&nbsp;
+				              <span className="round-time">{item.time}</span>
+				            </div>
+				          ))}
+				          <br />
+				          <p className="note">잔여석 안내 서비스를 제공하지 않습니다.</p>
+				        </>
+				      ) : (
+				        <p style={{color: '#e74c3c', textAlign: 'center', padding: '10px', fontSize: '13px'}}>
+				          이 날짜에는 공연이 없습니다.
+				        </p>
+				      )}
+				    </div>
+				  </>
+				) : (
+				  <p>공연 날짜 정보가 없습니다.</p>
+				)}
+              </div>
+
+			  <button
+			    className="reserve-btn"
+			    disabled={!selectedDate || !hasSchedule}
+			    onClick={() => {
+			      if (!selectedDate) return;
+			      const ticketId = ticket.ticketId; // ticket 객체에서 가져오기
+			      window.open(
+			        `/Ticket/Buy2/${ticketId}`,
+			        "TicketBuy",
+			        "width=1450,height=1024,scrollbars=yes"
+			      );
+			    }}
+			  >
+			    예매하기
+			  </button>
+           
+              <p className="bottom-note">
+                위버스 멤버십 가입자 10% 적립 &gt; <br />
+                <span>이 공연이 궁금하다면</span>
+              </p>
             </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

@@ -26,7 +26,7 @@ export default function MyTick() {
 	
 	
 	
-	// 🔹 예시: 로그인 후 토큰 발급 (실제 로그인 API 호출 필요)
+	// 로그인 후 토큰 발급 (실제 로그인 API 호출 필요)
 	const loginAndSaveToken = async () => {
 		try {
 			const res = await axios.post("http://localhost:9090/auth/login", {
@@ -45,7 +45,7 @@ export default function MyTick() {
 		}
 	};
 	
-	// ✅ 올바른 코드
+
 	const fetchOrders = async () => {
 	  try {
 	    const response = await fetch(
@@ -98,16 +98,17 @@ export default function MyTick() {
 	    withCredentials: true,
 	  })
 	  .then(res => {
-	    
-	    setOrders(res.data.list || []);
+	    const sortedOrders = (res.data.list || []).sort(
+	      (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+	    );
+	    setOrders(sortedOrders);
 	    setLoading(false);
 	  })
 	  .catch(err => {
-	   
-	    
 	    setError(err.response?.data?.message || err.message);
 	    setLoading(false);
 	  });
+
 	}, []);
 
 
@@ -158,69 +159,35 @@ export default function MyTick() {
 							<p>주문 내역이 없습니다.</p>
 						)}
 
-						{orders.map(order => (
-						    <Link
-						        key={order.ordersId}  // ← orderId → ordersId
-						        to={`/member/ticket/${order.ordersId}`}  // ← orderId → ordersId
-						        className="member-Member-conBox"
-						    >
-						        <img
-						            src="https://via.placeholder.com/200x150"
-						            alt="공연 썸네일"
-						            className="member-Member-consImg"
-						        />
+						{orders.map((order, idx) => (
+						  <Link
+						      key={order.ordersId}  
+						      to={`/member/ticket/${order.ordersId}`}
+						      className={`member-Member-conBox ${idx === 0 ? 'recent-order' : 'older-order'}`}
+						  >
+						      <img
+						          src="https://via.placeholder.com/200x150"
+						          alt="공연 썸네일"
+						          className="member-Member-consImg"
+						      />
+						      <div className="member-Member-dayBox">
+						          <span>{order.ddayText}</span>
+						          <div className="member-Member-dayBoxTb">
+						              <table>
+						                  <tbody>
+						                      <tr><th>{order.ticketTitle}</th></tr>
+						                      <tr><th>{order.ticketVenue || '장소 미정'}</th></tr>
+						                      <tr><td>{order.ticketDate} {order.showStartTime}</td></tr>
+						                  </tbody>
+						              </table>
+						          </div>
+						      </div>
+						  </Link>
+						))}
+						<br/>
 
-						        <div className="member-Member-dayBox">
-						            <span>{order.ddayText}</span>  {/* ← D-DAY 표시 */}
+						
 
-						            <div className="member-Member-dayBoxTb">
-						                <table>
-						                    <tbody>
-						                        <tr><th>{order.ticketTitle}</th></tr>  {/* ← title → ticketTitle */}
-						                        <tr><th>{order.ticketVenue || '장소 미정'}</th></tr>  {/* ← venue → ticketVenue */}
-						                        <tr><td>{order.ticketDate} {order.showStartTime}</td></tr>  {/* ← date → ticketDate + showStartTime */}
-						                    </tbody>
-						                </table>
-						            </div>
-						        </div>
-						    </Link>
-						))}<br/>
-
-						<Link to="/member/TkRead" className="member-Member-conBox2">
-							<img src={Consbnd} alt="콘서트_썸네일" className="member-Member-consImg" />
-
-							<div className="member-Member-dayBox">
-
-
-								<div className="member-Member-dayBoxTb">
-									<table>
-										<tbody>
-											<tr><th>2025 보이넥스트도어 단독 팬미팅〈KNOCK ON〉</th></tr>
-											<tr><th>인천 인스파이어 아레나</th></tr>
-											<tr><td>2025. 10. 18 (금) 13:00  </td></tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</Link><br />
-
-						<Link to="/member/TkRead" className="member-Member-conBox2">
-							<img src={Consitt} alt="콘서트_썸네일" className="member-Member-consImg" />
-
-							<div className="member-Member-dayBox">
-
-
-								<div className="member-Member-dayBoxTb">
-									<table>
-										<tbody>
-											<tr><th>2025 아일릿 단독 팬미팅〈Glitter Day〉</th></tr>
-											<tr><th>고척 스카이돔</th></tr>
-											<tr><td>2025. 09. 13 (토) 12:00  </td></tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</Link><br /><br />
 						<div className="member-ticket-plus">
 							<strong> + </strong> <span> 내 티켓 목록 더 보기 </span>
 						</div><br />

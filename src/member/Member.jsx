@@ -26,7 +26,7 @@ export default function Member() {
 	  const token = localStorage.getItem("accessToken");
 
 	  // 회원 정보 가져오기
-	  axios.get("http://localhost:9090/ticketnow/members/me", {
+	  axios.get(`http://localhost:9090/ticketnow/members/${memberId}`, {
 	    headers: { Authorization: `Bearer ${token}` }
 	  })
 	  .then(res => {

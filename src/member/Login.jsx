@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../css/style.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 
 export default function Login() {
@@ -51,7 +51,7 @@ export default function Login() {
             if (role === "ADMIN") {
                 navigate("/admin/Admin");
             } else {
-                navigate("/member/Member");
+                navigate(`/member/Member/${userId}`);
             }
 
         } catch (err) {

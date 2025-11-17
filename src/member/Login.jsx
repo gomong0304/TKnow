@@ -49,6 +49,7 @@ export default function Login() {
 
             // 역할에 따른 라우팅
             if (role === "ADMIN") {
+				localStorage.setItem("adminId", userId);
                 navigate("/admin/Admin");
             } else {
                 navigate(`/member/Member/${userId}`);

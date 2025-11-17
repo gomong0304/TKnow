@@ -23,85 +23,62 @@ export default function AdminInven2() {
 	const [promotion, setPromotion] = useState("");
 	const [mainImage, setMainImage] = useState(null);
 	const [detailImage, setDetailImage] = useState(null);
+	const [formData, setFormData] = useState(null);
+	const [category, setCategory] = useState("GENERAL");
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 
-	// 등록 버튼 클릭
 	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setLoading(true);
-		setError("");
+	  e.preventDefault();
+	  setLoading(true);
+	  setError("");
 
-		try {
-			// FormData 생성
-			const formData = new FormData();
+	  try {
+	    // 날짜/시간 형식: yyyy-MM-ddTHH:mm:ss
+	    const startDateTime = `${startAt.year}-${startAt.month.padStart(2,'0')}-${startAt.day.padStart(2,'0')}T${startAt.hour.padStart(2,'0')}:${startAt.minute.padStart(2,'0')}:00`;
+	    const endDateTime = `${endAt.year}-${endAt.month.padStart(2,'0')}-${endAt.day.padStart(2,'0')}T${endAt.hour.padStart(2,'0')}:${endAt.minute.padStart(2,'0')}:00`;
 
-			// 필수 필드
-			formData.append("title", title);
+	    // JSON payload 생성 (이미지 제외)
+	    const payload = {
+	      title,
+		   category: "GENERAL", // 카테고리 기본값
+	      startAt: startDateTime,
+	      endAt: endDateTime,
+	      venueName,
+	      venueAddress,
+	      totalSeats,
+	      price,
+	      ticketCost,
+	      ticketPrice,
+	      ticketStock,
+	      ticketDetail,
+	      ageLimit,
+	      benefit,
+	      promotion
+	    };
 
-			// 날짜/시간 형식: yyyy-MM-ddTHH:mm:ss
-			const startDateTime = `${startAt.year}-${startAt.month.padStart(2, '0') }-${startAt.day.padStart(2, '0')}T${startAt.hour.padStart(2, '0')}:${startAt.minute.padStart(2, '0')}:00`;
-			const endDateTime = `${endAt.year}-${endAt.month.padStart(2, '0')}-${endAt.day.padStart(2, '0')}T${endAt.hour.padStart(2, '0')}:${endAt.minute.padStart(2, '0')}:00`;
+	    const token = localStorage.getItem("accessToken");
 
-			formData.append("startAt", startDateTime);
-			formData.append("endAt", endDateTime);
-			formData.append("venueName", venueName);
-			formData.append("venueAddress", venueAddress);
-			formData.append("totalSeats", totalSeats);
-			formData.append("price", price);
+	    const res = await axios.post(
+	      "http://localhost:9090/ticketnow/tickets",
+	      payload,
+	      { headers: { Authorization: `Bearer ${token}` } }
+	    );
 
-			// 선택 필드
-			if (ticketCost) formData.append("ticketCost", ticketCost);
-			if (ticketPrice) formData.append("ticketPrice", ticketPrice);
-			if (ticketStock) formData.append("ticketStock", ticketStock);
-			if (ticketDetail) formData.append("ticketDetail", ticketDetail);
-			if (ageLimit) formData.append("ageLimit", ageLimit);
-			if (benefit) formData.append("benefit", benefit);
-			if (promotion) formData.append("promotion", promotion);
+	    alert("상품 등록 성공!");
+	    console.log("응답:", res.data);
 
-			// 이미지 파일
-			if (mainImage) formData.append("mainImage", mainImage);
-			if (detailImage) formData.append("detailImage", detailImage);
-
-			// 토큰
-			const token = localStorage.getItem("accessToken");
-			if (!token) {
-				setError("로그인이 필요합니다.");
-				setLoading(false);
-				return;
-			}
-
-			console.log("상품 등록 요청 시작...");
-
-			// API 호출
-			const response = await axios.post(
-				"http://localhost:9090/ticketnow/admin/tickets",
-				formData,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "multipart/form-data"
-					}
-				}
-			);
-
-			console.log("상품 등록 성공:", response.data);
-			alert("상품이 성공적으로 등록되었습니다!");
-			navigate("/admin/AdminInven");
-
-		} catch (err) {
-			console.error("상품 등록 실패:", err);
-			console.error("응답:", err.response?.data);
-
-			const errorMsg = err.response?.data?.message || err.message || "상품 등록에 실패했습니다.";
-			setError(errorMsg);
-			alert(`등록 실패: ${errorMsg}`);
-		} finally {
-			setLoading(false);
-		}
+	  } catch (err) {
+	    console.error("상품 등록 실패:", err);
+	    setError("상품 등록 실패: " + err.message);
+		console.log("카테고리:", category);
+		
+	  } finally {
+	    setLoading(false);
+	  }
 	};
-
+	
 	return (
 		<form className="member-Member-page" onSubmit={handleSubmit}>
 			<div className="member-left">
@@ -140,6 +117,13 @@ export default function AdminInven2() {
 										{/* 제목 (필수) */}
 										<tr><th>상품명 <span style={{ color: 'red' }}>*</span></th></tr>
 										<tr><td><input type="text" className="Ad-conts-resNum" value={title} onChange={e => setTitle(e.target.value)} required /></td></tr>
+										
+										<tr><th>카테고리 <span style={{ color: 'red' }}>*</span></th></tr>
+										<select value={category} className="Ad-conts-resNum" onChange={e => setCategory(e.target.value)}>
+										  <option value="IDOL">아이돌</option>
+										  <option value="MUSICAL">뮤지컬</option>
+										  <option value="SPORTS">스포츠</option>
+										</select>
 
 										{/* 시작 날짜/시간 (필수) */}
 										<tr><th>공연 시작 일시 <span style={{ color: 'red' }}>*</span></th></tr>

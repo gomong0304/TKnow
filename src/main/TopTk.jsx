@@ -14,14 +14,20 @@ export default function TopTk() {
 
 
 	useEffect(() => {
-		axios
-			.get("http://localhost:9090/ticketnow/tickets")
-			.then((res) => {
-				console.log("응답:", res.data);
-				const list = res.data.data || res.data.list || [];
-				setTickets(list);
-			})
-			.catch((err) => console.error("오류:", err));
+	  const token = localStorage.getItem("accessToken");
+
+	  axios
+	    .get("http://localhost:9090/ticketnow/tickets", {
+	      headers: {
+	        Authorization: `Bearer ${token}`
+	      }
+	    })
+	    .then((res) => {
+	      console.log("응답:", res.data);
+	      const list = res.data.data || res.data.list || [];
+	      setTickets(list);
+	    })
+	    .catch((err) => console.error("오류:", err));
 	}, []);
 
 	const formatDate = (dateArr, fallback = "") => {

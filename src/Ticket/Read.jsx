@@ -74,57 +74,61 @@ export default function Read() {
 	};
 
 	useEffect(() => {
+	  const token = localStorage.getItem("accessToken"); // 로그인 시 저장한 JWT
+
 	  axios
-	    .get(`http://localhost:9090/ticketnow/tickets/${id}`)
+	    .get(`http://localhost:9090/ticketnow/tickets/${id}`, {
+	      headers: {
+	        Authorization: `Bearer ${token}` // JWT 헤더 추가
+	      }
+	    })
 	    .then((res) => {
 	      console.log("ticket data:", res.data);
-	      
-	      // schedule이 비어있으면 startAt/endAt으로 생성
-	      if (!res.data.schedule || res.data.schedule.length === 0) {
-	        const [sYear, sMonth, sDay] = res.data.startAt;
-	        const [eYear, eMonth, eDay] = res.data.endAt;
-	        
-	        const start = new Date(sYear, sMonth - 1, sDay);
-	        const end = new Date(eYear, eMonth - 1, eDay);
-	        
-	        const generatedSchedule = [];
-	        const currentDate = new Date(start);
-	        
-	        while (currentDate <= end) {
-	          generatedSchedule.push({
-	            date: [
-	              currentDate.getFullYear(),
-	              currentDate.getMonth() + 1,
-	              currentDate.getDate()
-	            ],
-	            weekday: ['일', '월', '화', '수', '목', '금', '토'][currentDate.getDay()],
-	            time: "19:00",
-	            round: "1회차"
-	          });
-	          currentDate.setDate(currentDate.getDate() + 1);
-	        }
-	        
-	        res.data.schedule = generatedSchedule;
-	      }
-	      
+
+		  if (!res.data.schedule || res.data.schedule.length === 0) {
+		    const start = new Date(res.data.startAt);
+		    const end = new Date(res.data.endAt);
+
+		    const generatedSchedule = [];
+		    const currentDate = new Date(start);
+
+		    while (currentDate <= end) {
+		      generatedSchedule.push({
+		        date: [
+		          currentDate.getFullYear(),
+		          currentDate.getMonth() + 1,
+		          currentDate.getDate()
+		        ],
+		        weekday: ['일', '월', '화', '수', '목', '금', '토'][currentDate.getDay()],
+		        time: "19:00",
+		        round: "1회차"
+		      });
+		      currentDate.setDate(currentDate.getDate() + 1);
+		    }
+
+		    res.data.schedule = generatedSchedule;
+		  }
+
 	      setTicket(res.data);
-	      
+
 	      if (res.data.schedule && res.data.schedule.length > 0) {
 	        const firstDate = formatDate(res.data.schedule[0].date);
 	        setSelectedDate(firstDate);
-	        // 첫 공연 날짜의 월로 이동
 	        const [year, month] = res.data.schedule[0].date;
 	        setCurrentMonth(new Date(year, month - 1, 1));
 	      }
 	    })
 	    .catch((err) => console.error(err));
 	}, [id]);
-
+	
 	if (!ticket) return <div>로딩 중...</div>;
 
 	const hasSchedule = ticket.schedule && ticket.schedule.length > 0;
 	const calendar = generateCalendar();
 	const selectedSchedules = ticket.schedule?.filter(s => formatDate(s.date) === selectedDate) || [];
+	
+	
+	
   return (
     <div className="read-top">
       <div className="read-page">

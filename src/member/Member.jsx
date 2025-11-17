@@ -23,7 +23,9 @@ export default function Member() {
 	
 
 	useEffect(() => {
-	  const token = localStorage.getItem("accessToken");
+	  const token = localStorage.getItem("accessToken");  // 받은 토큰 저장
+	  const memberId = localStorage.getItem("memberId");  // 로그인한 아이디 저장
+	  const orders = localStorage.getItem("orsers");  // 주문 내역 저장
 
 	  // 회원 정보 가져오기
 	  axios.get(`http://localhost:9090/ticketnow/members/${memberId}`, {
@@ -87,7 +89,7 @@ export default function Member() {
 							<table>
 								<tbody className="member-box1-bottom1">
 									<tr><td>
-									<Link to="../admin/Admin/">내 아이돌 콘서트 앞 숙소 예약까지</Link></td></tr>
+									<Link to="../admin/Admin">내 아이돌 콘서트 앞 숙소 예약까지</Link></td></tr>
 									<tr><th>콘서트 준비는 티켓나우와 함께!</th></tr>
 								</tbody>
 							</table>

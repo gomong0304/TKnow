@@ -4,95 +4,99 @@
 
 <mapper namespace="ticketnow.modules.ticket.mapper.TicketMapper">
 
-  <!-- DTO 컬럼 매핑: DB 스키마 → TicketResponseDTO 필드 -->
-  <sql id="ticketDTOColumns">
-    t.ticket_id     AS ticketId,
-    t.ticket_title  AS title,
-    t.start_at      AS startAt,
-    t.end_date      AS endAt,
-    t.venueName     AS venueName,
-    t.venueAddress  AS venueAddress,
-    t.ticket_stock  AS totalSeats,
-    t.ticket_stock  AS remainingSeats,
-    t.ticket_price  AS price,
-    t.ticket_status AS ticketStatus,
-    t.created_at    AS createdAt,
-    t.updated_at    AS updatedAt,
-    NULL            AS deletedAt
-  </sql>
+	<!-- DTO 컬럼 매핑: DB 스키마 → TicketResponseDTO 필드 -->
+	<sql id="ticketDTOColumns">
+		t.ticket_id AS ticketId,
+		t.ticket_title AS title,
+		t.start_at AS startAt,
+		t.end_date AS endAt,
+		t.venueName AS venueName,
+		t.venueAddress AS venueAddress,
+		t.ticket_stock AS totalSeats,
+		t.ticket_stock AS remainingSeats,
+		t.ticket_price AS price,
+		t.ticket_status AS ticketStatus,
+		t.created_at AS createdAt,
+		t.updated_at AS updatedAt,
+		NULL AS deletedAt
+	</sql>
 
-  <!-- INSERT: Map 파라미터 기반, PK 자동 채번 -->
-<insert id="insertTicketFromMap" parameterType="map"
-          useGeneratedKeys="true" keyProperty="ticketId">
-    INSERT INTO ticket (
-      ticket_title, ticket_date, start_at, end_date, ticket_price, ticket_stock,
-      ticket_detail, ticket_category, ticket_status,
-      created_at, updated_at
-    ) VALUES (
-      #{title},              /* req.title           */
-      #{startAt},            /* req.startAt → 관람일 기본값 */
-      #{startAt},            /* req.startAt → 공연 시작일시 */
-      #{endAt},              /* req.endAt   → 공연 종료일시 */
-      #{price},              /* req.price           */
-      #{totalSeats},         /* req.totalSeats      */
-      #{detail},             /* req.detail          */
-      #{category},           /* req.category        */
-      #{ticketDetail},       /* req.ticketDetail    */
-      #{ticketStatus},       /* 'SCHEDULED' 등      */
-      NOW(), NOW()
-    )
-  </insert>
-
-
-
-  <!-- 단건 DTO 조회 -->
-  <select id="selectTicketDTOById" parameterType="long"
-          resultType="ticketnow.modules.ticket.dto.TicketResponseDTO">
-    SELECT
-      <include refid="ticketDTOColumns"/>
-    FROM ticket t
-    WHERE t.ticket_id = #{ticketId}
-  </select>
-
-  <!-- 페이지 조회 -->
-  <select id="selectTicketDTOPage"
-          resultType="ticketnow.modules.ticket.dto.TicketResponseDTO">
-    SELECT
-      <include refid="ticketDTOColumns"/>
-    FROM ticket t
-    ORDER BY t.created_at DESC
-    LIMIT #{limit} OFFSET #{offset}
-  </select>
-
-  <!-- 총 개수 -->
-  <select id="countTickets" resultType="long">
-    SELECT COUNT(*) FROM ticket
-  </select>
-
-  <!-- 부분 수정(전달된 필드만 갱신) -->
-<update id="updateTicketFromMap" parameterType="map">
-    UPDATE ticket
-    <set>
-      <if test="title != null">          ticket_title   = #{title},       </if>
-      <if test="startAt != null">        ticket_date    = #{startAt},     </if>
-      <if test="startAt != null">        start_at       = #{startAt},     </if>
-      <if test="endAt != null">          end_date       = #{endAt},       </if>
-      <if test="price != null">          ticket_price   = #{price},       </if>
-      <if test="totalSeats != null">     ticket_stock   = #{totalSeats},  </if>
-      <if test="detail != null">         ticket_detail  = #{detail},      </if>
-      <if test="category != null">       ticket_category= #{category},    </if>
-      <if test="ticketStatus != null">   ticket_status  = #{ticketStatus},</if>
-      updated_at = NOW()
-    </set>
-    WHERE ticket_id = #{ticketId}
-  </update>
+	<!-- INSERT: Map 파라미터 기반, PK 자동 채번 -->
+	<insert id="insertTicketFromMap" parameterType="map"
+		useGeneratedKeys="true" keyProperty="ticketId">
+		INSERT INTO ticket (
+		ticket_title, ticket_date, start_at, end_date, ticket_price, ticket_stock,
+		ticket_detail, ticket_category, ticket_status,
+		created_at, updated_at
+		) VALUES (
+		#{title}, /* req.title */
+		#{startAt}, /* req.startAt → 관람일 기본값 */
+		#{startAt}, /* req.startAt → 공연 시작일시 */
+		#{endAt}, /* req.endAt → 공연 종료일시 */
+		#{price}, /* req.price */
+		#{totalSeats}, /* req.totalSeats */
+		#{detail}, /* req.detail */
+		#{category}, /* req.category */
+		#{ticketDetail}, /* req.ticketDetail */
+		#{ticketStatus}, /* 'SCHEDULED' 등 */
+		NOW(), NOW()
+		)
+	</insert>
 
 
-  <!-- 소프트 삭제 대체: 상태를 CLOSED로 전환 -->
-  <update id="softDeleteTicket" parameterType="long">
-    UPDATE ticket
-    SET ticket_status = 'CLOSED', updated_at = NOW()
-    WHERE ticket_id = #{ticketId}
-  </update>
 
+	<!-- 단건 DTO 조회 -->
+	<select id="selectTicketDTOById" parameterType="long"
+		resultType="ticketnow.modules.ticket.dto.TicketResponseDTO">
+		SELECT
+		<include refid="ticketDTOColumns" />
+		FROM ticket t
+		WHERE t.ticket_id = #{ticketId}
+	</select>
+
+	<!-- 페이지 조회 -->
+	<select id="selectTicketDTOPage"
+		resultType="ticketnow.modules.ticket.dto.TicketResponseDTO">
+		SELECT
+		<include refid="ticketDTOColumns" />
+		FROM ticket t
+		ORDER BY t.created_at DESC
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+
+	<!-- 총 개수 -->
+	<select id="countTickets" resultType="long">
+		SELECT COUNT(*) FROM ticket
+	</select>
+
+	<!-- 부분 수정(전달된 필드만 갱신) -->
+	<update id="updateTicketFromMap" parameterType="map">
+		UPDATE ticket
+		<set>
+			<if test="title != null"> ticket_title = #{title},       </if>
+			<if test="startAt != null"> ticket_date = #{startAt},     </if>
+			<if test="startAt != null"> start_at = #{startAt},     </if>
+			<if test="endAt != null"> end_date = #{endAt},       </if>
+			<if test="price != null"> ticket_price = #{price},       </if>
+			<if test="totalSeats != null"> ticket_stock = #{totalSeats},  </if>
+			<if test="detail != null"> ticket_detail = #{detail},      </if>
+			<if test="category != null"> ticket_category= #{category},    </if>
+			<if test="ticketStatus != null"> ticket_status = #{ticketStatus},</if>
+			updated_at = NOW()
+		</set>
+		WHERE ticket_id = #{ticketId}
+	</update>
+
+
+	<!-- 소프트 삭제 대체: 상태를 CLOSED로 전환 <update id="softDeleteTicket" parameterType="long"> 
+		UPDATE ticket SET ticket_status = 'CLOSED', updated_at = NOW() WHERE ticket_id 
+		= #{ticketId} </update> -->
+
+	<!-- 티켓 물리 삭제 -->
+	<delete id="hardDeleteTicket" parameterType="long">
+		DELETE
+		FROM ticket
+		WHERE ticket_id = #{ticketId}
+		<!-- 만약 PK 컬럼명이 ticket_id가 아니라 id 라면: WHERE id = #{ticketId} -->
+	</delete>
 </mapper>

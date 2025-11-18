@@ -177,7 +177,7 @@ public class TicketServiceImpl implements TicketService {
 	public void deleteTicket(Long ticketId) {
 		final long t0 = System.nanoTime();
 		log.debug("[Ticket][DELETE] id={}", ticketId);
-		int rows = ticketMapper.softDeleteTicket(ticketId);
+		int rows = ticketMapper.hardDeleteTicket(ticketId);
 		log.info("[Ticket][DELETE] soft delete rows={}, id={}", rows, ticketId);
 		log.debug("[Ticket][DELETE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
 	}

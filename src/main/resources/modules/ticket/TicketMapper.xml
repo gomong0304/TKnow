@@ -10,9 +10,8 @@
     t.ticket_title  AS title,
     t.start_at      AS startAt,
     t.end_date      AS endAt,
-    /* 스키마에 없는 컬럼은 NULL로 채워 DTO와 형식만 맞춤 */
-    NULL            AS venueName,
-    NULL            AS venueAddress,
+    t.venueName     AS venueName,
+    t.venueAddress  AS venueAddress,
     t.ticket_stock  AS totalSeats,
     t.ticket_stock  AS remainingSeats,
     t.ticket_price  AS price,
@@ -38,6 +37,7 @@
       #{totalSeats},         /* req.totalSeats      */
       #{detail},             /* req.detail          */
       #{category},           /* req.category        */
+      #{ticketDetail},       /* req.ticketDetail    */
       #{ticketStatus},       /* 'SCHEDULED' 등      */
       NOW(), NOW()
     )

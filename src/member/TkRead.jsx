@@ -30,12 +30,13 @@ export default function TickRead() {
 			}
 		})
 			.then(res => {
-				console.log("✅ 티켓 데이터:", res.data);
+				console.log("티켓 데이터:", res.data);
 				setData(res.data);
 				setLoading(false);
+				
 			})
 			.catch(err => {
-				console.error("❌ 티켓 조회 실패:", err);
+				console.error("티켓 조회 실패:", err);
 				setError(err.response?.data?.message || "티켓 정보를 불러올 수 없습니다.");
 				setLoading(false);
 			});
@@ -111,18 +112,20 @@ export default function TickRead() {
 
 							<div className="member-tkRead-dayBox">
 								<div className="member-tkRead-my">
+								{data && (
 									<table>
 										<tbody>
 											<tr><th>예매자</th><td>{data.memberName}</td></tr>
-											<tr><th>예매번호</th><td>{data.orderNumber}</td></tr>
+											<tr><th>예매번호</th><td>{data.orderTicketId}</td></tr>
 											<tr><th>이용일</th><td>{data.ticketDate}</td></tr>
-											<tr><th>장소</th><td>{data.ticketVenue || '정보 없음'}</td></tr>
+											<tr><th>장소</th><td>{data.venueName}</td></tr>
 											<tr><th>좌석</th><td>{data.seatCode}</td></tr>
 											<tr><th>티켓 수령 방법</th><td>모바일 티켓</td></tr>
 											<tr><th>받으시는 분</th><td>{data.memberName}</td></tr>
-											<tr><th>연락처</th><td>{data.phone}</td></tr>
+											<tr><th>연락처</th><td>{data.memberPhone}</td></tr>
 										</tbody>
 									</table>
+									)}
 								</div>
 							</div>
 						</div>
@@ -137,15 +140,15 @@ export default function TickRead() {
 									<div className="ticket-buy6-text1">{data.qr}</div>
 									<div className="ticket-buy6-text2">{data.ticketTitle}</div>
 
-									<div className="ticket-buy6-text1">{data.ordersNumber}</div>
+									<div className="ticket-buy6-text1">{data.orderId}</div>
 
 									<div className="ticket-buy6-text2">{data.concertTitle}</div>
 
 									<table className="ticket-buy6-table">
-										<tr><th>예매 번호</th><td>｜</td><td>{data.ordersNumber}</td></tr>
+										<tr><th>예매 번호</th><td>｜</td><td>{data.orderTicketId}</td></tr>
 										<tr><th>좌석 번호</th><td>｜</td><td>{data.seatCode}</td></tr>
 										<tr><th>날짜</th><td>｜</td><td>{data.ticketDate}</td></tr>
-										<tr><th>장소</th><td>｜</td><td>{data.venue || '정보 없음'}</td></tr>
+										<tr><th>장소</th><td>｜</td><td>{data.venueName}</td></tr>
 									</table>
 									<div className="ticket-qr-box">
 										<QRCodeCanvas
@@ -168,7 +171,7 @@ export default function TickRead() {
 							<table className="member-tkRead-text1">
 								<tbody>
 									<tr>
-										<th>예매 번호</th><td>｜</td><td>{data.orderNumber}</td>
+										<th>예매 번호</th><td>｜</td><td>{data.orderTicketId}</td>
 										<th>배송</th><td>｜</td><td>{data.deliveryType}</td>
 										<th>가격 등급</th><td>｜</td><td>{data.priceLevel}</td>
 									</tr>
@@ -179,7 +182,7 @@ export default function TickRead() {
 									</tr>
 									<tr>
 										<th>수수료</th><td>｜</td><td>{data.fee?.toLocaleString()} 원</td>
-										<th>배송비</th><td>｜</td><td>{data.delivery?.toLocaleString()} 원</td>
+										<th>배송비</th><td>｜</td><td>0 원</td>
 										<th>총 결제 금액</th><td>｜</td>
 										<td style={{ color: "#FFA6C9", fontWeight: "bold" }}>
 											{((data.price || 0) + (data.delivery || 0) + (data.fee || 0)).toLocaleString()} 원

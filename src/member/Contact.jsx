@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../css/style.css";
 import { Link } from "react-router-dom";
@@ -6,51 +6,105 @@ import { Link } from "react-router-dom";
 
 
 export default function Contact() {
-	
-	const[email, setEmail] = useState("");
-	const[phone, setPhone] = useState("");
-	const[noticetype, setNoticetype] = useState("");
-	const[reservation, setReservation] = useState("");
-	const[details, setDetails] = useState("");
-	const[file, setfile] = useState(null);
-	
+
+	const [memberEmail, setMemberEmail] = useState("");
+	const [memberPhone, setMemberPhone] = useState("");
+	const [title, setTitle] = useState("");
+	const [categoryType, setCategoryType] = useState("");
+	const [orderTicketId, setOrderTicketId] = useState("");
+	const [content, setContent] = useState("");
+	const [attachments, setAttachments] = useState(null);
+
+
+	useEffect(() => {
+		const token = localStorage.getItem("accessToken");  // 로그인 토큰
+		const storedMemberId = localStorage.getItem("memberId");  // 로그인한 회원 ID
+
+		if (!token || !storedMemberId) {
+			console.error("로그인 정보가 없습니다.");
+			return;
+		}
+
+		axios.get(`http://localhost:9090/ticketnow/members/${storedMemberId}`, {
+			headers: { Authorization: `Bearer ${token}` }
+		})
+			.then(res => {
+				setMemberEmail(res.data.memberEmail);
+				setMemberPhone(res.data.memberPhone);
+			})
+			.catch(err => {
+				console.error("회원 정보 가져오기 실패:", err.response?.data || err);
+			});
+	}, []);
+
+
+
+
+
 	const handleSubmit = async () => {
-	  const formData = new FormData();
-	  formData.append("email", email);
-	  formData.append("phone", phone);
-	  formData.append("noticetype", noticetype);
-	  formData.append("reservation", reservation);
-	  formData.append("reservationNo", details);
-	  formData.append("content", file);
 
-	  if (file) {
-	    formData.append("attachments", file); // 백엔드 DTO 필드명 맞춰야 함
-	  }
+		const token = localStorage.getItem("accessToken");
+		const memberId = localStorage.getItem("memberId");
 
-	  try {
-	    const res = await axios.post("/boards/inquiry", formData, {
-	      headers: {
-	        Authorization: `Bearer ${localStorage.getItem("access")}`,
-	        "Content-Type": "multipart/form-data",
-	        "X-Request-Id": crypto.randomUUID() // 선택
-	      }
-	    });
+		const formData = new FormData();
 
-	    alert("문의 등록을 완료했습니다");
-	    console.log("boardId:", res.data);
+		formData.append("memberEmail", memberEmail);
+		formData.append("memberPhone", memberPhone);
+		formData.append("title", title);
+		formData.append("categoryType", categoryType);
+		formData.append("orderTicketId", orderTicketId);
+		formData.append("content", content);
 
-	  } catch (err) {
-	    console.error(err);
-	    alert("문의 등록을 실패했습니다");
-	  }
+		// 첨부파일 처리 (배열일 경우 반복 추가)
+		if (attachments && attachments.length > 0) {
+		  attachments.forEach(file => {
+		    formData.append("attachments", file);
+		  });
+		}
+
+		if (attachments) {
+			formData.append("attachments", attachments); // 백엔드 DTO 필드명 맞춰야 함
+		}
+
+		try {
+			const res = await axios.post("http://localhost:9090/ticketnow/boards/inquiry", formData, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+					"Content-Type": "multipart/form-data",
+					"X-Request-Id": crypto.randomUUID() // 선택
+				}
+			});
+
+			alert("문의 등록을 완료했습니다");
+			console.log("boardId:", res.data);
+
+		} catch (err) {
+			console.error(err);
+			alert("문의 등록을 실패했습니다");
+		}
 	};
-	
 
-	
-	
-	
-	
-	
+
+
+
+	const [reservations, setReservations] = useState([]);
+
+	useEffect(() => {
+		const fetchReservations = async () => {
+			try {
+				const res = await axios.get("/orders/my", {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("access")}`
+					}
+				});
+				setReservations(res.data); // res.data: [{id:1, name:"콘서트A"}, ...]
+			} catch (err) {
+				console.error(err);
+			}
+		};
+		fetchReservations();
+	}, []);
+
 	return (
 		<div className="member-Member-page">
 
@@ -95,64 +149,65 @@ export default function Contact() {
 								<table>
 									<tbody>
 										<tr><th>이메일 주소</th></tr>
-										<tr><td><input type="text" onChange={(e) => setEmail(e.target.value)}></input></td></tr>
+										<tr><td><input type="text" value={memberEmail} readOnly /></td></tr>
 										<tr><th>휴대 전화 번호</th></tr>
-										<tr><td><input type="text" onChange={(e) => setPhone(e.target.value)}></input></td></tr>
+										<tr><td><input type="text" value={memberPhone} readOnly /></td></tr>
 										<tr><th>문의 유형</th></tr>
-										<tr><td><input type="text" onChange={(e) => setNoticetype(e.target.value)}></input></td></tr>
+										<tr><td>
+											<select onChange={(e) => setCategoryType(e.target.value)} className="Ad-conts-resNum">
+											<option value="RESERVATION">예약</option>
+											  <option value="CANCEL">취소</option>
+											  <option value="REFUND">환불</option>
+											  <option value="ETC">기타</option>
+											</select>
+										</td></tr>
+
 										<tr><th>예약번호</th></tr>
-										<tr><td><input type="text" alt="예약번호"  className="conts-resNum" onChange={(e) => setReservation(e.target.value)}>
+										<tr><td><input type="text" alt="예약번호" className="conts-resNum" onChange={(e) => setOrderTicketId(e.target.value)}>
 										</input>&nbsp;&nbsp;&nbsp;
-										<button type="text" className="conts-resNumBtn">예약번호 조회</button></td></tr>
+											<button type="text" className="conts-resNumBtn">예약번호 조회</button></td></tr>
+										<tr><th>문의 제목</th></tr>
+										<tr><td><input type="text" value={title} onChange={(e) => setTitle(e.target.value)} /></td></tr>
 										<tr><th>문의내용</th></tr>
-										<tr><td><textarea type="text" rows="6" className="conts-area" onChange={(e) => setDetails(e.target.value)}>
+										<tr><td><textarea type="text" rows="6" className="conts-area" onChange={(e) => setContent(e.target.value)}>
 										</textarea></td></tr>
 										<tr>
-										  <th>첨부파일</th>
+											<th>첨부파일</th>
 										</tr>
 										<tr>
-										  <td>
-										
-										  <input 
-										     type="text" 
-										     alt="첨부파일" 
-										     className="conts-resNum" 
-										     value={file ? (Array.isArray(file) ? file.map(f => f.name).join(', ') : file.name) : ''} 
-										     readOnly 
-										   />
+											<td>
 
-										    &nbsp;&nbsp;&nbsp;
+												<input
+													type="text"
+													alt="첨부파일"
+													className="conts-resNum"
+													value={attachments ? (Array.isArray(attachments) ? attachments.map(f => f.name).join(', ') : attachments.name) : ''}
+													readOnly
+												/>
 
-										 
-										    <label className="conts-resNumBtn">
-										      첨부파일
-										      <input 
-										        type="file" 
-										        style={{ display: "none" }} 
-										        onChange={(e) => { 
-										          if (e.target.files) setfile(Array.from(e.target.files)) 
-										        }} 
-										      />
-										    </label>
-										  </td>
+												&nbsp;&nbsp;&nbsp;
+
+
+												<label className="conts-resNumBtn">
+													첨부파일
+													<input
+														type="file"
+														style={{ display: "none" }}
+														onChange={(e) => {
+															if (e.target.files) setAttachments(Array.from(e.target.files))
+														}}
+													/>
+												</label>
+											</td>
 										</tr>
-										<br/>
-										
-										
-										
+										<br />
+
+
+
 										<button type="text" className="conts-conts-btn" onClick={handleSubmit}>문의하기</button>
 									</tbody>
 								</table>
-								<input 
-								   type="file" 
-								   style={{ display: "none" }} 
-								   onChange={(e) => { 
-								     if (e.target.files) {
-								       const filesArray = Array.from(e.target.files);
-								       setfile(filesArray.length === 1 ? filesArray[0] : filesArray);
-								     }
-								   }} 
-								 />
+					
 
 							</div>
 

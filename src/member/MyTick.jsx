@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import "../css/style.css";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Cons from "../images/cons.png";
-import Consitt from "../images/consitt.png";
-import Consbnd from "../images/consbnd.png";
 
 
 export default function MyTick() {
@@ -67,49 +64,27 @@ export default function MyTick() {
 
 	useEffect(() => {
 	  const token = localStorage.getItem("accessToken");
-
-	  console.log("=== 주문 조회 시작 ===");
-	  console.log("1. 토큰:", token ? token.substring(0, 30) + "..." : "없음");
-
 	  if (!token) {
-	    console.error("❌ 토큰 없음");
 	    setError("로그인이 필요합니다.");
 	    setLoading(false);
 	    return;
 	  }
 
-	  // 토큰 디코딩
-	  try {
-	    const payload = JSON.parse(atob(token.split('.')[1]));
-	    console.log("2. 토큰 내용:", payload);
-	    console.log("3. 만료시각:", new Date(payload.exp * 1000));
-	    console.log("4. 현재시각:", new Date());
-	    console.log("5. 만료여부:", payload.exp * 1000 < Date.now() ? "만료됨" : "유효함");
-	  } catch (e) {
-	    console.error("❌ 토큰 파싱 실패:", e);
-	  }
+	  const fetchOrders = async () => {
+	    try {
+	      const res = await axios.get("http://localhost:9090/ticketnow/orders", {
+	        headers: { Authorization: `Bearer ${token}` }
+	      });
+	      setOrders(res.data.list || []);
+	      setLoading(false);
+	    } catch (err) {
+	      setError(err.response?.data?.message || err.message);
+	      setLoading(false);
+	    }
+	  };
 
-	  axios.get("http://localhost:9090/ticketnow/orders", {
-	    headers: { 
-	      Authorization: `Bearer ${token}`,
-	      "Content-Type": "application/json"
-	    },
-	    params: { page: 1, size: 10 },
-	    withCredentials: true,
-	  })
-	  .then(res => {
-	    const sortedOrders = (res.data.list || []).sort(
-	      (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
-	    );
-	    setOrders(sortedOrders);
-	    setLoading(false);
-	  })
-	  .catch(err => {
-	    setError(err.response?.data?.message || err.message);
-	    setLoading(false);
-	  });
-
-	}, []);
+	  fetchOrders();
+	}, []); // token이 바뀌면 다시 호출하려면 token을 deps에 넣기
 
 
 	return (

@@ -12,24 +12,22 @@ export default function TopTk() {
 	const [ticket, setTicket] = useState(null);
 
 
-
 	useEffect(() => {
-	  const token = localStorage.getItem("accessToken");
-
 	  axios
-	    .get("http://localhost:9090/ticketnow/tickets", {
-	      headers: {
-	        Authorization: `Bearer ${token}`
-	      }
-	    })
+	    .get("http://localhost:9090/ticketnow/tickets")
 	    .then((res) => {
-	      console.log("응답:", res.data);
 	      const list = res.data.data || res.data.list || [];
 	      setTickets(list);
 	    })
-	    .catch((err) => console.error("오류:", err));
-	}, []);
+	    .catch((err) => {
+	      console.error("오류:", err);
 
+	      // 백엔드가 401로 막을 경우 기본 더미 데이터라도 넣기
+	      setTickets([]);
+	    });
+	}, []);
+	
+	
 	const formatDate = (dateArr, fallback = "") => {
 		if (!dateArr || !Array.isArray(dateArr)) return fallback;
 

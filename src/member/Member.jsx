@@ -25,7 +25,7 @@ export default function Member() {
 	useEffect(() => {
 	  const token = localStorage.getItem("accessToken");  // 받은 토큰 저장
 	  const memberId = localStorage.getItem("memberId");  // 로그인한 아이디 저장
-	  const orders = localStorage.getItem("orsers");  // 주문 내역 저장
+	  const orders = localStorage.getItem("orders");  // 주문 내역 저장
 
 	  // 회원 정보 가져오기
 	  axios.get(`http://localhost:9090/ticketnow/members/${memberId}`, {

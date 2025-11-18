@@ -92,7 +92,7 @@ public class TicketController {
 	}
 
 	/**
-	 * 티켓 삭제(소프트 삭제) DELETE /tickets/{ticketId} - 정책: 실제 삭제 대신 deleted_at 타임스탬프 갱신 -
+	 * 티켓 삭제(소프트 삭제) DELETE /tickets/{ticketId}
 	 * 응답: 본문 없이 200 OK(또는 204 No Content 사용 가능)
 	 */
 	@PreAuthorize("hasAnyRole('USER','ADMIN')")

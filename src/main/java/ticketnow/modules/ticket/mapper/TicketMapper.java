@@ -28,5 +28,12 @@ public interface TicketMapper {
     int updateTicketFromMap(Map<String, Object> params);
 
     // 소프트 삭제 대체: 상태 CLOSED 전환
-    int softDeleteTicket(@Param("ticketId") Long ticketId);
+    // int softDeleteTicket(@Param("ticketId") Long ticketId);
+    
+    /**
+     * 티켓 물리 삭제 (DELETE FROM ticket ...)
+     * @param ticketId 삭제할 티켓 PK
+     * @return 삭제된 행 수 (0 또는 1)
+     */
+    int hardDeleteTicket(@Param("ticketId") Long ticketId);
 }

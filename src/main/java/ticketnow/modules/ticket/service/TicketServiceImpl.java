@@ -54,6 +54,7 @@ public class TicketServiceImpl implements TicketService {
 		p.put("totalSeats", req.getTotalSeats());
 		p.put("remainingSeats", req.getTotalSeats()); // 디폴트: 남은 좌석 = 총좌석
 		p.put("price", req.getPrice());
+		p.put("ticketDetail", req.getTicketDetail());
 		p.put("ticketStatus", status.name());
 		
 		log.debug("[Ticket][CREATE][BEFORE] params={}", p); // INSERT 전 파라미터 확인

@@ -151,35 +151,9 @@
 		<!-- 그 외 멤버 API는 인증 필요 -->
 		<intercept-url pattern="/members/**"
 			access="isAuthenticated()" />
-    
-    
-	     <!-- 그 외는 인증 필요 -->
-	    <intercept-url pattern="/**" access="isAuthenticated()"/> <!-- JWT 유효해야 통과 -->    
-    
-    
-    
-    
-	<!-- ========================= 접근권한 설정 종료  ========================= -->
-    <!-- 사용자 정의 JWT 필터 삽입 -->
-    <!-- 스프링 기본 인증 필터보다 먼저 수행 -->
-       <custom-filter ref="jwtAuthenticationFilter" before="FORM_LOGIN_FILTER"/>
-=======
-		<intercept-url pattern="/pay/**"
-			access="hasAnyRole('USER','ADMIN')" />
->>>>>>> feature/common
-
-		<!-- ============================ Member ============================ -->
-		<!-- 회원가입(POST /members) 오픈 -->
-		<intercept-url pattern="/members" method="POST"
-			access="permitAll" />
-
-		<!-- 그 외 멤버 API는 인증 필요 -->
-		<intercept-url pattern="/members/**"
-			access="isAuthenticated()" />
 
 
-
-		<!-- ============================ ticket ============================ -->
+<!-- ============================ ticket ============================ -->
 		<!-- 티켓 목록 조회,하나 조회(Get /tickets) 오픈 -->
 		<intercept-url pattern="/tickets" method="GET"
 			access="permitAll" />
@@ -190,10 +164,8 @@
 			
 		<!-- 그 외는 인증 필요 -->
 		<intercept-url pattern="/**" access="isAuthenticated()" /> <!-- JWT 유효해야 통과 -->
-
-
-
-
+     
+  
 		<!-- ========================= 접근권한 설정 종료 ========================= -->
 		<!-- 사용자 정의 JWT 필터 삽입 -->
 		<!-- 스프링 기본 인증 필터보다 먼저 수행 -->

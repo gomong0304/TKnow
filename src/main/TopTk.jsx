@@ -21,20 +21,16 @@ export default function TopTk() {
 	    })
 	    .catch((err) => {
 	      console.error("오류:", err);
-
-	      // 백엔드가 401로 막을 경우 기본 더미 데이터라도 넣기
 	      setTickets([]);
 	    });
 	}, []);
-	
-	
+
 	const formatDate = (dateArr, fallback = "") => {
 		if (!dateArr || !Array.isArray(dateArr)) return fallback;
 
 		const [year, month, day] = dateArr;
 		if (!year || !month || !day) return fallback;
 
-		// JS Date에서 월은 0~11 이므로 month-1
 		const date = new Date(year, month - 1, day);
 		if (isNaN(date.getTime())) return fallback;
 
@@ -66,7 +62,7 @@ export default function TopTk() {
 							{t.venueName || "장소 미정"}
 						</p>
 						<span style={{ fontSize: "18px", color: "#808080" }}>
-							{formatDate(t.startAt)} ~ {formatDate(t.endAt, formatDate(t.startAt))}
+							{formatDate(t.ticketDate)}
 						</span>
 					</div>
 				))}

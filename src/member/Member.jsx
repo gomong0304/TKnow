@@ -74,7 +74,7 @@ export default function Member() {
 							<strong>힙합개냥이</strong><span> 님 반갑습니다!</span><br /><br />
 							<table>
 								<tbody>
-									<tr><td><Link to="/member/Member" className="member-Member-click">회원정보</Link></td></tr>
+									<tr><td><Link to="/member/Member/${memberId}" className="member-Member-click">회원정보</Link></td></tr>
 									<tr><td>보안설정</td></tr>
 									<tr><td>회원등급</td></tr>
 									<tr><td><Link to="/member/MyTick" className="member-Member">나의 티켓</Link></td></tr>

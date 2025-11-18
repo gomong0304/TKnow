@@ -161,25 +161,15 @@ export default function Read() {
                         <th>공연 시간</th>
                         <td>{ticket.duration || "정보 없음"}</td>
                       </tr>
-                      <tr>
-                        <th>관람 연령</th>
-                        <td>{ticket.ageLimit || "미취학 아동 입장 불가"}</td>
-                      </tr>
+                    
                       <tr>
                         <th>가격</th>
                         <td>{ticket.price ? `${ticket.price} 원` : "정보 없음"}</td>
                       </tr>
-                      <tr>
-                        <th>혜택</th>
-                        <td>{ticket.benefit || "없음"}</td>
-                      </tr>
-                      <tr>
-                        <th>프로모션</th>
-                        <td>{ticket.promotion || "없음"}</td>
-                      </tr>
+          
                       <tr>
                         <th>배송</th>
-                        <td>{ticket.delivery || "배송 정보 없음"}</td>
+                        <td>{ticket.delivery || "모바일 티켓 및 현장 수령"}</td>
                       </tr>
                     </tbody>
                   </table>

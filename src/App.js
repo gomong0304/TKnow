@@ -248,7 +248,7 @@ function App() {
 					/>
 
 					<Route
-						path="/admin/AdminInven3/:id"
+						path="/admin/AdminInven3/:ticketId"
 						element={
 							<>
 								<Header />

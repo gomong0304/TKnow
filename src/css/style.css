@@ -2658,6 +2658,18 @@ map {
 	white-space: nowrap;
 }
 
+.conts-conts-btn1 {
+	background: #FFA6C9;
+	padding: 20px 85px 20px 85px;
+	color: white;
+	font-size: 20px;
+	font-weight: bold;
+	outline: none;
+	border: none;
+	border-radius: 10px;
+	white-space: nowrap;
+}
+
 .member-seach-box input {
 	/* 공부 서치 입력창 뒤로 밀기 */
 	background: white;

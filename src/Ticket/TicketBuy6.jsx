@@ -94,13 +94,23 @@ export default function TicketBuy6() {
     <div className="ticket-buy-main">
       <div className="ticket-buy-page">
         {/* 상단 단계 표시 */}
-        <div className="ticket-buy-top">
-          <button className="ticket-buy-button2">01 날짜 선택</button>
-          <button className="ticket-buy-button2">02 좌석 선택</button>
-          <button className="ticket-buy-button2">03 가격 선택</button>
-          <button className="ticket-buy-button2">04 배송 선택</button>
-          <button className="ticket-buy-button1">05 결제 완료</button>
-        </div>
+		<div className="ticket-buy-top">
+							<button className="ticket-buy-button2">01&nbsp;
+								<span className="ticket-buy-button-text1">날짜 선택</span></button>
+
+							<button className="ticket-buy-button2">02&nbsp;
+								<span className="ticket-buy-button-text1">좌석 선택</span></button>
+
+							<button className="ticket-buy-button2">03&nbsp;
+								<span className="ticket-buy-button-text1">가격 선택</span></button>
+
+							<button className="ticket-buy-button2">04&nbsp;
+								<span className="ticket-buy-button-text1">배송 선택</span></button>
+
+							<button className="ticket-buy-button1">05&nbsp;
+								<span className="ticket-buy-button-text1">결제하기</span></button>
+						</div><br />
+
 
         <br />
         <div className="ticket-buy-middle">

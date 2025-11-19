@@ -8,7 +8,8 @@
 	<sql id="ticketDTOColumns">
 		t.ticket_id AS ticketId,
 		t.ticket_title AS title,
-		t.start_at AS startAt,
+		t.start_at
+		AS startAt,
 		t.end_date AS endAt,
 		t.venueName AS venueName,
 		t.venueAddress AS venueAddress,
@@ -26,7 +27,8 @@
 		useGeneratedKeys="true" keyProperty="ticketId">
 		INSERT INTO ticket (
 		ticket_title, ticket_date, start_at, end_date, ticket_price, ticket_stock,
-		ticket_detail, ticket_category, ticket_status,
+		ticket_detail, ticket_category, ticket_status, venueName,
+		venueAddress,
 		created_at, updated_at
 		) VALUES (
 		#{title}, /* req.title */
@@ -35,10 +37,11 @@
 		#{endAt}, /* req.endAt → 공연 종료일시 */
 		#{price}, /* req.price */
 		#{totalSeats}, /* req.totalSeats */
-		#{detail}, /* req.detail */
-		#{category}, /* req.category */
 		#{ticketDetail}, /* req.ticketDetail */
+		#{category}, /* req.category */
 		#{ticketStatus}, /* 'SCHEDULED' 등 */
+		#{venueName},    /* venueName */
+		#{venueAddress}, /* venueAddress */
 		NOW(), NOW()
 		)
 	</insert>

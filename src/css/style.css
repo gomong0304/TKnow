@@ -2670,6 +2670,19 @@ map {
 	white-space: nowrap;
 }
 
+.conts-conts-btn2 {
+	background: #FFA6C9;
+	padding: 20px 214px 20px 214px;
+	color: white;
+	font-size: 20px;
+	font-weight: bold;
+	outline: none;
+	border: none;
+	border-radius: 10px;
+	white-space: nowrap;
+	display: block;
+}
+
 .member-seach-box input {
 	/* 공부 서치 입력창 뒤로 밀기 */
 	background: white;
@@ -3223,16 +3236,19 @@ table td:first-child { /* 공부 테이블값 고정*/
 }
 
 .admin-member-memBox4 table {
-	border-spacing: 0px 15px;
+	border-spacing: 0px 25px;
 }
 
 .admin-member-memBox5 table {
-	border-spacing: 0px 15px;
+	border-spacing: 0px 25px;
 }
 
 .AdConts-table {
-	gap: 120px;
+	gap: 150px;
+	display: table;
 }
+
+
 
 .AdConts-area {
 	padding: 15px;

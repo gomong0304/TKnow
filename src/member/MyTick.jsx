@@ -31,7 +31,7 @@ export default function MyTick() {
 					}
 				});
 
-				console.log("📦 내 주문 내역:", res.data);
+				console.log("내 주문 내역:", res.data);
 				
 				// PageResponseDTO 구조에 맞게 데이터 추출
 				const orderList = res.data.list || res.data.data || [];
@@ -39,7 +39,7 @@ export default function MyTick() {
 				setLoading(false);
 
 			} catch (err) {
-				console.error("❌ 주문 조회 실패:", err);
+				console.error("주문 조회 실패:", err);
 				
 				if (err.response?.status === 401) {
 					setError("로그인이 만료되었습니다. 다시 로그인해주세요.");

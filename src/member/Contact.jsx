@@ -39,7 +39,26 @@ export default function Contact() {
 
 
 
+	useEffect(() => {
+	  fetchReservations();
+	}, []);
 
+	const fetchReservations = async () => {
+	  try {
+	    const token = localStorage.getItem("accessToken");
+
+	    const res = await axios.get("http://localhost:9090/orders/my", {
+	      headers: {
+	        Authorization: `Bearer ${token}`
+	      }
+	    });
+
+	    console.log(res.data);
+	    setReservations(res.data);
+	  } catch (err) {
+	    console.error(err);
+	  }
+	};
 
 	const handleSubmit = async () => {
 
@@ -155,10 +174,12 @@ export default function Contact() {
 										<tr><th>문의 유형</th></tr>
 										<tr><td>
 											<select onChange={(e) => setCategoryType(e.target.value)} className="Ad-conts-resNum">
-											<option value="RESERVATION">예약</option>
-											  <option value="CANCEL">취소</option>
-											  <option value="REFUND">환불</option>
-											  <option value="ETC">기타</option>
+											<option value="SHOW_INFO">공연 정보</option>
+											  <option value="TICKET_BOOKING">예메</option>
+											  <option value="TICKET_BOOKING">환불</option>
+											  <option value="FREE">계정</option>
+											  <option value="ACCOUNT">시스템</option>
+											  <option value="TECHNICAL">기타</option>
 											</select>
 										</td></tr>
 

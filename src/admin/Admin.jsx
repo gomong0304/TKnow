@@ -69,7 +69,7 @@ export default function AdminDashboard() {
               </tr>
               <tr>
                 <td>
-                  <Link to="/admin/AdminContact" className="member-mytick">
+                  <Link to="/admin/AdminContact2" className="member-mytick">
                     1:1 문의사항 관리
                   </Link>
                 </td>

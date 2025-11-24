@@ -76,6 +76,13 @@ export default function AdminInven() {
 	const handleClick = (ticketId) => {
 		navigate(`/admin/AdminInven3/${ticketId}`);
 	};
+	
+	const statusLabel = {
+	  ON_SALE: "판매중",
+	  SOLD_OUT: "매진",
+	  SCHEDULED: "오픈 예정",
+	  CLOSED: "판매 종료",
+	};
 
 	return (
 		<div className="member-Member-page">
@@ -87,7 +94,7 @@ export default function AdminInven() {
 							<tr><td><Link to="/admin/AdminMember" className="member-mytick">회원 관리</Link></td></tr>
 							<tr><td>보안 관리</td></tr>
 							<tr><td>공지사항 관리</td><td className="admin-btn">공지 등록</td></tr>
-							<tr><td><Link to="/admin/AdminContact" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
+							<tr><td><Link to="/admin/AdminContact2" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
 							<tr><td><Link to="/admin/AdminInven" className="member-Member-click">재고 관리</Link></td>
 								<td><Link to="/admin/AdminInven2" className="admin-btn2">상품 등록</Link></td></tr>
 						</tbody>
@@ -103,7 +110,7 @@ export default function AdminInven() {
 					<div className="inven-main-box">
 						{error && (
 							<div style={{ color: 'red', padding: '10px', marginBottom: '10px' }}>
-								❌ {error}
+								{error}
 							</div>
 						)}
 
@@ -123,25 +130,31 @@ export default function AdminInven() {
 									</thead>
 
 									<tbody>
-										{tickets.length > 0 ? (
-											tickets.map((t) => (
-												<tr
-													key={t.ticketId}
-													onClick={() => handleClick(t.ticketId)}
-													style={{ cursor: "pointer" }}
-												>
-													<td>{t.ticketId}</td>
-													<td>{t.title}</td>
-													<td>{t.price?.toLocaleString()}</td>
-													<td>{t.remainingSeats || t.totalSeats}</td>
-													<td className={(t.remainingSeats || t.totalSeats) > 0 ? "admin-con-btn" : "admin-con-btn1"}>
-														{(t.remainingSeats || t.totalSeats) > 0 ? "판매 중" : "판매 종료"}
-													</td>
-												</tr>
-											))
-										) : (
-											<tr><td colSpan="5">불러올 티켓이 없습니다</td></tr>
-										)}
+									  {tickets.length > 0 ? (
+									    tickets.map((t) => (
+									      <tr
+									        key={t.ticketId}
+									        onClick={() => handleClick(t.ticketId)}
+									        style={{ cursor: "pointer" }}
+									      >
+									        <td>{t.ticketId}</td>
+									        <td>{t.title}</td>
+									        <td>{t.price?.toLocaleString()}</td>
+									        <td>{t.remainingSeats || t.totalSeats}</td>
+
+									        {/* 상태 표시 부분 */}
+									        <td className={
+									          t.ticketStatus === "ON_SALE"
+									            ? "admin-con-btn"
+									            : "admin-con-btn1"
+									        }>
+									          {statusLabel[t.ticketStatus] || "알수없음"}
+									        </td>
+									      </tr>
+									    ))
+									  ) : (
+									    <tr><td colSpan="5">불러올 티켓이 없습니다</td></tr>
+									  )}
 									</tbody>
 								</table>
 								<br /><br />

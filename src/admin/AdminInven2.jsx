@@ -23,6 +23,7 @@ export default function AdminInven2() {
 	const [mainImage, setMainImage] = useState(null);
 	const [detailImage, setDetailImage] = useState(null);
 	const [category, setCategory] = useState("");
+	const [ticketStatus, setTicketStatus] = useState("");
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
@@ -52,7 +53,8 @@ export default function AdminInven2() {
 				ticketDetail,
 				ageLimit,
 				benefit,
-				promotion
+				promotion,
+				ticketStatus
 			};
 
 			console.log("전송 데이터:", payload);
@@ -70,12 +72,14 @@ export default function AdminInven2() {
 			navigate("/admin/AdminInven");
 
 		} catch (err) {
-			console.error("❌ 상품 등록 실패:", err);
+			console.error("상품 등록 실패:", err);
 			setError(err.response?.data?.message || err.message);
 		} finally {
 			setLoading(false);
 		}
 	};
+	
+	
 
 	return (
 		<form className="member-Member-page" onSubmit={handleSubmit}>
@@ -87,7 +91,7 @@ export default function AdminInven2() {
 							<tr><td><Link to="/admin/AdminMember" className="member-mytick">회원 관리</Link></td></tr>
 							<tr><td>보안 관리</td></tr>
 							<tr><td>공지사항 관리</td><td className="admin-btn">공지 등록</td></tr>
-							<tr><td><Link to="/admin/AdminContact" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
+							<tr><td><Link to="/admin/AdminContact2" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
 							<tr><td><Link to="/admin/AdminInven" className="member-Member-click">재고 관리</Link></td>
 								<td><Link to="/admin/AdminInven2" className="admin-btn2">상품 등록</Link></td></tr>
 						</tbody>
@@ -104,7 +108,7 @@ export default function AdminInven2() {
 
 						{error && (
 							<div style={{ color: 'red', marginBottom: '20px', padding: '10px', border: '1px solid red' }}>
-								❌ {error}
+								 {error}
 							</div>
 						)}
 
@@ -114,6 +118,18 @@ export default function AdminInven2() {
 									<tbody>
 										<tr><th>상품명 <span style={{ color: 'red' }}>*</span></th></tr>
 										<tr><td><input type="text" className="Ad-conts-resNum" value={title} onChange={e => setTitle(e.target.value)} required /></td></tr>
+
+										<tr><th>판매 상태 <span style={{ color: 'red' }}>*</span></th></tr>
+										<tr>
+											<td>
+												<select value={ticketStatus} className="Ad-conts-resNum" onChange={e => setTicketStatus(e.target.value)} required>
+													<option value="ON_SALE">판매중</option>
+													<option value="SOLD_OUT">매진</option>
+													<option value="SCHEDULED">오픈 예정</option>
+													<option value="CLOSED">판매 종료</option>
+												</select>
+											</td>
+										</tr>
 
 										<tr><th>카테고리 <span style={{ color: 'red' }}>*</span></th></tr>
 										<tr>
@@ -169,7 +185,7 @@ export default function AdminInven2() {
 										<tr><th>상품 상세 설명</th></tr>
 										<tr><td><textarea className="Ad-conts-resNum" value={ticketDetail} onChange={e => setTicketDetail(e.target.value)} rows="4" style={{ width: '100%' }} /></td></tr>
 
-								
+
 										<tr><th>대표 이미지</th></tr>
 										<tr><td><input type="file" accept="image/*" onChange={e => setMainImage(e.target.files[0])} /></td></tr>
 

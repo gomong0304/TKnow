@@ -88,7 +88,7 @@ export default function MemberDetail() {
               <tr><td><Link to="/admin/AdminMember" className="member-Member-click">회원 관리</Link></td></tr>
               <tr><td>보안 관리</td></tr>
               <tr><td>공지사항 관리</td><td className="admin-btn">공지 등록</td></tr>
-              <tr><td><Link to="/admin/AdminContact" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
+              <tr><td><Link to="/admin/AdminContact2" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
               <tr><td><Link to="/admin/AdminInven" className="member-mytick">재고 관리</Link></td>
               <td><Link to="/admin/AdminInven2" className="admin-btn2">상품 등록</Link></td></tr>
             </tbody>

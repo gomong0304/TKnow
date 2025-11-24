@@ -20,6 +20,7 @@ export default function Member() {
 	const [memberPhone, setMemberPhone] = useState ("");
 	const [orders, setOrders] = useState([]);
 	const [recentOrder, setRecentOrder] = useState(null);
+	const [profileUrl, setProfileUrl] = useState("");
 	
 
 	useEffect(() => {
@@ -61,9 +62,50 @@ export default function Member() {
 		    console.log("매핑된 최근 주문:", recent);
 		    setRecentOrder(recent);
 		  })
-		.catch(err => console.error("❌ 최근 주문 조회 실패:", err));
+		.catch(err => console.error("최근 주문 조회 실패:", err));
 	  }, []);
 	
+	  const handleChangeImage = () => {
+	    const input = document.createElement("input");
+	    input.type = "file";
+	    input.accept = "image/*";
+	    input.onchange = async (e) => {
+	      const file = e.target.files[0];
+	      if (!file) return;
+
+	      const formData = new FormData();
+	      formData.append("newImages[0].file", file);
+	      formData.append("newImages[0].imageType", "PROFILE"); // FileService에서 ImageType.valueOf() 처리
+	      formData.append("newImages[0].imageSort", 0);
+	      formData.append("newImages[0].isPrimary", true);
+
+	      // 회원 ID 필요
+	      formData.append("memberId", memberId); 
+
+	      try {
+	        const token = localStorage.getItem("accessToken");
+	        const res = await axios.post(
+	          "http://localhost:9090/files/upsert", 
+	          formData, 
+	          {
+	            headers: { 
+	              "Content-Type": "multipart/form-data",
+	              Authorization: `Bearer ${token}`
+	            }
+	          }
+	        );
+
+	        console.log("업로드 완료:", res.data);
+	        // 새 프로필 URL로 화면 갱신
+	        setProfileUrl(res.data[0].imageUrl);
+
+	      } catch (err) {
+	        console.error(err);
+	        alert("이미지 업로드 실패");
+	      }
+	    };
+	    input.click();
+	  };
 	
 	return (
 		<div className="member-Member-page">
@@ -71,7 +113,7 @@ export default function Member() {
 
 		<div className="member-left">
 						<div className="member-Member-box1">
-							<strong>힙합개냥이</strong><span> 님 반갑습니다!</span><br /><br />
+							<strong>{memberName.memberName || "회원"}</strong><span> 님 반갑습니다!</span><br /><br />
 							<table>
 								<tbody>
 									<tr><td><Link to="/member/Member/${memberId}" className="member-Member-click">회원정보</Link></td></tr>
@@ -107,7 +149,13 @@ export default function Member() {
 
 					<div className="member-pro-box">
 						<div className="member-Member-propile-imgBox">
-							<img src={Pro} alt="프로필_사진" className="member-Member-proImg" />
+							<img src={profileUrl || Pro} alt="프로필_사진" className="member-Member-proImg" />
+							<button
+							         onClick={handleChangeImage}
+							         className="member-propile-change-btn"
+							       >
+							         변경
+							       </button>
 							<img src={ProMod} alt="프로필_사진" className="member-Member-prMod" />
 
 							<div className="member-propile-table">

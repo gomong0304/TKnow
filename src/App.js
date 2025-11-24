@@ -30,6 +30,7 @@ import Admin from "./admin/Admin";
 import AdminMember from "./admin/AdminMember";
 import AdminMember1 from "./admin/AdminMember1";
 import AdminContact from "./admin/AdminContact";
+import AdminContact2 from "./admin/AdminContact2";
 import AdminInven from "./admin/AdminInven";
 import AdminInven2 from "./admin/AdminInven2";
 import AdminInven3 from "./admin/AdminInven3";
@@ -215,11 +216,22 @@ function App() {
 					/>
 
 					<Route
-						path="/admin/AdminContact"
+						path="/admin/AdminContact/:boardId"
 						element={
 							<>
 								<Header />
 								<AdminContact />
+								<Footer />
+							</>
+						}
+					/>
+
+					<Route
+						path="/admin/AdminContact2"
+						element={
+							<>
+								<Header />
+								<AdminContact2 />
 								<Footer />
 							</>
 						}
@@ -267,7 +279,7 @@ function App() {
 					<Route path="/Ticket/Buy4/:id" element={<TicketBuy4 />} />
 					<Route path="/Ticket/Buy5/:id" element={<TicketBuy5 />} />
 					<Route path="/Ticket/Buy6/:id" element={<TicketBuy6 />} />
-					<Route path="/Fllor/F2" element={<F2 />} />
+					<Route path="/Fllor/F2/:id" element={<F2 />} />
 
 
 				</Routes>

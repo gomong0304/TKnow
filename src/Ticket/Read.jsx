@@ -10,6 +10,7 @@ export default function Read() {
 	const [ticket, setTicket] = useState(null);
 	const [selectedDate, setSelectedDate] = useState("");
 	const [currentMonth, setCurrentMonth] = useState(new Date());
+	
 
 	// YYYY.MM.DD 포맷
 	const formatDate = (dateArr, fallback = "") => {
@@ -76,18 +77,22 @@ export default function Read() {
 	useEffect(() => {
 	  const token = localStorage.getItem("accessToken"); // 로그인 시 저장한 JWT
 
-	  axios
-	    .get(`http://localhost:9090/ticketnow/tickets/${id}`, {
-	      headers: {
-	        Authorization: `Bearer ${token}` // JWT 헤더 추가
-	      }
-	    })
+	  const config = token
+	    ? { headers: { Authorization: `Bearer ${token}` } }
+	    : {};
+		
+		axios
+		   .get(`http://localhost:9090/ticketnow/tickets/${id}`, config)
 	    .then((res) => {
 	      console.log("ticket data:", res.data);
 
 		  if (!res.data.schedule || res.data.schedule.length === 0) {
-		    const start = new Date(res.data.startAt);
-		    const end = new Date(res.data.endAt);
+
+		    const [sy, sm, sd, sh, smin] = res.data.startAt;
+		    const [ey, em, ed] = res.data.endAt;
+
+		    const start = new Date(sy, sm - 1, sd);
+		    const end = new Date(ey, em - 1, ed);
 
 		    const generatedSchedule = [];
 		    const currentDate = new Date(start);
@@ -100,7 +105,7 @@ export default function Read() {
 		          currentDate.getDate()
 		        ],
 		        weekday: ['일', '월', '화', '수', '목', '금', '토'][currentDate.getDay()],
-		        time: "19:00",
+		        time: `${String(sh).padStart(2, "0")}:${String(smin).padStart(2, "0")}`,
 		        round: "1회차"
 		      });
 		      currentDate.setDate(currentDate.getDate() + 1);
@@ -108,6 +113,7 @@ export default function Read() {
 
 		    res.data.schedule = generatedSchedule;
 		  }
+		  
 
 	      setTicket(res.data);
 

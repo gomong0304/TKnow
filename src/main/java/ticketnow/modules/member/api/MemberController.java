@@ -3,13 +3,20 @@ package ticketnow.modules.member.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import ticketnow.modules.member.dto.MemberCreateRequestDTO;
 import ticketnow.modules.member.dto.MemberUpdateRequestDTO;
@@ -17,6 +24,14 @@ import ticketnow.modules.member.dto.MemberResponseDTO;
 import ticketnow.modules.common.dto.paging.PageRequestDTO;
 import ticketnow.modules.common.dto.paging.PageResponseDTO;
 import ticketnow.modules.member.service.MemberService;
+
+//★ 이미지 관련 import
+import ticketnow.modules.common.constant.ImageType;
+import ticketnow.modules.common.domain.ImageVO;
+import ticketnow.modules.common.dto.image.ImageDTO;
+import ticketnow.modules.common.dto.image.ImageListDTO;
+import ticketnow.modules.common.dto.image.NewImageDTO;
+import ticketnow.modules.common.service.image.FileService;
 
 /**
  * 회원(Member) 관련 CRUD API
@@ -29,6 +44,9 @@ import ticketnow.modules.member.service.MemberService;
 public class MemberController {
 
     private final MemberService memberService; // 서비스 계층 의존성
+    
+    // ★ 추가: 이미지 처리 서비스
+    private final FileService fileService;
 
     /**
      * 회원 생성(등록)
@@ -109,4 +127,54 @@ public class MemberController {
         memberService.deleteMember(memberId);
         return ResponseEntity.ok().build();
     }
+    
+    /**
+     * 회원 프로필 이미지 업로드/교체
+     * POST /members/{memberId}/profile-image
+     * - Multipart/form-data, field name = "file"
+     * - FileService.upsertImages() 재사용 (ImageType.MEMBER_PROFILE)
+     */
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping(
+            value = "/{memberId}/profile-image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<List<ImageDTO>> uploadProfileImage(
+            @PathVariable @NotBlank String memberId,
+            @RequestPart("file") MultipartFile file,
+            @RequestHeader(value = "X-Request-Id", required = false) String requestId
+    ) throws IOException {
+
+        log.info("[POST] /members/{}/profile-image | X-Request-Id={} | filename={}",
+                memberId, requestId, file != null ? file.getOriginalFilename() : null);
+
+        // 1) FileService가 요구하는 ImageListDTO 구성
+        ImageListDTO req = ImageListDTO.builder()
+                .memberId(memberId)  // 어떤 회원의 이미지인지 지정
+                .newImages(Collections.singletonList(
+                        NewImageDTO.builder()
+                                .file(file)
+                                .isPrimary(true)                    // 대표 이미지
+                                .imageSort(1)                       // 정렬순서 1
+                                .imageType(ImageType.MEMBER_PROFILE.name()) // enum 문자열
+                                .build()
+                ))
+                .build();
+
+        // 2) 공통 FileService로 업로드 + DB 등록
+        List<ImageVO> images = fileService.upsertImages(req);
+
+        // 3) 뷰용 DTO로 변환해서 반환
+        List<ImageDTO> resp = images.stream()
+                .map(vo -> ImageDTO.builder()
+                        .imageUrl(vo.getImageUrl())
+                        .isPrimary(vo.getIsPrimary())
+                        .imageSort(vo.getImageSort())
+                        .imageType(vo.getImageType() != null ? vo.getImageType().name() : null)
+                        .build())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(resp);
+    }
+    
 }

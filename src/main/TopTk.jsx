@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import MainEvent from "../images/event.png";
 
@@ -44,7 +44,21 @@ export default function TopTk() {
 
 		<div className="toptk">
 			<div className="liveTopTk">실시간 인기 티켓</div><br /><br />
+			
+			<div className="tkList1">
+			<Link to="/Ticket/List"><button className="tkList">티켓 전체 보기</button></Link>
+			<Link to="/Ticket/List"><button className="tkList">에스엠</button></Link>
+			<Link to="/Ticket/List"><button className="tkList">하이브</button></Link>
+			<Link to="/Ticket/List"><button className="tkList">제이와이피</button></Link>
+			<Link to="/Ticket/List"><button className="tkList">웨이크원</button></Link>
+			<Link to="/Ticket/List"><button className="tkList">기타</button></Link>
+			</div>
+			<br/><br/>
+			
 			<div className="TopList">
+			
+			
+			
 				{tickets.slice(0, 5).map((t, index) => (
 					<div
 						key={t.ticketId}

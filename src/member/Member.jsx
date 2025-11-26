@@ -11,6 +11,7 @@ import NJS from "../images/pick_newjeans.png";
 import KIKI from "../images/pick_kiki.png";
 import ILLIT from "../images/pick_illit.png";
 import Ht from "../images/ht.png";
+import api from "../api";
 
 export default function Member() {
 	
@@ -29,7 +30,8 @@ export default function Member() {
 	  const orders = localStorage.getItem("orders");  // 주문 내역 저장
 
 	  // 회원 정보 가져오기
-	  axios.get(`http://localhost:9090/ticketnow/members/${memberId}`, {
+	  
+	  api.get(`members/${memberId}`, {
 	    headers: { Authorization: `Bearer ${token}` }
 	  })
 	  .then(res => {
@@ -42,7 +44,7 @@ export default function Member() {
 	  
 	  // 주문 내역 가져오기
 
-	    axios.get("http://localhost:9090/ticketnow/orders?page=1&size=1", {
+	    api.get("orders?page=1&size=1", {
 	      headers: { Authorization: `Bearer ${token}` }
 	    })
 		.then(res => {
@@ -85,7 +87,7 @@ export default function Member() {
 	      try {
 	        const token = localStorage.getItem("accessToken");
 	        const res = await axios.post(
-	          "http://localhost:9090/files/upsert", 
+	          "http://localhost:9090/ticketnow/files/upsert", 
 	          formData, 
 	          {
 	            headers: { 

@@ -278,6 +278,7 @@ export default function TicketBuy() {
 							<Link
 							  to={`/Ticket/Buy4/${id}`}
 							  state={{
+								seatId: selectedSeat?.dbId,
 							    selectedSeat,
 							    normalCount,
 							    discount1Count,

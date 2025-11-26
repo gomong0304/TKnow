@@ -20,6 +20,7 @@ import TicketBuy6 from "./Ticket/TicketBuy6";
 import F2 from "./Ticket/FllorF2";
 import Login from "./member/Login";
 import Join from "./member/Join";
+import List from "./Ticket/List";
 import Member from "./member/Member";
 import MyTick from "./member/MyTick";
 import TkRead from "./member/TkRead";
@@ -82,7 +83,7 @@ function App() {
 					/>
 
 					<Route
-						path="/Ticket/Review"
+						path="/Ticket/Review/:id"
 						element={
 							<>
 								<Header />
@@ -114,6 +115,8 @@ function App() {
 						}
 					/>
 
+
+
 					<Route
 						path="/member/Member/:id"
 						element={
@@ -137,7 +140,16 @@ function App() {
 							</>
 						}
 					/>
-
+					<Route
+						path="/Ticket/List"
+						element={
+							<>
+								<Header />
+								<List />
+								<Footer />
+							</>
+						}
+					/>
 					<Route
 						path="/member/ticket/:orderId"
 						element={

@@ -6,7 +6,7 @@ import axios from "axios";
 
 export default function TicketBuy2() {
   const { id } = useParams();
-  const navigate = useNavigate(); // ✅ 이미 있음
+  const navigate = useNavigate();
   const location = useLocation();
   const { selectedDate, selectedSeat } = location.state || {};
   const prevSelectedDate = location.state?.selectedDate;
@@ -18,7 +18,7 @@ export default function TicketBuy2() {
   const handleGoF2 = () => {
 	const handleGoF2 = () => {
 	  navigate(`/Fllor/F2/${id}`, { 
-	    state: { selectedDate, ticket }
+	    state: { selectedSeat, selectedDate, ticket }
 	  });
 	};
     navigate(`/Fllor/F2/${id}`, { // id 포함해서 navigate

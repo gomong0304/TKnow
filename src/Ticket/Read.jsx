@@ -184,16 +184,18 @@ export default function Read() {
 
               <div className="read-particular">
                 <div className="button-class">
-                  <button className="read-button2">공연정보</button>
+				<Link to={`/Ticket/${ticket.ticketId}`}>
+				  <button className="read-button2">공연정보</button>
+				</Link>
                   <button className="read-button1">판매정보</button>
-                  <Link to="/Ticket/Review">
-                    <button className="read-button1">공연후기</button>
-                  </Link>
+				  <Link to={`/Ticket/Review/${ticket.ticketId}`}>
+				    <button className="read-button1">공연후기</button>
+				  </Link>
                   <button className="read-button1">기대평</button>
                   <button className="read-button1">QNA</button>
                 </div>
-              </div>
-
+              </div><br/>
+			  <br/>
               <div className="concert-particular">
                 <strong className="concert-particular-1">공연 시간 정보</strong>
                 <br /><br />

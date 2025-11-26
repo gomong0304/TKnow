@@ -123,7 +123,8 @@ export default function AdminInven2() {
 										<tr>
 											<td>
 												<select value={ticketStatus} className="Ad-conts-resNum" onChange={e => setTicketStatus(e.target.value)} required>
-													<option value="ON_SALE">판매중</option>
+												<option value="" disabled>선택하세요</option>	
+												<option value="ON_SALE">판매중</option>
 													<option value="SOLD_OUT">매진</option>
 													<option value="SCHEDULED">오픈 예정</option>
 													<option value="CLOSED">판매 종료</option>
@@ -135,7 +136,8 @@ export default function AdminInven2() {
 										<tr>
 											<td>
 												<select value={category} className="Ad-conts-resNum" onChange={e => setCategory(e.target.value)} required>
-													<option value="CONCERT">콘서트</option>
+												<option value="" disabled>선택하세요</option>	
+												<option value="CONCERT">콘서트</option>
 													<option value="MUSICAL">뮤지컬</option>
 													<option value="SPORTS">스포츠</option>
 													<option value="EXHIBITION">전시회</option>
@@ -177,10 +179,36 @@ export default function AdminInven2() {
 										<tr><td><input type="number" min="1" className="Ad-conts-resNum" value={totalSeats} onChange={e => setTotalSeats(e.target.value)} required /></td></tr>
 
 										<tr><th>기본 가격 <span style={{ color: 'red' }}>*</span></th></tr>
-										<tr><td><input type="number" min="0" className="Ad-conts-resNum" value={price} onChange={e => setPrice(e.target.value)} required /></td></tr>
+										<tr>
+										  <td>
+										    <input
+										      type="number"
+										      min="0"
+										      className="Ad-conts-resNum"
+										      value={price}
+										      onChange={e => {
+										        const val = e.target.value;
+										        setPrice(val);
+										        if (val) setTicketCost((parseFloat(val) * 0.4).toFixed(0)); // 40% 자동 계산
+										        else setTicketCost("");
+										      }}
+										      required
+										    />
+										  </td>
+										</tr>
 
 										<tr><th>매입 원가</th></tr>
-										<tr><td><input type="number" min="0" className="Ad-conts-resNum" value={ticketCost} onChange={e => setTicketCost(e.target.value)} /></td></tr>
+										<tr>
+										  <td>
+										    <input
+										      type="number"
+										      min="0"
+										      className="Ad-conts-resNum"
+										      value={ticketCost}
+										      readOnly
+										    />
+										  </td>
+										</tr>
 
 										<tr><th>상품 상세 설명</th></tr>
 										<tr><td><textarea className="Ad-conts-resNum" value={ticketDetail} onChange={e => setTicketDetail(e.target.value)} rows="4" style={{ width: '100%' }} /></td></tr>

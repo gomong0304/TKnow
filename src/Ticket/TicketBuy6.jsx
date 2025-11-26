@@ -21,7 +21,7 @@ export default function TicketBuy6() {
   // 결제 정보 불러오기
   useEffect(() => {
     const info = location.state || JSON.parse(localStorage.getItem("lastPayment") || "{}");
-    console.log("📦 결제 정보 로드:");
+    console.log("결제 정보 로드:");
     console.log("  normalCount:", info?.normalCount);
     console.log("  discount1Count:", info?.discount1Count);
     console.log("  discount2Count:", info?.discount2Count);
@@ -44,13 +44,13 @@ export default function TicketBuy6() {
     };
 
     if (paymentInfo.paymentMethod === "신용카드") {
-      payUrl = "http://localhost:9090/pay/card/approve";
+      payUrl = "http://localhost:9090/ticketnow/pay/card/approve";
       payData.cardCompany = paymentInfo.cardType;
     } else if (paymentInfo.paymentMethod === "무통장") {
-      payUrl = "http://localhost:9090/pay/vbank/issue";
+      payUrl = "http://localhost:9090/ticketnow/pay/vbank/issue";
       payData.bankName = "신한";
     } else {
-      payUrl = "http://localhost:9090/pay/card/approve";
+      payUrl = "http://localhost:9090/ticketnow/pay/card/approve";
       payData.cardCompany = "일반";
     }
 
@@ -58,27 +58,30 @@ export default function TicketBuy6() {
       .post(payUrl, payData, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       })
-      .then(res => console.log("✅ 결제 정보 DB 저장 완료:", res.data))
-      .catch(err => console.error("❌ 결제 저장 실패:", err));
+      .then(res => console.log("결제 정보 DB 저장 완료:", res.data))
+      .catch(err => console.error("결제 저장 실패:", err));
   }, [paymentInfo]);
 
   // 주문 데이터 DB 저장 + 창 닫기 / 홈 이동
   const handleClose = async () => {
-    if (!paymentInfo) return;
+	if (!paymentInfo?.seatIdList || paymentInfo.seatIdList.length === 0) {
+	    alert("좌석이 선택되지 않았습니다.");
+	    return;
+	}
 
     const token = localStorage.getItem("accessToken");
 
-    // ✅ 수량 검증 추가
+    // 수량 검증 추가
     if (total < 1) {
       alert("주문 수량이 올바르지 않습니다.");
       return;
     }
 
-    // ✅ 백엔드 DTO에 맞춰 필드명 변경
+    // 백엔드 DTO에 맞춰 필드명 변경
     const orderData = {
-      ordersTotalAmount: paymentInfo.totalPrice,           // 총 결제 금액
-      ordersTicketQuantity: total,                         // 총 예매 수량
-      seatIdList: paymentInfo.seatIdList || [1]            // ✅ 좌석 DB ID 목록
+      ordersTotalAmount: paymentInfo.totalPrice, 
+      ordersTicketQuantity: total,    
+      seatIdList: paymentInfo.seatIdList
     };
 
     console.log("📤 주문 데이터 전송:");
@@ -86,7 +89,7 @@ export default function TicketBuy6() {
     console.log("  ordersTicketQuantity:", orderData.ordersTicketQuantity);
     console.log("  seatIdList:", orderData.seatIdList);
     
-    console.log("🔢 수량 계산:");
+    console.log(" 수량 계산:");
     console.log("  normal:", normal);
     console.log("  discount1:", discount1);
     console.log("  discount2:", discount2);
@@ -95,13 +98,13 @@ export default function TicketBuy6() {
 
     try {
       const response = await axios.post(
-        "http://localhost:9090/orders",  // ✅ /ticketnow 제거
+        "http://localhost:9090/ticketnow/orders",  
         orderData,
         {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         }
       );
-      console.log("✅ 주문 데이터 DB 저장 완료:", response.data);
+      console.log("주문 데이터 DB 저장 완료:", response.data);
       
       // 성공 시 창 닫기 또는 홈 이동
       if (window.opener) {
@@ -110,7 +113,7 @@ export default function TicketBuy6() {
         navigate("/");
       }
     } catch (err) {
-      console.error("❌ 주문 저장 실패:", err.response?.data || err);
+      console.error("주문 저장 실패:", err.response?.data || err);
       alert("주문 저장에 실패했습니다. 다시 시도해주세요.");
     }
   };

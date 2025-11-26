@@ -9,11 +9,11 @@ export default function F2Floor() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { selectedDate, ticket } = location.state || {}; // TicketBuy2에서 넘어온 데이터
-  const [selectedSeat, setSelectedSeat] = useState(null);
+  const { selectedDate, ticket } = location.state || {};
+  const [selectedSeat, setSelectedSeat] = useState(null); // 좌석 선택
   const [reservedSeats, setReservedSeats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [ticketInfo, setTicketInfo] = useState(ticket || null); // TicketBuy2에서 넘어온 공연 정보
+  const [ticketInfo, setTicketInfo] = useState(ticket || null);
 
   // 좌석 데이터 생성
   const rows = 12;
@@ -25,20 +25,26 @@ export default function F2Floor() {
   const startY = 0;
 
   const seats = [];
+  let seatDbId = 1;
+
+  // 티켓 가격 기준 (ticketInfo에서 가져오거나 기본값)
+  const basePrice = ticketInfo?.price || 100000;
+
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       seats.push({
         id: `${r}-${c}`,
+        dbId: seatDbId++,        // DB FK용
         grade: "R",
         row: r + 1,
         number: c + 1,
+        price: basePrice,
         x: startX + c * (seatWidth + seatGap),
         y: startY + r * (seatHeight + seatGap),
       });
     }
   }
 
-  // 예약 좌석 + 공연 정보 가져오기
   useEffect(() => {
     setLoading(true);
 
@@ -46,6 +52,7 @@ export default function F2Floor() {
       .get(`http://localhost:9090/ticketnow/tickets/${id}/reserved-seats`)
       .then((res) => setReservedSeats(res.data.reservedSeats || []))
       .catch(() => {
+        // 임의 예약 좌석 생성
         const randomReserved = [];
         const reservedCount = Math.floor(Math.random() * 50) + 23;
         for (let i = 0; i < reservedCount; i++) {
@@ -66,49 +73,53 @@ export default function F2Floor() {
     }
   }, [id]);
 
+  // 좌석 선택
   const handleSelectSeat = (seat) => {
     if (reservedSeats.includes(seat.id)) {
-      alert("이미 선택된 좌석입니다.");
+      alert("이미 예약된 좌석입니다.");
       return;
     }
-    setSelectedSeat(seat);
+    setSelectedSeat(seat); // 여기서 seat 객체 전체를 selectedSeat로 저장
+    console.log("🪑 선택한 좌석:", seat);
   };
 
+  // 다음 단계
   const handleNext = () => {
     if (!selectedSeat) {
       alert("좌석을 선택하세요!");
       return;
     }
 
-    axios
-      .post(`http://localhost:9090/ticketnow/tickets/${id}/select-seat`, {
-        seatId: selectedSeat.id,
-        grade: selectedSeat.grade,
-        row: selectedSeat.row,
-        number: selectedSeat.number,
-      })
-      .then(() => {
-        navigate(`/Ticket/Buy3/${id}`, {
-          state: { selectedSeat, selectedDate, ticketInfo },
-        });
-      })
-      .catch(() => {
-        // API 오류 시에도 페이지 이동
-        navigate(`/Ticket/Buy3/${id}`, {
-          state: { selectedSeat, selectedDate, ticketInfo },
-        });
-      });
+    console.log("➡️ Buy3로 이동, 좌석 정보:", selectedSeat);
+
+    navigate(`/Ticket/Buy3/${id}`, {
+      state: {
+        selectedSeat,   // 좌석 전체 객체 전달 (dbId 포함)
+        selectedDate,
+        ticketInfo,
+      },
+    });
   };
 
   return (
     <div className="ticket-stage-main">
       <div className="ticket-seage-page">
         <div className="ticket-buy-top">
-          <button className="ticket-buy-button2">01&nbsp;<span className="ticket-buy-button-text1">날짜 선택</span></button>
-          <button className="ticket-buy-button1">02&nbsp;<span className="ticket-buy-button-text1">좌석 선택</span></button>
-          <button className="ticket-buy-button2">03&nbsp;<span className="ticket-buy-button-text1">가격 선택</span></button>
-          <button className="ticket-buy-button2">04&nbsp;<span className="ticket-buy-button-text1">배송 선택</span></button>
-          <button className="ticket-buy-button2">05&nbsp;<span className="ticket-buy-button-text1">결제하기</span></button>
+          <button className="ticket-buy-button2">
+            01&nbsp;<span className="ticket-buy-button-text1">날짜 선택</span>
+          </button>
+          <button className="ticket-buy-button1">
+            02&nbsp;<span className="ticket-buy-button-text1">좌석 선택</span>
+          </button>
+          <button className="ticket-buy-button2">
+            03&nbsp;<span className="ticket-buy-button-text1">가격 선택</span>
+          </button>
+          <button className="ticket-buy-button2">
+            04&nbsp;<span className="ticket-buy-button-text1">배송 선택</span>
+          </button>
+          <button className="ticket-buy-button2">
+            05&nbsp;<span className="ticket-buy-button-text1">결제하기</span>
+          </button>
         </div>
         <br />
 
@@ -120,10 +131,11 @@ export default function F2Floor() {
               <img src={F2} className="ticket-f2-img" alt="좌석 배치도" />
               {seats.map((seat) => {
                 const isReserved = reservedSeats.includes(seat.id);
+                const isSelected = selectedSeat?.id === seat.id;
                 return (
                   <div
                     key={seat.id}
-                    className={`seat ${selectedSeat?.id === seat.id ? "selected" : ""}`}
+                    className={`seat ${isSelected ? "selected" : ""}`}
                     style={{
                       position: "absolute",
                       left: `${seat.x}px`,
@@ -132,7 +144,7 @@ export default function F2Floor() {
                       height: `${seatHeight}px`,
                       backgroundColor: isReserved
                         ? "#999"
-                        : selectedSeat?.id === seat.id
+                        : isSelected
                         ? "#FFA6C9"
                         : "#D9D9D9",
                       cursor: isReserved ? "not-allowed" : "pointer",
@@ -158,7 +170,11 @@ export default function F2Floor() {
                 <tbody>
                   <tr>
                     <td>{selectedSeat ? selectedSeat.grade : "-"}</td>
-                    <td>{selectedSeat ? `F2 구역 - ${selectedSeat.row}열 - ${selectedSeat.number}` : "-"}</td>
+                    <td>
+                      {selectedSeat
+                        ? `F2 구역 - ${selectedSeat.row}열 - ${selectedSeat.number}`
+                        : "-"}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -173,10 +189,17 @@ export default function F2Floor() {
             <br />
 
             <div className="ticket-stage-button2">
-              <Link to={`/Ticket/Buy2/${id}`} state={{ selectedDate, ticketInfo }} className="ticket-stage-back">
+              <Link
+                to={`/Ticket/Buy2/${id}`}
+                state={{ selectedDate, ticketInfo }}
+                className="ticket-stage-back"
+              >
                 이전 단계
               </Link>
-              <button className="ticket-stage-back" onClick={() => setSelectedSeat(null)}>
+              <button
+                className="ticket-stage-back"
+                onClick={() => setSelectedSeat(null)}
+              >
                 좌석 다시 선택
               </button>
             </div>

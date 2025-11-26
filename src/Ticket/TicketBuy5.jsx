@@ -14,14 +14,14 @@ export default function TicketBuy5() {
 	// Buy4에서 넘어온 정보
 	const {
 		selectedSeat,
-		normalCount = 1,      // 기본값 1 설정
-		discount1Count = 0,   // 기본값 0 설정
-		discount2Count = 0,   // 기본값 0 설정
-		discount3Count = 0,   // 기본값 0 설정
+		normalCount = 1,    
+		discount1Count = 0,   
+		discount2Count = 0,   
+		discount3Count = 0,   
 		totalPrice,
 		basePrice,
-		serviceFee = 0,       // 기본값 0 설정
-		deliveryFee = 0,      // 기본값 0 설정
+		serviceFee = 0,       
+		deliveryFee = 0,    
 		discountPrice,
 		totalSeatCount,
 		ticketDate,
@@ -29,7 +29,7 @@ export default function TicketBuy5() {
 		ticketTitle,
 		ticketImage,
 		cancelDate,
-		deliveryMethod = "현장수령",  // 기본값 설정
+		deliveryMethod = "현장수령", 
 		name,
 		birthdate,
 		phone,
@@ -62,12 +62,13 @@ export default function TicketBuy5() {
 		  orderId: `ORDER_${Date.now()}`,
 		  ticketId: id,
 		  selectedSeat,
-		  seatInfo: selectedSeat ? `F2 구역 - ${selectedSeat.row}열 - ${selectedSeat.number}` : 'F2 구역',
-		  normalCount,           // 명시적으로 설정
-		  discount1Count,        // 명시적으로 설정
-		  discount2Count,        // 명시적으로 설정
-		  discount3Count,        // 명시적으로 설정
-		  totalCount,            // 계산된 총 수량 추가
+		  seatIdList: selectedSeat?.dbId ? [selectedSeat.dbId] : [], 
+		  seatInfo: selectedSeat?.seatInfo || `F2 구역 - ${selectedSeat?.row}열 - ${selectedSeat?.number}`,
+		  normalCount,           
+		  discount1Count,        
+		  discount2Count,       
+		  discount3Count,     
+		  totalCount,           
 		  totalPrice,
 		  deliveryMethod,
 		  name,
@@ -87,7 +88,7 @@ export default function TicketBuy5() {
 		  deliveryFee
 		};
 
-		console.log("💾저장할 결제 정보:", paymentInfo);
+		console.log("💾 저장할 결제 정보:", paymentInfo);
 
 		localStorage.setItem('lastPayment', JSON.stringify(paymentInfo));
 

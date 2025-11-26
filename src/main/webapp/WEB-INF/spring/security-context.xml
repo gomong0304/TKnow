@@ -110,6 +110,13 @@
 	<!-- 인증 필요하지만 토큰 없을 때 401로 보낼 핸들러 -->
 	<http entry-point-ref="jwtAuthenticationEntryPoint"
 		create-session="stateless" use-expressions="true">
+		
+		<!-- [추가] CORS 설정 적용 : 위에서 정의한 corsSource 사용 -->
+        <cors configuration-source-ref="corsSource"/>
+
+        <!-- [추가] CORS preflight(OPTIONS) 요청은 무조건 허용 -->
+        <intercept-url pattern="/**" method="OPTIONS" access="permitAll"/>
+		
 		<!-- create-session="stateless: 서버 세션을 만들지 않음(REST/JWT 권장) -->
 		<!-- use-expressions="true" : 인증은 됐지만 권한 부족 시 403 핸들러 -->
 		<csrf disabled="true" />  <!-- CSRF 비활성화: 폼 세션 대신 토큰 방식 사용 -->
@@ -152,6 +159,10 @@
 		<intercept-url pattern="/members/**"
 			access="isAuthenticated()" />
 
+		<!-- ============================ File ============================ -->
+        <!-- 파일 업로드/조회: 로그인 한 USER/ADMIN만 사용 -->
+        <intercept-url pattern="/files/**"
+            access="hasAnyRole('USER','ADMIN')" />
 
 
 		<!-- ============================ ticket ============================ -->
@@ -165,8 +176,6 @@
 			
 		<!-- 그 외는 인증 필요 -->
 		<intercept-url pattern="/**" access="isAuthenticated()" /> <!-- JWT 유효해야 통과 -->
-
-
 
 
 		<!-- ========================= 접근권한 설정 종료 ========================= -->

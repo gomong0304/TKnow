@@ -167,7 +167,7 @@ public class MemberController {
         // 3) 뷰용 DTO로 변환해서 반환
         List<ImageDTO> resp = images.stream()
                 .map(vo -> ImageDTO.builder()
-                        .imageUrl(vo.getImageUrl())
+                        .imageUrl(vo.getImgUrl())
                         .isPrimary(vo.getIsPrimary())
                         .imageSort(vo.getImageSort())
                         .imageType(vo.getImageType() != null ? vo.getImageType().name() : null)
@@ -178,3 +178,4 @@ public class MemberController {
     }
     
 }
+

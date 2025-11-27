@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../css/style.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 
 export default function AdminInven2() {
 	const navigate = useNavigate();
@@ -61,8 +61,8 @@ export default function AdminInven2() {
 
 			const token = localStorage.getItem("accessToken");
 
-			const res = await axios.post(
-				"http://localhost:9090/ticketnow/tickets",
+			const res = await api.post(
+				"tickets",
 				payload,
 				{ headers: { Authorization: `Bearer ${token}` } }
 			);

@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../api";
 
 export default function Contact() {
+
 	const navigate = useNavigate();
 	const { boardId } = useParams();
 
@@ -15,40 +16,58 @@ export default function Contact() {
 	const [orderTicketId, setOrderTicketId] = useState("");
 	const [content, setContent] = useState("");
 	const [attachments, setAttachments] = useState([]);
-	const [boardList, setBoardList] = useState([]); // 문의 목록
-	const [board, setBoard] = useState(null);
 	const [previewImages, setPreviewImages] = useState([]);
+	const [boardList, setBoardList] = useState([]);
 
 	const token = localStorage.getItem("accessToken");
 	const memberId = localStorage.getItem("memberId");
 
-	// 회원 정보 불러오기
+	// 회원 정보 가져오기
 	useEffect(() => {
 		if (!token || !memberId) return;
-		api
-			.get(`/members/${memberId}`, { headers: { Authorization: `Bearer ${token}` } })
-			.then((res) => {
+		api.get(`/members/${memberId}`, { headers: { Authorization: `Bearer ${token}` } })
+			.then(res => {
 				setMemberEmail(res.data.memberEmail || "");
 				setMemberPhone(res.data.memberPhone || "");
 			})
-			.catch((err) => console.error("회원 정보 가져오기 실패:", err.response?.data || err));
+			.catch(err => console.error(err));
 	}, [token, memberId]);
 
 	// 내 문의 목록 불러오기
 	useEffect(() => {
-		if (!token || !memberId) return;
-
-		api
-			.get(`/boards/my`, {
-				headers: { Authorization: `Bearer ${token}` },
+		if (!token) return;
+		api.get("/boards/my", { headers: { Authorization: `Bearer ${token}` } })
+			.then(res => {
+				// 서버가 객체를 내려도 배열로 변환
+				const list = Array.isArray(res.data) ? res.data : res.data.items || [];
+				setBoardList(list);
 			})
-			.then((res) => {			const list = Array.isArray(res.data) ? res.data : res.data.items || [];
-			     setBoardList(list);
-			   })
-			.catch((err) =>
-				console.error("내 문의 목록 불러오기 실패:", err.response?.data || err)
-			);
-	}, [token, memberId]);
+			.catch(err => console.error(err));
+	}, [token]);
+
+	// 상세 문의 불러오기
+	useEffect(() => {
+	  if (!boardId || !token) return;
+	  api.get(`/boards/my/${boardId}`, { headers: { Authorization: `Bearer ${token}` } })
+	    .then(res => {
+	      console.log("상세 문의 데이터:", res.data); // <-- 여기에 images가 있는지 확인
+	      const data = res.data;
+	      setTitle(data.title || "");
+	      setContent(data.content || "");
+	      setAttachments(data.images || []);
+	      setPreviewImages((data.images || []).map(img => img.img_url));
+	    })
+	    .catch(err => console.error(err));
+	}, [boardId, token]);
+
+	// 파일 선택 시 미리보기
+	const handleFileChange = (e) => {
+		const files = Array.from(e.target.files);
+		setAttachments(files);
+
+		const previews = files.map(file => URL.createObjectURL(file));
+		setPreviewImages(previews);
+	};
 
 	// 문의 등록
 	const handleSubmit = async () => {
@@ -61,43 +80,22 @@ export default function Contact() {
 		formData.append("categoryType", categoryType);
 		formData.append("orderTicketId", orderTicketId);
 		formData.append("content", content);
-
-		attachments.forEach((file) => formData.append("attachments", file));
+		attachments.forEach(file => formData.append("attachments", file));
 
 		try {
-			const res = await api.post("/boards/inquiry", formData, {
+			await api.post("/boards/inquiry", formData, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 					"Content-Type": "multipart/form-data",
 					"X-Request-Id": crypto.randomUUID(),
 				},
 			});
-			alert("문의 등록을 완료했습니다");
-			console.log("boardId:", res.data);
-
-			// 등록 완료 후 MyContact 페이지로 이동
+			alert("문의 등록 완료!");
 			navigate("/member/MyContact");
 		} catch (err) {
 			console.error(err);
-			alert("문의 등록을 실패했습니다");
+			alert("문의 등록 실패!");
 		}
-	};
-
-	const handleFileChange = async (e) => {
-		const files = Array.from(e.target.files);
-
-		setAttachments(files);
-
-		const readFiles = files.map((file) => {
-			return new Promise((resolve) => {
-				const reader = new FileReader();
-				reader.onloadend = () => resolve(reader.result);
-				reader.readAsDataURL(file);
-			});
-		});
-
-		const previews = await Promise.all(readFiles);
-		setPreviewImages(previews);
 	};
 
 	return (
@@ -208,8 +206,7 @@ export default function Contact() {
 												<input
 													type="number"
 													className="conts-resNum"
-													onChange={(e) => setOrderTicketId(e.target.value)}
-												/>
+													value={orderTicketId} onChange={e => setOrderTicketId(e.target.value)} />
 												&nbsp;&nbsp;&nbsp;
 												<button type="button" className="conts-resNumBtn">
 													예약번호 조회
@@ -222,7 +219,7 @@ export default function Contact() {
 										</tr>
 										<tr>
 											<td>
-												<input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+												<input value={title} onChange={e => setTitle(e.target.value)} />
 											</td>
 										</tr>
 
@@ -234,54 +231,67 @@ export default function Contact() {
 												<textarea
 													rows="6"
 													className="conts-area"
-													value={content}
-													onChange={(e) => setContent(e.target.value)}
-												/>
+													value={content} onChange={e => setContent(e.target.value)} />
 											</td>
 										</tr>
+									
 
 										<tr>
-											<th>첨부파일</th>
-										</tr>
-										<tr>
-											<td>
-												<input
-													type="text"
-													className="conts-resNum"
-													value={attachments.map(f => f.name || f.origin_name).join(", ")} readOnly />
+										   <td>
+										     <button className="conts-conts-btn" onClick={handleSubmit}>
+										       문의하기
+										     </button>
+										   </td>
+										 </tr>
 
-												&nbsp;&nbsp;&nbsp;
-												<label>
-													첨부파일
-													<input type="file" style={{ display: "none" }} multiple onChange={handleFileChange} />
-												</label>
-												<div className="preview-container" style={{ marginTop: "10px" }}>
-													{previewImages.map((src, idx) => (
-														<img key={idx} src={src} alt="preview" style={{ width: "120px", marginRight: "10px", borderRadius: "6px" }} />
-													))}
-												</div>
-											</td>
-										</tr><br />
-										<tr>
-											<td>
-												<button className="conts-conts-btn" onClick={handleSubmit}>
-													문의하기
-												</button>
-											</td>
-										</tr>
 									</tbody>
 								</table>
 							</div>
 
-							{/* 내 문의 목록 */}
+							{/* 내 문의 목록 + 이미지 */}
 							<div className="member-tkRead-dayBox">
 								{boardList.map(board => (
-									<div key={board.boardId} style={{ marginTop: "15px", borderTop: "1px solid #ddd", paddingTop: "10px" }}>
+									<div
+										key={board.boardId}
+										style={{
+											marginTop: "15px",
+											borderTop: "1px solid #ddd",
+											paddingTop: "10px",
+										}}
+									>
 										<strong>{board.title}</strong>
 										<p>{board.content}</p>
-										{(board.images || []).map((img, idx) => (
-											<img key={idx} src={img.img_url} alt={img.origin_name} style={{ width: "120px", marginRight: "10px", borderRadius: "6px" }} />
-										))}
+
+										{/* 이미지 박스 */}
+										<div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
+										{board.attachments?.length > 0 ? (
+										  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
+										    {board.attachments.map((img, idx) => {
+										      console.log("이미지 URL:", img.img_url); // 이제 찍힘
+										      return (
+										        <div
+										          key={idx}
+										          style={{
+										            width: "120px",
+										            height: "120px",
+										            borderRadius: "6px",
+										            overflow: "hidden",
+										            border: "1px solid #ccc",
+										          }}
+										        >
+										          <img
+										            src={img.img_url} // 서버에서 내려주는 URL 그대로
+										            alt={img.origin_name || "img"}
+										            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+										          />
+										        </div>
+										      );
+										    })}
+										  </div>
+										) : (
+										  <p>등록된 이미지가 없습니다.</p>
+										)}
+										</div>
 									</div>
 								))}
 							</div>

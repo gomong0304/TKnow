@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import Stage from "../images/stage.png";
-import axios from "axios";
+import api from "../api";
 
 export default function TicketBuy2() {
   const { id } = useParams();
@@ -31,8 +31,8 @@ export default function TicketBuy2() {
   };
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:9090/ticketnow/tickets/${id}`)
+    api
+      .get(`/tickets/${id}`)
       .then((res) => {
         console.log(res.data);  // <-- 여기서 확인
         setTicket(res.data);

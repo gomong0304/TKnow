@@ -3,6 +3,7 @@ import "../css/style.css";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import F2 from "../images/f2.png";
 import axios from "axios";
+import api from "../api";
 
 export default function F2Floor() {
   const { id } = useParams();
@@ -48,8 +49,8 @@ export default function F2Floor() {
   useEffect(() => {
     setLoading(true);
 
-    axios
-      .get(`http://localhost:9090/ticketnow/tickets/${id}/reserved-seats`)
+    api
+      .get(`/tickets/${id}/reserved-seats`)
       .then((res) => setReservedSeats(res.data.reservedSeats || []))
       .catch(() => {
         // 임의 예약 좌석 생성
@@ -66,8 +67,8 @@ export default function F2Floor() {
       .finally(() => setLoading(false));
 
     if (!ticketInfo) {
-      axios
-        .get(`http://localhost:9090/ticketnow/tickets/${id}`)
+      api
+        .get(`/tickets/${id}`)
         .then((res) => setTicketInfo(res.data))
         .catch((err) => console.error("공연 정보 조회 실패:", err));
     }
@@ -90,7 +91,7 @@ export default function F2Floor() {
       return;
     }
 
-    console.log("➡️ Buy3로 이동, 좌석 정보:", selectedSeat);
+    console.log("Buy3로 이동, 좌석 정보:", selectedSeat);
 
     navigate(`/Ticket/Buy3/${id}`, {
       state: {

@@ -25,6 +25,7 @@ import Member from "./member/Member";
 import MyTick from "./member/MyTick";
 import TkRead from "./member/TkRead";
 import Contact from "./member/Contact";
+import ContactRead from "./member/ContactRead";
 import MyContact from "./member/MyContact";
 import OftenContact from "./member/OftenContact";
 import Admin from "./admin/Admin";
@@ -171,6 +172,17 @@ function App() {
 							</>
 						}
 					/>
+					
+					<Route
+							path="/member/ContactRead/:boardId"
+							element={
+								<>
+									<Header />
+									<ContactRead />
+									<Footer />
+								</>
+							}
+						/>
 
 					<Route
 						path="/member/MyContact"

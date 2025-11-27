@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { data, Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 
 export default function AdminInven3() {
 	const navigate = useNavigate();
@@ -32,7 +32,7 @@ export default function AdminInven3() {
 		const fetchTicketData = async () => {
 			try {
 				const token = localStorage.getItem("accessToken");
-				const res = await axios.get(`http://localhost:9090/ticketnow/tickets/${ticketId}`, {
+				const res = await api.get(`/tickets/${ticketId}`, {
 					headers: { Authorization: `Bearer ${token}` }
 				});
 
@@ -121,8 +121,8 @@ export default function AdminInven3() {
 			const token = localStorage.getItem("accessToken");
 
 			// PUT 요청으로 수정
-			await axios.put(
-				`http://localhost:9090/ticketnow/tickets/${ticketId}`,
+			await api.put(
+				`/tickets/${ticketId}`,
 				payload,
 				{ headers: { Authorization: `Bearer ${token}` } }
 			);
@@ -149,8 +149,8 @@ export default function AdminInven3() {
 			const token = localStorage.getItem("accessToken");
 
 			// DELETE 요청
-			await axios.delete(
-				`http://localhost:9090/ticketnow/tickets/${ticketId}`,
+			await api.delete(
+				`/tickets/${ticketId}`,
 				{ headers: { Authorization: `Bearer ${token}` } }
 			);
 

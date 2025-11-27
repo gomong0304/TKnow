@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import Kkw from "../images/kkw.png";
 import ProMod from "../images/pro_mod.png";
@@ -8,6 +7,7 @@ import User from "../images/user.png";
 import Inventory1 from "../images/inventory1.png";
 import Inventory2 from "../images/inventory2.png";
 import Inventory3 from "../images/inventory3.png";
+import api from "../api";
 
 export default function AdminDashboard() {
   const [adminInfo, setAdminInfo] = useState(null);
@@ -22,9 +22,8 @@ export default function AdminDashboard() {
       return;
     }
 
-    // ✅ URL 수정: /admins/ → /members/
-    axios
-      .get(`http://localhost:9090/ticketnow/members/${adminId}`, {
+    api
+      .get(`members/${adminId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

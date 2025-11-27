@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
-import MainEvent from "../images/event.png";
+import api from "../api";
 
 
 export default function List() {
@@ -13,8 +12,8 @@ export default function List() {
 
 
 	useEffect(() => {
-	  axios
-	    .get("http://localhost:9090/ticketnow/tickets")
+	 api
+	    .get("/tickets")
 	    .then((res) => {
 	      const list = res.data.data || res.data.list || [];
 	      setTickets(list);

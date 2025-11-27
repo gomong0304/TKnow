@@ -2,7 +2,7 @@ import React, { useState, useEffect, payload } from "react";
 import "../css/style.css";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import Cons from "../images/cons.png";
-import axios from "axios";
+import api from "../api";
 
 export default function TicketBuy4() {
 	const { id } = useParams();
@@ -71,8 +71,8 @@ export default function TicketBuy4() {
 	  //    → payload.sub = memberId
 	  const memberId = payload.sub;
 
-	  axios
-	    .get(`http://localhost:9090/ticketnow/members/${memberId}`, {
+	  api
+	    .get(`/members/${memberId}`, {
 	      headers: { Authorization: `Bearer ${token}` },
 	    })
 	    .then((res) => {

@@ -3,7 +3,6 @@ import "../css/style.css";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import Cons from "../images/cons.png";
 import Ad1 from "../images/ad1.png";
-import axios from "axios";
 
 export default function TicketBuy5() {
 	const { id } = useParams();

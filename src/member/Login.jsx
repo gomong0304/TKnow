@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../css/style.css";
 import { Link, useNavigate} from "react-router-dom";
 import axios from "axios";
+import api from "../api";
 
 export default function Login() {
     const [userId, setUserId] = useState("");
@@ -19,8 +20,8 @@ export default function Login() {
 
         try {
             // 실제 로그인 요청
-            const res = await axios.post(
-                "http://localhost:9090/ticketnow/auth/login",
+            const res = await api.post(
+                "/auth/login",
                 {
                     memberId: userId,   // 백엔드 DTO 기준
                     password: password  // 필드명 password 맞음

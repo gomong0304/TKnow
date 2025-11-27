@@ -3,6 +3,7 @@ import "../css/style.css";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import Cons from "../images/cons.png";
+import api from "../api";
 
 export default function TicketBuy() {
   const { id } = useParams();
@@ -11,8 +12,8 @@ export default function TicketBuy() {
   const [selectedRound, setSelectedRound] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:9090/ticketnow/tickets/${id}`)
+    api
+      .get(`/tickets/${id}`)
       .then((res) => {
         const data = res.data;
         setTicket(data);

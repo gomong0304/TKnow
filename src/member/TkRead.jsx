@@ -5,6 +5,7 @@ import Ticket from "../images/ticket.png";
 import TKNOW_w from "../images/TKNOW_w.png";
 import { QRCodeCanvas } from "qrcode.react";
 import axios from "axios";
+import api from "../api";
 
 export default function TickRead() {
 	const { orderId } = useParams();
@@ -23,16 +24,17 @@ export default function TickRead() {
 		}
 
 		// ⭐ context path 포함 + 토큰 추가
-		axios.get(`http://localhost:9090/ticketnow/orders/${orderId}`, {
+		api.get(`/orders/${orderId}`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 				"Content-Type": "application/json"
 			}
 		})
-			.then(res => {
-				console.log("티켓 데이터:", res.data);
-				setData(res.data);
-				setLoading(false);
+		.then(res => {
+		    console.log("🎫 티켓 데이터:", res.data);
+		    console.log("📍 venueName 필드:", res.data.venueName);
+		    console.log("📋 전체 필드 목록:", Object.keys(res.data));
+		    setData(res.data);
 				
 			})
 			.catch(err => {

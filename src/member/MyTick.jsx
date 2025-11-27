@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../css/style.css";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../api";
 
 export default function MyTick() {
 	const [orders, setOrders] = useState([]);
@@ -21,7 +22,7 @@ export default function MyTick() {
 				}
 
 				// 내 주문 내역만 가져오기 (JWT에서 자동으로 memberId 추출)
-				const res = await axios.get("http://localhost:9090/ticketnow/orders", {
+				const res = await api.get("/orders", {
 					headers: { 
 						Authorization: `Bearer ${token}` 
 					},

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
-import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import Boy from "../images/boy.png"; 
 import Girl from "../images/girl.png"; 
+import api from "../api";
 
 export default function Read() {
 	const { id } = useParams();
@@ -81,8 +81,8 @@ export default function Read() {
 	    ? { headers: { Authorization: `Bearer ${token}` } }
 	    : {};
 		
-		axios
-		   .get(`http://localhost:9090/ticketnow/tickets/${id}`, config)
+		api
+		   .get(`/tickets/${id}`, config)
 	    .then((res) => {
 	      console.log("ticket data:", res.data);
 

@@ -140,12 +140,30 @@ export default function AdminContactDetail() {
                       <td colSpan={2}><textarea rows="6" className="conts-area" value={board.content || ""} readOnly /></td>
                     </tr>
 
-                    <tr>
-                      <th>첨부파일</th>
-                    </tr>
-                    {board.attachments?.map((file, idx) => (
-                      <tr key={idx}><td>{file.imageUrl}</td></tr>
-                    ))}
+					<tr>
+					  <th>첨부파일</th>
+					</tr>
+					{board.image?.length > 0 ? (
+					  board.image.map((file, idx) => (
+					    <tr key={idx}>
+					      <td>
+					        <a href={file.imgUrl} target="_blank" rel="noopener noreferrer">
+					          {file.orginName}
+					        </a>
+					        <br />
+					        <img
+					          src={file.imgUrl}
+					          alt={file.orginName}
+					          style={{ maxWidth: "200px" }}
+					        />
+					      </td>
+					    </tr>
+					  ))
+					) : (
+					  <tr>
+					    <td>첨부파일 정보 없음</td>
+					  </tr>
+					)}
 
                     <tr>
                       <th>댓글</th>

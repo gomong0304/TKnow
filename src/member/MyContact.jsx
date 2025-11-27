@@ -1,28 +1,22 @@
 import React, { useEffect, useState } from "react";
 import "../css/style.css";
-import { Link } from "react-router-dom";
+import { Link, useParams,useNavigate } from "react-router-dom";
+import api from "../api";
 
 export default function MyContact() {
   const [inquiries, setInquiries] = useState([]);
+  const { boardId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-
-    if (!token) {
-      console.warn("로그인이 필요합니다.");
-      return;
-    }
+    if (!token) return;
 
     fetch("http://localhost:9090/ticketnow/boards/my", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
-      .then((data) => {
-        console.log("문의 내역:", data);
-        setInquiries(data.list || []); // 페이징 형태면 list 사용
-      })
+      .then((data) => setInquiries(data.list || []))
       .catch((err) => console.error("문의 불러오기 실패:", err));
   }, []);
 
@@ -66,29 +60,24 @@ export default function MyContact() {
             <strong>내 문의 내역</strong>
             <br /><br />
 
-            {inquiries.length === 0 ? (
-              <p>문의 내역이 없습니다.</p>
-            ) : (
-              inquiries.map((inq, idx) => (
-                <div className="member-mycont-Box" key={idx}>
-                  <div className="cont-cont-list">
-                    <strong>[문의]</strong>
-                    <span> {inq.title}</span><br />
-
-                    {inq.reply ? (
-                      <p>
-                        <strong>[답변]</strong>
-                        <span> {inq.reply} </span>
-                      </p>
-                    ) : (
-                      <p>
-                        <strong>[답변대기]</strong>
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
+			    {inquiries.map((inq) => (
+			        <div
+			          key={inq.boardId}
+			          className="member-mycont-Box"
+			          style={{ cursor: "pointer" }}
+			          onClick={() => navigate(`/member/ContactRead/${inq.boardId}`)} // 클릭 시 이동
+			        >
+			          <div className="cont-cont-list">
+			            <strong>[문의]</strong> <span>{inq.title}</span><br />
+			            {inq.reply ? (
+			              <p><strong>[답변]</strong> <span>{inq.reply}</span></p>
+			            ) : (
+			              <p><strong>[답변대기]</strong></p>
+			            )}
+			          </div>
+			        </div>
+			      ))}
+			
 
             <br />
 

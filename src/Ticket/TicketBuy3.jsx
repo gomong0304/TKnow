@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../css/style.css";
-import axios from "axios";
+import api from "../api";
 import { Link, useParams, useLocation } from "react-router-dom";
 import Cons from "../images/cons.png";
 
@@ -19,8 +19,8 @@ export default function TicketBuy() {
 	const [discount3Count, setDiscount3Count] = useState(0);
 
 	useEffect(() => {
-		axios
-			.get(`http://localhost:9090/ticketnow/tickets/${id}`)
+		api
+			.get(`/tickets/${id}`)
 			.then((res) => {
 				setTicketData(res.data);
 				if (selectedSeat) setNormalCount(1);

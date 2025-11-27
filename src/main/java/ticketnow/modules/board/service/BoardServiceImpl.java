@@ -66,7 +66,7 @@ public class BoardServiceImpl implements BoardService {
     private List<ImageDTO> toImageDTOs(List<ImageVO> list) {
         if (list == null) return List.of();
         return list.stream().map(vo -> ImageDTO.builder()
-                        .imageUrl(vo.getImageUrl())
+                        .imageUrl(vo.getImgUrl())
                         .isPrimary(vo.getIsPrimary())
                         .imageSort(vo.getImageSort())
                         .imageType(vo.getImageType() != null ? vo.getImageType().name() : null)

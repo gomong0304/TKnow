@@ -206,7 +206,7 @@ public class OrdersServiceImpl implements OrdersService {
 
 		// 화면 표시에 맞게 ImageDTO로 변환
 		ImageDTO imageDTO = ImageDTO.builder()
-				.imageUrl(img.getImageUrl()) // 이미지 URL
+				.imageUrl(img.getImgUrl()) // 이미지 URL
 				.isPrimary(img.getIsPrimary()) // 대표 여부
 				.imageSort(img.getImageSort()) // 정렬 순서
 				.imageType(img.getImageType() != null ? img.getImageType().name() : null)

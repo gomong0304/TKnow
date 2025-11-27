@@ -44,11 +44,11 @@ public class FileService {
 
                 // 1-2) VO 구성 (DB 스키마 컬럼과 자동 매핑)
                 ImageVO vo = ImageVO.builder()
-                		.imageUuid(UUID.randomUUID().toString())
+                      .imageUuid(UUID.randomUUID().toString())
                         .imageExt(getExt(file.getOriginalFilename()))
                         .orginName(file.getOriginalFilename())
                         .fileName(extractFileName(url))
-                        .imageUrl(url)
+                        .imgUrl(url)
                         .imageType(ImageType.valueOf(ni.getImageType()))
                         .imageSort(ni.getImageSort())
                         .isPrimary(Boolean.TRUE.equals(ni.getIsPrimary()))

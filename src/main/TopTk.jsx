@@ -10,7 +10,7 @@ export default function TopTk() {
   const navigate = useNavigate();
   const BASE = process.env.REACT_APP_API_URL || "http://localhost:9090";
 
-/*  // ✅ 이미지 URL 처리 함수 (오타 모두 수정!)
+  // ✅ 이미지 URL 처리 함수 (오타 모두 수정!)
   const resolveImageUrl = (imageUrl) => {
     // undefined, null, 빈 문자열 체크
     if (!imageUrl) {
@@ -24,13 +24,6 @@ export default function TopTk() {
 
     // 상대 경로인 경우 BASE URL 붙이기
     return `${BASE}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
-  };*/
-  
-  const resolveImageUrl = (url) => {
-	if(!url) return "https://via.placeholder.com/400x300?text=No+Image";
-	return url.staersWith("http")
-	? url
-	: `${BASE}${url}`;
   };
 
   useEffect(() => {
@@ -38,7 +31,21 @@ export default function TopTk() {
       .get("/tickets")
       .then((res) => {
         const list = res.data.data || res.data.list || [];
-        console.log("📦 티켓 데이터:", list);
+        
+        console.log("📦 전체 응답:", res.data);
+        console.log("📦 티켓 리스트:", list);
+        
+        // ✅ 각 티켓의 이미지 URL 상세 확인
+        list.forEach((ticket, idx) => {
+          console.log(`🎫 티켓 ${idx + 1}:`, {
+            ticketId: ticket.ticketId,
+            title: ticket.title,
+            mainImageUrl: ticket.mainImageUrl || "❌ 없음",
+            originalUrl: ticket.originalUrl || "❌ 없음",
+            모든필드: ticket  // 전체 객체 출력
+          });
+        });
+        
         setTickets(list);
       })
       .catch((err) => {

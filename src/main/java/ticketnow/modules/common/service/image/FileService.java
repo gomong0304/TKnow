@@ -48,7 +48,7 @@ public class FileService {
                         .imageExt(getExt(file.getOriginalFilename()))
                         .orginName(file.getOriginalFilename())
                         .fileName(extractFileName(url))
-                        .imageUrl(url)
+                        .imgUrl(url)
                         .imageType(ImageType.valueOf(ni.getImageType()))
                         .imageSort(ni.getImageSort())
                         .isPrimary(Boolean.TRUE.equals(ni.getIsPrimary()))

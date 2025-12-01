@@ -163,16 +163,45 @@ public class MemberController {
 
         // 2) 공통 FileService로 업로드 + DB 등록
         List<ImageVO> images = fileService.upsertImages(req);
+        log.info("[MemberController] uploadProfileImage after upsert size={}",
+                images != null ? images.size() : 0);
 
-        // 3) 뷰용 DTO로 변환해서 반환
-        List<ImageDTO> resp = images.stream()
-                .map(vo -> ImageDTO.builder()
-                        .imageUrl(vo.getImgUrl())
-                        .isPrimary(vo.getIsPrimary())
-                        .imageSort(vo.getImageSort())
-                        .imageType(vo.getImageType() != null ? vo.getImageType().name() : null)
-                        .build())
-                .collect(Collectors.toList());
+        List<ImageDTO> resp;
+
+        if (images == null || images.isEmpty()) {
+            // 정말 아무 것도 없으면 기존대로 빈 배열 반환
+            resp = List.of();
+        } else {
+            // 1차: MEMBER_PROFILE + 대표 이미지만 필터
+            resp = images.stream()
+                    .filter(vo -> vo.getImageType() == ImageType.MEMBER_PROFILE
+                            && Boolean.TRUE.equals(vo.getIsPrimary()))
+                    .map(vo -> ImageDTO.builder()
+                            .imageUrl(vo.getImgUrl())
+                            .isPrimary(vo.getIsPrimary())
+                            .imageSort(vo.getImageSort())
+                            .imageType(vo.getImageType() != null ? vo.getImageType().name() : null)
+                            .build())
+                    .collect(Collectors.toList());
+
+            // 2차: 필터 결과가 비어 있으면, 가장 마지막 이미지를 강제로 '대표 프로필'로 만들어 응답
+            if (resp.isEmpty()) {
+                ImageVO last = images.get(images.size() - 1);
+
+                ImageDTO dto = ImageDTO.builder()
+                        .imageUrl(last.getImgUrl())
+                        .isPrimary(true)
+                        .imageSort(
+                                last.getImageSort() != null
+                                        ? last.getImageSort()
+                                        : 1
+                        )
+                        .imageType(ImageType.MEMBER_PROFILE.name())
+                        .build();
+
+                resp = List.of(dto);
+            }
+        }
 
         return ResponseEntity.ok(resp);
     }

@@ -24,8 +24,8 @@ public class LocalStorage {
     		
   
         public LocalStorage() {
-            this.uploadRoot = System.getProperty("user.dir") + File.separator + "uploads";
-            log.info("[LocalStorage] uploadRoot={}", uploadRoot); // 업로드경로 확인 가능
+        	   this.uploadRoot = "C:" + File.separator + "tkupload";
+        	   log.info("[LocalStorage] uploadRoot={}", uploadRoot); // 업로드경로 확인 가능
         }
         
     // 파일 저장
@@ -39,14 +39,15 @@ public class LocalStorage {
         } // save(file) 내부에서 save(file,null) 호출
           // save(file, String subDir) 서브 디렉터리 지정 가능
         
-        // 날짜 기준 기본 디렉터리 (yyyy/MM/dd)
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-
         // 실제 파일이 저장될 물리 경로
-        String dirPath = (subDir != null && !subDir.isBlank())
-                ? uploadRoot + File.separator + subDir
-                : uploadRoot + File.separator + today;
+        String dirPath ;
+        if (subDir != null && !subDir.isBlank()) {
+            dirPath = uploadRoot + File.separator + subDir;
+        } else {
+            dirPath = uploadRoot;
+        }
 
+      
         File dir = new File(dirPath);
 
         if (!dir.exists() && !dir.mkdirs()) {
@@ -70,12 +71,22 @@ public class LocalStorage {
         file.transferTo(target); // 업로드된 파일을 실제 물리 파일로 저장
 
         String relativePath = dirPath.substring(uploadRoot.length()).replace("\\", "/");
+
+        // subDir 가 없는 경우(dirPath == uploadRoot) ⇒ /uploads/파일명 형태로만 반환
+        if (relativePath == null || relativePath.isBlank()) {
+            String webPath = "/uploads/" + savedName;
+            log.info("[LocalStorage] 저장 완료 webPath={}", webPath);
+            return webPath;
+        }
+
         if (!relativePath.startsWith("/")) {
             relativePath = "/" + relativePath;
         }
+
         String webPath = "/uploads" + relativePath + "/" + savedName;
         log.info("[LocalStorage] 저장 완료 webPath={}", webPath);
         return webPath;
+
     }
 
     // 파일 삭제

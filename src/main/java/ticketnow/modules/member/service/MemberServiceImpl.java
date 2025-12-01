@@ -13,12 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ticketnow.modules.common.dto.paging.PageRequestDTO;
 import ticketnow.modules.common.dto.paging.PageResponseDTO;
+import ticketnow.modules.common.mapper.image.ImageMapper;
 import ticketnow.modules.member.constant.MemberRole;
 import ticketnow.modules.member.domain.MemberVO;
 import ticketnow.modules.member.dto.MemberCreateRequestDTO;
 import ticketnow.modules.member.dto.MemberUpdateRequestDTO;
 import ticketnow.modules.member.dto.MemberResponseDTO;
 import ticketnow.modules.member.mapper.MemberMapper;
+import ticketnow.modules.common.domain.ImageVO;
+import ticketnow.modules.common.constant.ImageType;
 
 /**
  * Member 비즈니스 서비스 - 트랜잭션 경계에서 Mapper호출 - 비밀번호 해시, 기본 ROLE, 소프트삭제 등 도메인 규칙 담당 -
@@ -30,7 +33,7 @@ import ticketnow.modules.member.mapper.MemberMapper;
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberMapper memberMapper;
-
+	 private final ImageMapper imageMapper;
 	// 간단 데모용. 실무에선 @Bean 으로 관리하거나 PasswordEncoder 주입 권장
 	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -112,19 +115,46 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional(readOnly = true)
 	public MemberResponseDTO getMember(String memberId) {
-		final long t0 = System.nanoTime();
-		log.debug("[MemberService][GET] memberId={}", memberId);
+	    final long t0 = System.nanoTime();
+	    log.debug("[MemberService][GET] memberId={}", memberId);
 
-		MemberVO vo = memberMapper.selectMemberById(memberId);
-		if (vo == null) {
-			log.warn("[MemberService][GET] not found memberId={}", memberId);
-			throw new IllegalStateException("회원이 존재하지 않습니다: " + memberId);
-		}
+	    MemberVO vo = memberMapper.selectMemberById(memberId);
+	    if (vo == null) {
+	        log.warn("[MemberService][GET] not found memberId={}", memberId);
+	        throw new IllegalStateException("회원이 존재하지 않습니다: " + memberId);
+	    }
 
-		debugSnapshot(vo, "GET:FOUND");
-		log.debug("[MemberService][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
-		return toResponse(vo);
+	    debugSnapshot(vo, "GET:FOUND");
+
+	    // 기본 회원 정보 매핑
+	    MemberResponseDTO res = toResponse(vo);
+
+	    // ===== 프로필 이미지 조회 =====
+	    String profileImageUrl = null;
+
+	    // 이미지 테이블에서 해당 회원의 이미지 목록 조회
+	    List<ImageVO> images = imageMapper.selectImagesByMember(memberId);
+
+	    if (images != null && !images.isEmpty()) {
+	        // MEMBER_PROFILE + isPrimary=true 를 우선으로 선택
+	        ImageVO profile = images.stream()
+	                .filter(img -> img.getImageType() == ImageType.MEMBER_PROFILE
+	                        && Boolean.TRUE.equals(img.getIsPrimary()))
+	                .findFirst()
+	                // 없으면 그냥 첫 번째 이미지라도 사용
+	                .orElse(images.get(0));
+
+	        profileImageUrl = profile.getImgUrl();
+	    }
+
+	    // DTO에 프로필 이미지 경로 세팅
+	    res.setProfileImageUrl(profileImageUrl);
+	    // ============================
+
+	    log.debug("[MemberService][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+	    return res;
 	}
+
 
 	// =================================================================================
 	// 페이지 조회

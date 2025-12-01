@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { useNavigate, Link } from "react-router-dom";
 import MainEvent from "../images/event.png";
-import DefaultImage from "../images/top5.png"; // ✅ 기본 이미지 import
+import DefaultImage from "../images/top5.png"; //  기본 이미지 import
 import api from "../api";
 
 export default function TopTk() {
   const [tickets, setTickets] = useState([]);
   const navigate = useNavigate();
-  const BASE = process.env.REACT_APP_API_URL || "http://localhost:9090";
+  const BASE = process.env.REACT_APP_API_URL || "http://localhost:9090/ticketnow";
 
-  // ✅ 이미지 URL 처리 함수 (오타 모두 수정!)
+  //  이미지 URL 처리 함수 (오타 모두 수정!)
   const resolveImageUrl = (imageUrl) => {
     // undefined, null, 빈 문자열 체크
     if (!imageUrl) {
@@ -37,11 +37,11 @@ export default function TopTk() {
         
         // ✅ 각 티켓의 이미지 URL 상세 확인
         list.forEach((ticket, idx) => {
-          console.log(`🎫 티켓 ${idx + 1}:`, {
+          console.log(` 티켓 ${idx + 1}:`, {
             ticketId: ticket.ticketId,
             title: ticket.title,
-            mainImageUrl: ticket.mainImageUrl || "❌ 없음",
-            originalUrl: ticket.originalUrl || "❌ 없음",
+            mainImageUrl: ticket.mainImageUrl || " 없음",
+            originalUrl: ticket.originalUrl || " 없음",
             모든필드: ticket  // 전체 객체 출력
           });
         });

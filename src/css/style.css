@@ -1846,6 +1846,11 @@ map {
 	border: 5px solid #D9D9D9;
 	border-radius: 100%;
 	position: absolute;
+
+	  width: 180px;     /* 필요하면 160~200px 사이에서 조정 */
+ 	 height: 180px;
+	  object-fit: cover;   /* 박스를 꽉 채우면서 중앙 기준으로 잘라줌 */
+ 	 display: block;
 }
 
 .member-Member-prMod {
@@ -3434,3 +3439,4 @@ table td:first-child { /* 공부 테이블값 고정*/
   border-radius: 8px;
   margin-bottom: 10px;
 }
+

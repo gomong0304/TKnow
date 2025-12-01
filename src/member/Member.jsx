@@ -12,6 +12,18 @@ import ILLIT from "../images/pick_illit.png";
 import Ht from "../images/ht.png";
 import api from "../api";
 
+//  api의 baseURL을 이용해서 이미지 URL 만드는 공통 함수
+const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
+
+const resolveImageUrl = (path) => {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+
+  return `${BASE_URL}${path}`;
+};
+
 export default function Member() {
   const [memberId, setMemberId] = useState("");
   const [memberEmail, setMemberEmail] = useState("");
@@ -21,15 +33,20 @@ export default function Member() {
   const [recentOrder, setRecentOrder] = useState(null);
   const [profileUrl, setProfileUrl] = useState("");
 
-  useEffect(() => {
+    useEffect(() => {
     const token = localStorage.getItem("accessToken"); // 받은 토큰
     const localMemberId = localStorage.getItem("memberId"); // 로그인한 아이디
-    // 주문 내역 로컬 저장값(사용 안하면 제거 가능)
-    const localOrders = localStorage.getItem("orders");
 
+    // 0) localStorage 에 저장된 프로필 경로가 있으면 먼저 적용
+    const savedPath = localStorage.getItem("profileImagePath");
+    if (savedPath) {
+      setProfileUrl(resolveImageUrl(savedPath));
+    }
+
+    // 토큰이나 아이디가 없으면 여기서 종료
     if (!localMemberId || !token) return;
 
-    // 회원 정보 가져오기
+    // 1) 회원 정보 가져오기
     api
       .get(`members/${localMemberId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -40,17 +57,18 @@ export default function Member() {
         setMemberName(res.data.memberName || "");
         setMemberPhone(res.data.memberPhone || "");
 
-        // 프로필 이미지 설정 (있으면)
+        // 서버에서 profileImageUrl 내려주는 경우 우선 사용
         if (res.data.profileImageUrl) {
-          const imageUrl = res.data.profileImageUrl.startsWith("http")
-            ? res.data.profileImageUrl
-            : `http://localhost:9090${res.data.profileImageUrl}`;
+          const imageUrl = resolveImageUrl(res.data.profileImageUrl);
           setProfileUrl(imageUrl);
+
+          // 새로고침용으로 상대 경로 저장
+          localStorage.setItem("profileImagePath", res.data.profileImageUrl);
         }
       })
       .catch((err) => console.error("회원정보 조회 실패:", err));
 
-    // 최근 주문 1건 조회
+    // 2) 최근 주문 1건 조회
     api
       .get("orders?page=1&size=1", {
         headers: { Authorization: `Bearer ${token}` },
@@ -74,7 +92,9 @@ export default function Member() {
       .catch((err) => console.error("최근 주문 조회 실패:", err));
   }, []);
 
-  // 프로필 변경 함수는 useEffect 밖에 있어야 함
+
+  // 프로필 변경 함수 (useEffect 밖)
+    // 프로필 변경 함수 (useEffect 밖)
   const handleChangeImage = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -91,27 +111,49 @@ export default function Member() {
         const token = localStorage.getItem("accessToken");
         const memberId = localStorage.getItem("memberId");
 
-        const res = await api.post(`/members/${memberId}/profile-image`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data"
+        const res = await api.post(
+          `/members/${memberId}/profile-image`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
           }
-        });
+        );
 
         console.log("업로드 응답:", res.data);
 
-        const img = res.data?.[0]?.imageUrl;
-        if (!img) {
-          alert("서버에서 이미지 URL을 돌려주지 않았음");
+        // 1) 응답 배열에서 '대표 회원 프로필' 이미지를 우선 선택
+        let imgPath = null;
+
+        if (Array.isArray(res.data)) {
+          const profileDto = res.data.find(
+            (img) =>
+              img.imageType === "MEMBER_PROFILE" &&
+              img.isPrimary === true
+          );
+
+          // 대표 프로필이 있으면 그걸, 없으면 첫 번째 항목이라도 사용
+          if (profileDto && profileDto.imageUrl) {
+            imgPath = profileDto.imageUrl;
+          } else if (res.data[0] && res.data[0].imageUrl) {
+            imgPath = res.data[0].imageUrl;
+          }
+        }
+
+        if (!imgPath) {
+          alert("서버에서 이미지 URL을 돌려주지 않았습니다.");
           return;
         }
 
-        const imageUrl = img.startsWith("http")
-          ? img
-          : `http://localhost:9090${img}`;
+        const imageUrl = resolveImageUrl(imgPath);
 
+        // 화면에 즉시 반영
         setProfileUrl(imageUrl);
-
+        // 새로고침 후에도 유지되도록 상대 경로를 저장
+        localStorage.setItem("profileImagePath", imgPath);
+        alert("프로필 이미지가 변경되었습니다.");
       } catch (err) {
         console.error("업로드 실패:", err);
         alert("이미지 업로드 실패");
@@ -120,7 +162,6 @@ export default function Member() {
 
     input.click();
   };
-
 
   return (
     <div className="member-Member-page">
@@ -134,7 +175,10 @@ export default function Member() {
             <tbody>
               <tr>
                 <td>
-                  <Link to={`/member/Member/${memberId}`} className="member-Member-click">
+                  <Link
+                    to={`/member/Member/${memberId}`}
+                    className="member-Member-click"
+                  >
                     회원정보
                   </Link>
                 </td>
@@ -176,7 +220,9 @@ export default function Member() {
             <tbody className="member-box1-bottom1">
               <tr>
                 <td>
-                  <Link to="../admin/Admin">내 아이돌 콘서트 앞 숙소 예약까지</Link>
+                  <Link to="../admin/Admin">
+                    내 아이돌 콘서트 앞 숙소 예약까지
+                  </Link>
                 </td>
               </tr>
               <tr>
@@ -195,11 +241,22 @@ export default function Member() {
         <div className="member-Member-box2">
           <div className="member-pro-box">
             <div className="member-Member-propile-imgBox">
-              <img src={profileUrl ? profileUrl : Pro} alt="프로필_사진" className="member-Member-proImg" />
-              <button onClick={handleChangeImage} className="member-propile-change-btn">
+              <img
+                src={profileUrl ? profileUrl : Pro}
+                alt="프로필_사진"
+                className="member-Member-proImg"
+              />
+              <button
+                onClick={handleChangeImage}
+                className="member-propile-change-btn"
+              >
                 변경
               </button>
-              <img src={ProMod} alt="프로필_사진" className="member-Member-prMod" />
+              <img
+                src={ProMod}
+                alt="프로필_사진"
+                className="member-Member-prMod"
+              />
 
               <div className="member-propile-table">
                 <table>
@@ -235,7 +292,11 @@ export default function Member() {
 
           {recentOrder ? (
             <Link to="/member/MyTick" className="member-Member-conBox1">
-              <img src={recentOrder.thumbnail || Cons} alt="콘서트_썸네일" className="member-Member-consImg" />
+              <img
+                src={recentOrder.thumbnail || Cons}
+                alt="콘서트_썸네일"
+                className="member-Member-consImg"
+              />
               <div className="member-Member-dayBox">
                 <span>{recentOrder.daysAgo} </span>
                 <div className="member-Member-dayBoxTb">
@@ -257,7 +318,11 @@ export default function Member() {
             </Link>
           ) : (
             <Link to="/member/MyTick" className="member-Member-conBox1">
-              <img src={Cons} alt="콘서트_썸네일" className="member-Member-consImg" />
+              <img
+                src={Cons}
+                alt="콘서트_썸네일"
+                className="member-Member-consImg"
+              />
               <div className="member-Member-dayBox">
                 <span>주문 내역이 없습니다</span>
                 <div className="member-Member-dayBoxTb">
@@ -304,7 +369,8 @@ export default function Member() {
                   <tr>
                     <th>주문 건</th>
                     <td>｜</td>
-                    <td>100 건</td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <td>100 건</td>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <th>주문 금액</th>
                     <td>｜</td>
                     <td>425,414,441 원</td>
@@ -400,7 +466,8 @@ export default function Member() {
             <br />
             <br />
             <div className="member-pwModBox-pw">
-              <input type="text" alt="패스워드_변경" />&nbsp;&nbsp;
+              <input type="text" alt="패스워드_변경" />
+              &nbsp;&nbsp;
               <input type="text" alt="패스워드_변경2" />
             </div>
           </div>
@@ -434,3 +501,4 @@ export default function Member() {
     </div>
   );
 }
+

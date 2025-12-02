@@ -31,9 +31,9 @@ export default function Member() {
   const [memberPhone, setMemberPhone] = useState("");
   const [orders, setOrders] = useState([]);
   const [recentOrder, setRecentOrder] = useState(null);
-  const [profileUrl, setProfileUrl] = useState("");
+  const [profileUrl, setProfileUrl] = useState(""); // 프로필 이미지 URL
 
-    useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem("accessToken"); // 받은 토큰
     const localMemberId = localStorage.getItem("memberId"); // 로그인한 아이디
 
@@ -57,12 +57,10 @@ export default function Member() {
         setMemberName(res.data.memberName || "");
         setMemberPhone(res.data.memberPhone || "");
 
-        // 서버에서 profileImageUrl 내려주는 경우 우선 사용
-        if (res.data.profileImageUrl) {
+        // ⚠ 이미 localStorage 에 값이 없을 때만 서버에서 온 값을 사용
+        if (!savedPath && res.data.profileImageUrl) {
           const imageUrl = resolveImageUrl(res.data.profileImageUrl);
           setProfileUrl(imageUrl);
-
-          // 새로고침용으로 상대 경로 저장
           localStorage.setItem("profileImagePath", res.data.profileImageUrl);
         }
       })
@@ -92,9 +90,7 @@ export default function Member() {
       .catch((err) => console.error("최근 주문 조회 실패:", err));
   }, []);
 
-
   // 프로필 변경 함수 (useEffect 밖)
-    // 프로필 변경 함수 (useEffect 밖)
   const handleChangeImage = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -151,8 +147,9 @@ export default function Member() {
 
         // 화면에 즉시 반영
         setProfileUrl(imageUrl);
-        // 새로고침 후에도 유지되도록 상대 경로를 저장
+        // 새로고침 후에도 유지되도록 localStorage 에 저장
         localStorage.setItem("profileImagePath", imgPath);
+
         alert("프로필 이미지가 변경되었습니다.");
       } catch (err) {
         console.error("업로드 실패:", err);
@@ -501,4 +498,3 @@ export default function Member() {
     </div>
   );
 }
-

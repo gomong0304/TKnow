@@ -1,3 +1,4 @@
+// src/Ticket/TicketBuy5.jsx
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";

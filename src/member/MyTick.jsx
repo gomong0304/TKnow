@@ -1,3 +1,4 @@
+// src/member/MyTick.jsx
 import React, { useEffect, useState } from "react";
 import "../css/style.css";
 import axios from "axios";

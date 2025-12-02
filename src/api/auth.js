@@ -1,3 +1,4 @@
+//src/api/auth.js
 import axios from "axios";
 
 const BASE_URL = "http://localhost:9090/ticketnow"; // 백엔드 URL

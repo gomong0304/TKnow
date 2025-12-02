@@ -1,3 +1,4 @@
+// src/main/Header.jsx
 import React from "react";
 import "../css/style.css";
 import { Link, useNavigate, useParams } from "react-router-dom"; // ✅ navigate 추가
@@ -20,6 +21,7 @@ export default function Header() {
 
     alert("로그아웃 되었습니다");
     navigate("/"); // 메인으로
+   window.location.replace("/");
   };
 
   return (

@@ -1,6 +1,7 @@
+// src/member/member.jsx
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Pro from "../images/propile.png";
 import ProMod from "../images/pro_mod.png";
 import Cons from "../images/cons.png";
@@ -25,6 +26,8 @@ const resolveImageUrl = (path) => {
 };
 
 export default function Member() {
+  const navigate = useNavigate(); // 
+
   const [memberId, setMemberId] = useState("");
   const [memberEmail, setMemberEmail] = useState("");
   const [memberName, setMemberName] = useState("");
@@ -37,10 +40,13 @@ export default function Member() {
     const token = localStorage.getItem("accessToken"); // 받은 토큰
     const localMemberId = localStorage.getItem("memberId"); // 로그인한 아이디
 
-    // 0) localStorage 에 저장된 프로필 경로가 있으면 먼저 적용
-    const savedPath = localStorage.getItem("profileImagePath");
-    if (savedPath) {
-      setProfileUrl(resolveImageUrl(savedPath));
+    // 0) localStorage 에 저장된 프로필 경로가 있으면 먼저 적용 (계정별 저장)
+    let savedPath = null;
+    if (localMemberId) {
+      savedPath = localStorage.getItem(`profileImagePath_${localMemberId}`);
+      if (savedPath) {
+        setProfileUrl(resolveImageUrl(savedPath));
+      }
     }
 
     // 토큰이나 아이디가 없으면 여기서 종료
@@ -61,7 +67,13 @@ export default function Member() {
         if (!savedPath && res.data.profileImageUrl) {
           const imageUrl = resolveImageUrl(res.data.profileImageUrl);
           setProfileUrl(imageUrl);
-          localStorage.setItem("profileImagePath", res.data.profileImageUrl);
+
+          if (localMemberId) {
+            localStorage.setItem(
+              `profileImagePath_${localMemberId}`,
+              res.data.profileImageUrl
+            );
+          }
         }
       })
       .catch((err) => console.error("회원정보 조회 실패:", err));
@@ -89,6 +101,25 @@ export default function Member() {
       })
       .catch((err) => console.error("최근 주문 조회 실패:", err));
   }, []);
+
+  // 
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("memberId");
+    localStorage.removeItem("role");
+
+    alert("로그아웃 되었습니다");
+    navigate("/"); // 메인페이지로 이동
+    window.location.replace("/");
+
+    // App.js의 RequireAuth가 해당 라우트가 렌더링 될 때 만 토큰을 검사함
+    // 마이페이지에 이미 들어와 있는 상태에서 로그아웃을 누르면 localStorage의 토큰을 지움
+    // RequireAuth 는 다시 렌더링되지 않기 때문에 토큰이 사라진걸 모르는 상태
+    // 원래는 navigate("/")가 라우팅을 바꿔줘야 하는데 실제 실행환경에서 제대로 동작하지 않아서 URL이 살아있는 상태가 됨
+    // RequireAuth가 개입할 기회가 사라짐. 로그아웃을 해도 새로고침 전까지 토큰만 사라진 상태로 이전 화면에 그대로 남아있음.
+    // 로그아웃 후에는 SPA 라우팅 + 강제 페이지 이동을 둘 다 걸어 두어 무조건 메인으로 보내는 방식으로 해둠
+  };
 
   // 프로필 변경 함수 (useEffect 밖)
   const handleChangeImage = () => {
@@ -126,8 +157,7 @@ export default function Member() {
         if (Array.isArray(res.data)) {
           const profileDto = res.data.find(
             (img) =>
-              img.imageType === "MEMBER_PROFILE" &&
-              img.isPrimary === true
+              img.imageType === "MEMBER_PROFILE" && img.isPrimary === true
           );
 
           // 대표 프로필이 있으면 그걸, 없으면 첫 번째 항목이라도 사용
@@ -147,8 +177,11 @@ export default function Member() {
 
         // 화면에 즉시 반영
         setProfileUrl(imageUrl);
-        // 새로고침 후에도 유지되도록 localStorage 에 저장
-        localStorage.setItem("profileImagePath", imgPath);
+
+        // 새로고침 후에도 유지되도록 localStorage 에 저장 (계정별로 분리)
+        if (memberId) {
+          localStorage.setItem(`profileImagePath_${memberId}`, imgPath);
+        }
 
         alert("프로필 이미지가 변경되었습니다.");
       } catch (err) {
@@ -230,7 +263,9 @@ export default function Member() {
           <br />
           <br />
 
-          <span className="member-box1-logout">로그아웃</span>
+          <span className="member-box1-logout" onClick={handleLogout}>
+            로그아웃
+          </span>
         </div>
       </div>
 
@@ -395,7 +430,7 @@ export default function Member() {
             <table>
               <tbody>
                 <tr>
-                  <td>2025 투모로우바이투게더 단독 콘서트〈# :  유화〉</td>
+                  <td>2025 투모로우바이투게더 단독 콘서트〈# : 유화〉</td>
                   <td>2025. 10. 11</td>
                   <td>
                     <span className="member-list-none">미작성</span>
@@ -489,7 +524,7 @@ export default function Member() {
           <br />
 
           <div className="member-Member-remove">
-            <span>로그아웃</span>
+            <span onClick={handleLogout}>로그아웃</span>
             <span>&nbsp;｜&nbsp;</span>
             <span>회원탈퇴</span>
           </div>

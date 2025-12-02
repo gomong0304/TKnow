@@ -1,7 +1,8 @@
+// src/App.js
 import React from "react";
 import { AuthProvider } from "./context/AuthContext";
 import "./css/style.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Header from "./main/Header";
 import Banner from "./main/Banner";
 import Banner2 from "./main/Banner2";
@@ -37,7 +38,18 @@ import AdminInven from "./admin/AdminInven";
 import AdminInven2 from "./admin/AdminInven2";
 import AdminInven3 from "./admin/AdminInven3";
 
+// accessToken이 없으면 alert을 띄우고 메인으로 강제 이동
+// 비회원이 직링 이용시 마이페이지에 접속 가능한 문제 해결
+function RequireAuth({ children }) {
+  const token = localStorage.getItem("accessToken");
 
+  if (!token) {
+    alert("로그인이 필요한 서비스입니다.");
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
 
 function App() {
 	return (
@@ -118,29 +130,33 @@ function App() {
 
 
 
-					<Route
-						path="/member/Member/:id"
-						element={
-							<>
-								<Header />
-								<Member />
-								<Footer />
-							</>
-						}
-					/>
+				<Route
+				path="/member/Member/:id"
+				element={
+					<RequireAuth>
+					<>
+						<Header />
+						<Member />
+						<Footer />
+					</>
+					</RequireAuth>
+				}
+				/>
+
 
 					<Route
-						path="/member/MyTick"
-						element={
-							<>
-
-								<Header />
-								<MyTick />
-								<Footer />
-
-							</>
-						}
+					path="/member/MyTick"
+					element={
+						<RequireAuth>
+						<>
+							<Header />
+							<MyTick />
+							<Footer />
+						</>
+						</RequireAuth>
+					}
 					/>
+
 					<Route
 						path="/Ticket/List"
 						element={
@@ -185,26 +201,32 @@ function App() {
 						/>
 
 					<Route
-						path="/member/MyContact"
-						element={
-							<>
-								<Header />
-								<MyContact />
-								<Footer />
-							</>
-						}
+					path="/member/MyContact"
+					element={
+						<RequireAuth>
+						<>
+							<Header />
+							<MyContact />
+							<Footer />
+						</>
+						</RequireAuth>
+					}
 					/>
 
-					<Route
-						path="/member/OftenContact"
-						element={
-							<>
-								<Header />
-								<OftenContact />
-								<Footer />
-							</>
-						}
+
+				<Route
+					path="/member/OftenContact"
+					element={
+						<RequireAuth>
+						<>
+							<Header />
+							<OftenContact />
+							<Footer />
+						</>
+						</RequireAuth>
+					}
 					/>
+
 
 					<Route
 						path="/admin/Admin"

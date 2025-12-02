@@ -1,3 +1,4 @@
+// src/admin/AdminInven.jsx
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { Link, useNavigate } from "react-router-dom";

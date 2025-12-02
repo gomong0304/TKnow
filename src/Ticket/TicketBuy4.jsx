@@ -1,3 +1,4 @@
+// src/Ticket/TicketBuy4.jsx
 import React, { useState, useEffect, payload } from "react";
 import "../css/style.css";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";

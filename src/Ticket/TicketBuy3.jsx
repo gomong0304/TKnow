@@ -1,3 +1,4 @@
+// src/Ticket/TicketBuy3.jsx
 import React, { useEffect, useState } from "react";
 import "../css/style.css";
 import api from "../api";

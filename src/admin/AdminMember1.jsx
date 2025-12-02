@@ -1,3 +1,4 @@
+// src/admin/AdminMember1.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../css/style.css";

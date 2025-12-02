@@ -1,3 +1,4 @@
+// src/Ticket/FllorF2.jsx
 import React, { useEffect, useState } from "react";
 import "../css/style.css";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";

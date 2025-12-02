@@ -1,3 +1,4 @@
+// src/main/Banner.jsx
 import React from "react";
 import "../css/style.css"
 import { Link, useParams } from "react-router-dom";

@@ -1,3 +1,4 @@
+// src/member/TkRead.jsx
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { Link, useParams } from "react-router-dom";

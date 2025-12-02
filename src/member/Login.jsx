@@ -1,3 +1,4 @@
+// src/member/Login.jsx
 import React, { useState } from "react";
 import "../css/style.css";
 import { Link, useNavigate} from "react-router-dom";
@@ -53,7 +54,7 @@ export default function Login() {
 				localStorage.setItem("adminId", userId);
                 navigate("/admin/Admin");
             } else {
-                navigate(`/member/Member/${userId}`);
+                 navigate("/");
             }
 
         } catch (err) {

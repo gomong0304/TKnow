@@ -1,3 +1,4 @@
+// src/Ticket/List.jsx
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
 import { useNavigate, Link } from "react-router-dom";

@@ -12,7 +12,7 @@ import KIKI from "../images/pick_kiki.png";
 import ILLIT from "../images/pick_illit.png";
 import Ht from "../images/ht.png";
 import api from "../api";
-
+import MemberSidebar from "./MemberSidebar";
 //  api의 baseURL을 이용해서 이미지 URL 만드는 공통 함수
 const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
 
@@ -195,80 +195,7 @@ export default function Member() {
 
   return (
     <div className="member-Member-page">
-      <div className="member-left">
-        <div className="member-Member-box1">
-          <strong>{memberName || "회원"}</strong>
-          <span> 님 반갑습니다!</span>
-          <br />
-          <br />
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <Link
-                    to={`/member/Member/${memberId}`}
-                    className="member-Member-click"
-                  >
-                    회원정보
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <td>보안설정</td>
-              </tr>
-              <tr>
-                <td>회원등급</td>
-              </tr>
-              <tr>
-                <td>
-                  <Link to="/member/MyTick" className="member-Member">
-                    나의 티켓
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <td>나의 일정</td>
-              </tr>
-              <tr>
-                <td>
-                  <Link to="/member/MyContact" className="member-Member">
-                    1:1 문의 내역
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <td>고객센터</td>
-              </tr>
-              <tr>
-                <td>공지사항</td>
-              </tr>
-            </tbody>
-          </table>
-          <hr className="member-box1-bottom" />
-
-          <table>
-            <tbody className="member-box1-bottom1">
-              <tr>
-                <td>
-                  <Link to="../admin/Admin">
-                    내 아이돌 콘서트 앞 숙소 예약까지
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <th>콘서트 준비는 티켓나우와 함께!</th>
-              </tr>
-            </tbody>
-          </table>
-          <br />
-          <br />
-
-          <span className="member-box1-logout" onClick={handleLogout}>
-            로그아웃
-          </span>
-        </div>
-      </div>
-
+       <MemberSidebar active="myContact" />
       <div className="member-right">
         <div className="member-Member-box2">
           <div className="member-pro-box">
@@ -383,7 +310,7 @@ export default function Member() {
             <br />
             <br />
             <span>3333-1234-56-7890</span>&nbsp;&nbsp;&nbsp;&nbsp;
-            <span>정*현</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span>김나우</span>&nbsp;&nbsp;&nbsp;&nbsp;
             <span>변경</span>
           </div>
           <br />

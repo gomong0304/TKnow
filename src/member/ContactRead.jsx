@@ -4,7 +4,7 @@ import axios from "axios";
 import "../css/style.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../api";
-
+import MemberSidebar from "./MemberSidebar";
 export default function Contact() {
 
 	const navigate = useNavigate();
@@ -101,56 +101,7 @@ export default function Contact() {
 
 	return (
 		<div className="member-Member-page">
-			<div className="member-left">
-				<div className="member-Member-box1">
-					<strong>힙합개냥이</strong>
-					<span>님 반갑습니다!</span>
-					<br />
-					<br />
-					<table>
-						<tbody>
-							<tr>
-								<td>
-									<Link to="/member/Member" className="member-Member">
-										회원정보
-									</Link>
-								</td>
-							</tr>
-							<tr>
-								<td>보안설정</td>
-							</tr>
-							<tr>
-								<td>회원등급</td>
-							</tr>
-							<tr>
-								<td>
-									<Link to="/member/MyTick" className="member-Member">
-										나의 티켓
-									</Link>
-								</td>
-							</tr>
-							<tr>
-								<td>나의 일정</td>
-							</tr>
-							<tr>
-								<td>
-									<Link to="/member/MyContact" className="member-Member-click">
-										1:1 문의 내역
-									</Link>
-								</td>
-							</tr>
-							<tr>
-								<td>고객센터</td>
-							</tr>
-							<tr>
-								<td>공지사항</td>
-							</tr>
-						</tbody>
-					</table>
-					<hr className="member-box1-bottom" />
-				</div>
-			</div>
-
+			<MemberSidebar active="myContact" />
 			<div className="member-right">
 				<div className="member-myTk-box2">
 					<div className="costs-main-box">
@@ -224,17 +175,54 @@ export default function Contact() {
 											</td>
 										</tr>
 
-										<tr>
-											<th>문의내용</th>
-										</tr>
-										<tr>
-											<td>
-												<textarea
-													rows="6"
-													className="conts-area"
-													value={content} onChange={e => setContent(e.target.value)} />
-											</td>
-										</tr>
+										{/* 문의 내용 (읽기 전용) */}
+						{/* 문의 내용 (읽기 전용) */}
+						<tr>
+						<th>문의내용</th>
+						</tr>
+						<tr>
+						<td>
+							<textarea
+							rows="6"
+							className="conts-area"
+							value={content}    
+							readOnly           // 읽기 전용
+							/>
+						</td>
+						</tr>
+
+						{/* 첨부 이미지 표시 */}
+						<tr>
+						<th>첨부파일</th>
+						</tr>
+						{attachments && attachments.length > 0 ? (
+						attachments.map((img, idx) => (
+							<tr key={idx}>
+							<td>
+								{/* 원본 파일명 텍스트 (있으면) */}
+								{(img.origin_name || img.originName) && (
+								<>
+									<span>{img.origin_name || img.originName}</span>
+									<br />
+								</>
+								)}
+
+								{/* 실제 이미지 */}
+								<img
+								src={img.img_url || img.imageUrl}  // 백엔드에서 내려주는 필드에 맞게 둘 다 대응
+								alt={img.origin_name || img.originName || `첨부파일 ${idx + 1}`}
+								style={{ maxWidth: "200px", marginTop: "8px" }}
+								/>
+							</td>
+							</tr>
+						))
+						) : (
+						<tr>
+							<td>첨부 이미지가 없습니다.</td>
+						</tr>
+						)}
+
+
 									
 
 										<tr>

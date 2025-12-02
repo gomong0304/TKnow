@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import "../css/style.css";
 import { Link, useParams,useNavigate } from "react-router-dom";
 import api from "../api";
-
+import MemberSidebar from "./MemberSidebar";
 export default function MyContact() {
   const [inquiries, setInquiries] = useState([]);
   const { boardId } = useParams();
@@ -23,36 +23,8 @@ export default function MyContact() {
 
   return (
     <div className="member-Member-page">
-      <div className="member-left">
-        <div className="member-Member-box1">
-          <strong>힙합개냥이</strong><span>님 반갑습니다!</span><br /><br />
-
-          <table>
-            <tbody>
-              <tr><td><Link to="/member/Member" className="member-Member">회원정보</Link></td></tr>
-              <tr><td>보안설정</td></tr>
-              <tr><td>회원등급</td></tr>
-              <tr><td><Link to="/member/MyTick" className="member-Member">나의 티켓</Link></td></tr>
-              <tr><td>나의 일정</td></tr>
-              <tr><td><Link to="/member/MyContact" className="member-Member-click">1:1 문의 내역</Link></td></tr>
-              <tr><td>고객센터</td></tr>
-              <tr><td>공지사항</td></tr>
-            </tbody>
-          </table>
-
-          <hr className="member-box1-bottom" />
-
-          <table>
-            <tbody className="member-box1-bottom1">
-              <tr><td>내 아이돌 콘서트 앞 숙소 예약까지</td></tr>
-              <tr><th>콘서트 준비는 티켓나우와 함께!</th></tr>
-            </tbody>
-          </table>
-
-          <br /><br />
-          <span className="member-box1-logout">로그아웃</span>
-        </div>
-      </div>
+      
+      <MemberSidebar active="myContact" />
 
       <div className="member-right">
         <div className="member-myTk-box2">

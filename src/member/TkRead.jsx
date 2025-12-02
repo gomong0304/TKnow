@@ -6,7 +6,7 @@ import Ticket from "../images/ticket.png";
 import TKNOW_w from "../images/TKNOW_w.png";
 import { QRCodeCanvas } from "qrcode.react";
 import api from "../api";
-
+import MemberSidebar from "./MemberSidebar";
 export default function TickRead() {
   const { orderId } = useParams();
   const [data, setData] = useState(null);
@@ -73,26 +73,26 @@ export default function TickRead() {
     );
   }
 
-  // 🔹 데이터 없음
+  //  데이터 없음
   if (!data) {
     return <div>데이터가 없습니다.</div>;
   }
 
-  // ✅ 장소 처리 - ticketVenue 필드 사용
+  // 장소 처리 - ticketVenue 필드 사용
   const venueName = data.ticketVenue || "장소 정보 없음";
   
-  // ✅ 연락처 처리
+  // 연락처 처리
   const memberPhone = data.memberPhone || "연락처 정보 없음";
   
-  // 🔍 디버깅: 장소가 null인지 확인
+  // 디버깅: 장소가 null인지 확인
   if (!data.ticketVenue) {
     console.warn("⚠️ ticketVenue가 null입니다! 백엔드 쿼리를 확인하세요.");
   }
 
-  // 🔹 이미지 안전하게 표시
+  // 이미지 안전하게 표시
   const ticketImg = data.ticketImage || Ticket;
 
-  // ✅ 가격 계산
+  // 가격 계산
   const ticketPrice = data.ticketPrice || 0;
   const fee = data.serviceFee || Math.round(ticketPrice * 0.1); // 백엔드 값 우선
   const deliveryFee = 0;
@@ -100,56 +100,7 @@ export default function TickRead() {
 
   return (
     <div className="member-Member-page">
-      <div className="member-left">
-        <div className="member-Member-box1">
-          <strong>{data.memberName}</strong>
-          <span>님 반갑습니다!</span>
-          <br />
-          <br />
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <Link to="/member/Member" className="member-Member">
-                    회원정보
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <td>보안설정</td>
-              </tr>
-              <tr>
-                <td>회원등급</td>
-              </tr>
-              <tr>
-                <td>
-                  <Link to="/member/MyTick" className="member-Member-click">
-                    나의 티켓
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <td>나의 일정</td>
-              </tr>
-              <tr>
-                <td>
-                  <Link to="/member/Contact" className="member-mytick">
-                    1:1 문의 내역
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <td>고객센터</td>
-              </tr>
-              <tr>
-                <td>공지사항</td>
-              </tr>
-            </tbody>
-          </table>
-          <hr className="member-box1-bottom" />
-        </div>
-      </div>
-
+      <MemberSidebar active="myContact" />
       <div className="member-right">
         <div className="member-myTk-box2">
           <div className="mytick-main-box">

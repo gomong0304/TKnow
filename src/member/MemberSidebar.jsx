@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";   // ✅ useLocation 추가
 import api from "../api";
 
-export default function MemberSidebar({ active }) {
+export default function MemberSidebar() {
   const [memberId, setMemberId] = useState("");
   const [memberName, setMemberName] = useState("");
 
   const location = useLocation();
   const path = location.pathname || "";
 
-  // ✅ URL 기준으로 자동 선택 (필요하면 여기 조건만 조절)
+  // ✅ URL 기준으로 자동 선택
   let autoActive = "";
   if (path.startsWith("/member/Member")) {
     autoActive = "member";
@@ -27,8 +27,8 @@ export default function MemberSidebar({ active }) {
     autoActive = "myContact";
   }
 
-  // prop(active)이 오면 그걸 우선, 아니면 URL 기반
-  const current = active || autoActive;
+  // ✅ 이제는 URL 기준만 사용 (active prop 무시)
+  const current = autoActive;
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -92,9 +92,6 @@ export default function MemberSidebar({ active }) {
                   나의 티켓
                 </Link>
               </td>
-            </tr>
-            <tr>
-              <td>나의 일정</td>
             </tr>
             <tr>
               <td>

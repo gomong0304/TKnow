@@ -2868,11 +2868,30 @@ map {
 	width: 400px;
 }
 
-table td:first-child { /* 공부 테이블값 고정*/
+/* table td:first-child { 
 	width: 140px;
 	white-space: nowrap;
 	gap: 4px;
+}*/
+
+/* 1:1 문의하기 테이블 기본 레이아웃 */
+.cont-conts-list table {
+  width: 100%;
+  border-collapse: collapse;
 }
+
+.cont-conts-list th {
+  text-align: left;
+  line-height: 50px;
+  width: 140px;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.cont-conts-list td {
+  vertical-align: top;
+}
+
 
 .admin-Member-conBoxnoe {
 	border: 1px solid #D9D9D9;
@@ -3441,3 +3460,44 @@ table td:first-child { /* 공부 테이블값 고정*/
   margin-bottom: 10px;
 }
 
+
+
+/* ===== 1:1 문의하기 테이블 전용 설정(전역 td:first-child 덮어쓰기) ===== */
+.cont-conts-list table td:first-child {
+  width: auto;          /* 140px 강제 폭 제거 */
+  white-space: normal;  /* 줄바꿈 허용 */
+}
+/* ===== 문의 첨부파일 미리보기 ===== */
+.preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 500px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+
+.preview-image,
+.reply-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  display: block;
+  margin-top : 30px;
+}
+
+/* 문의하기 테이블 셀 정렬 */
+.cont-conts-list td {
+  vertical-align: top;
+}
+
+/* 공용 구분선 */
+.border-line-tool {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}

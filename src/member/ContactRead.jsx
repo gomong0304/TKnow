@@ -7,6 +7,18 @@ import api from "../api";
 import MemberSidebar from "./MemberSidebar";
 export default function Contact() {
 
+	//  api의 baseURL을 이용해서 이미지 URL 만드는 공통 함수
+	const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
+
+	const resolveImageUrl = (path) => {
+		if (!path) return "";
+		if (path.startsWith("http://") || path.startsWith("https://")) {
+			return path;
+		}
+
+		return `${BASE_URL}${path}`;
+	};
+
 	const navigate = useNavigate();
 	const { boardId } = useParams();
 
@@ -18,10 +30,13 @@ export default function Contact() {
 	const [content, setContent] = useState("");
 	const [attachments, setAttachments] = useState([]);
 	const [previewImages, setPreviewImages] = useState([]);
+	const [replies, setReplies] = useState([]);
 	const [boardList, setBoardList] = useState([]);
 
 	const token = localStorage.getItem("accessToken");
 	const memberId = localStorage.getItem("memberId");
+
+
 
 	// 회원 정보 가져오기
 	useEffect(() => {
@@ -46,20 +61,50 @@ export default function Contact() {
 			.catch(err => console.error(err));
 	}, [token]);
 
-	// 상세 문의 불러오기
+	// ====== 내 문의 상세 조회 ======
 	useEffect(() => {
-	  if (!boardId || !token) return;
-	  api.get(`/boards/my/${boardId}`, { headers: { Authorization: `Bearer ${token}` } })
-	    .then(res => {
-	      console.log("상세 문의 데이터:", res.data); // <-- 여기에 images가 있는지 확인
-	      const data = res.data;
-	      setTitle(data.title || "");
-	      setContent(data.content || "");
-	      setAttachments(data.images || []);
-	      setPreviewImages((data.images || []).map(img => img.img_url));
-	    })
-	    .catch(err => console.error(err));
-	}, [boardId, token]);
+		const token = localStorage.getItem("accessToken");
+		const localMemberId = localStorage.getItem("memberId");
+
+		if (!token || !localMemberId) {
+			alert("로그인이 필요합니다.");
+			navigate("/member/Login");
+			return;
+		}
+
+		api
+			.get(`/boards/my/${boardId}`, {
+				headers: { Authorization: `Bearer ${token}` },
+			})
+			.then((res) => {
+				const data = res.data || {};
+
+				// 제목 / 내용
+				setTitle(data.title || "");
+				setContent(data.content || "");
+
+				// 문의 본문 첨부 이미지: attachments(List<ImageDTO>) 사용
+				const serverAttachments = Array.isArray(data.attachments)
+					? data.attachments
+					: [];
+
+				setAttachments(serverAttachments);
+
+				// 화면용 미리보기 URL 배열 (imageUrl 필드 사용)
+				setPreviewImages(
+					serverAttachments
+						.map((img) => img.imageUrl)
+						.filter((url) => typeof url === "string" && url.length > 0)
+				);
+
+				// 관리자 답변 목록: replies(List<ReplyItemDTO>)
+				setReplies(Array.isArray(data.replies) ? data.replies : []);
+			})
+			.catch((err) => {
+				console.error("문의 상세 조회 실패:", err);
+				alert("문의 상세 조회에 실패했습니다.");
+			});
+	}, [boardId, navigate]);
 
 	// 파일 선택 시 미리보기
 	const handleFileChange = (e) => {
@@ -114,8 +159,6 @@ export default function Contact() {
 									<tbody>
 										<tr>
 											<th>이메일 주소</th>
-										</tr>
-										<tr>
 											<td>
 												<input type="text" value={memberEmail} readOnly />
 											</td>
@@ -123,8 +166,6 @@ export default function Contact() {
 
 										<tr>
 											<th>휴대 전화 번호</th>
-										</tr>
-										<tr>
 											<td>
 												<input type="text" value={memberPhone} readOnly />
 											</td>
@@ -132,8 +173,6 @@ export default function Contact() {
 
 										<tr>
 											<th>문의 유형</th>
-										</tr>
-										<tr>
 											<td>
 												<select
 													value={categoryType}
@@ -141,7 +180,7 @@ export default function Contact() {
 													className="Ad-conts-resNum"
 												>
 													<option value="SHOW_INFO">공연 정보</option>
-													<option value="TICKET_BOOKING">예메</option>
+													<option value="TICKET_BOOKING">예매</option>
 													<option value="REFUND">환불</option>
 													<option value="FREE">계정</option>
 													<option value="ACCOUNT">시스템</option>
@@ -152,13 +191,13 @@ export default function Contact() {
 
 										<tr>
 											<th>예약번호</th>
-										</tr>
-										<tr>
 											<td>
 												<input
 													type="number"
 													className="conts-resNum"
-													value={orderTicketId} onChange={e => setOrderTicketId(e.target.value)} />
+													value={orderTicketId}
+													onChange={(e) => setOrderTicketId(e.target.value)}
+												/>
 												&nbsp;&nbsp;&nbsp;
 												<button type="button" className="conts-resNumBtn">
 													예약번호 조회
@@ -168,72 +207,124 @@ export default function Contact() {
 
 										<tr>
 											<th>문의 제목</th>
-										</tr>
-										<tr>
 											<td>
-												<input value={title} onChange={e => setTitle(e.target.value)} />
+												<input value={title} onChange={(e) => setTitle(e.target.value)} />
 											</td>
 										</tr>
 
-										{/* 문의 내용 (읽기 전용) */}
-						{/* 문의 내용 (읽기 전용) */}
-						<tr>
-						<th>문의내용</th>
-						</tr>
-						<tr>
-						<td>
-							<textarea
-							rows="6"
-							className="conts-area"
-							value={content}    
-							readOnly           // 읽기 전용
-							/>
-						</td>
-						</tr>
-
-						{/* 첨부 이미지 표시 */}
-						<tr>
-						<th>첨부파일</th>
-						</tr>
-						{attachments && attachments.length > 0 ? (
-						attachments.map((img, idx) => (
-							<tr key={idx}>
-							<td>
-								{/* 원본 파일명 텍스트 (있으면) */}
-								{(img.origin_name || img.originName) && (
-								<>
-									<span>{img.origin_name || img.originName}</span>
-									<br />
-								</>
-								)}
-
-								{/* 실제 이미지 */}
-								<img
-								src={img.img_url || img.imageUrl}  // 백엔드에서 내려주는 필드에 맞게 둘 다 대응
-								alt={img.origin_name || img.originName || `첨부파일 ${idx + 1}`}
-								style={{ maxWidth: "200px", marginTop: "8px" }}
-								/>
-							</td>
-							</tr>
-						))
-						) : (
-						<tr>
-							<td>첨부 이미지가 없습니다.</td>
-						</tr>
-						)}
-
-
-									
-
 										<tr>
-										   <td>
-										     <button className="conts-conts-btn" onClick={handleSubmit}>
-										       문의하기
-										     </button>
-										   </td>
-										 </tr>
+											<th>문의내용</th>
+											<td>
+												<textarea
+													rows="6"
+													className="conts-area"
+													value={content}
+													readOnly
+												/>
+											</td>
+										</tr>
 
+										{/* 첨부 이미지 정보 */}
+										<tr>
+											<th>첨부파일</th>
+											<td>
+												<input
+													type="text"
+													className="member-myCont-tt4"
+													value={
+														previewImages && previewImages.length > 0
+															? `${previewImages.length}개 첨부됨`
+															: "첨부된 파일이 없습니다."
+													}
+													readOnly
+												/>
+											</td>
+										</tr>
+
+										{/* 첨부 이미지 미리보기 */}
+										<tr>
+											<td colSpan="2">
+												<div className="preview-container">
+													{previewImages && previewImages.length > 0 ? (
+														previewImages.map((src, idx) => (
+															<img
+																key={idx}
+																src={resolveImageUrl(src)}
+																alt={`attachment-${idx + 1}`}
+																className="preview-image"
+															/>
+														))
+													) : (
+														<p>첨부 이미지가 없습니다.</p>
+													)}
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td colSpan="2">
+												<hr className="border-line-tool" />
+											</td>
+										</tr>
+
+										{/* 관리자 답변 */}
+										<tr>
+											<th>답변</th>
+											<td>
+												{replies && replies.length > 0 ? (
+													<div className="reply-list">
+														{replies.map((reply) => (
+															<div key={reply.replyId} className="reply-item">
+																<div className="reply-meta">
+																	<span className="reply-admin">관리자</span>
+																	<span className="reply-date">
+																		{reply.createdAt && Array.isArray(reply.createdAt)
+																			? new Date(
+																				reply.createdAt[0],
+																				reply.createdAt[1] - 1,
+																				reply.createdAt[2],
+																				reply.createdAt[3] || 0,
+																				reply.createdAt[4] || 0
+																			).toLocaleString()
+																			: ""}
+																	</span>
+																</div>
+																<div className="reply-content">{reply.content}</div>
+																{reply.attachments && reply.attachments.length > 0 && (
+																	<div className="reply-images">
+																		{reply.attachments.map((img, idx) => (
+																			<img
+																				key={idx}
+																				src={resolveImageUrl(img.imageUrl)}
+																				alt={`reply-img-${idx + 1}`}
+																				className="reply-image"
+																			/>
+																		))}
+																	</div>
+																)}
+															</div>
+														))}
+													</div>
+												) : (
+													<span>등록된 답변이 없습니다.</span>
+												)}
+											</td>
+										</tr>
+
+										{/* 목록 버튼 */}
+										<tr>
+											<td colSpan="2">
+												<button
+													type="button"
+													className="conts-conts-btn"
+													onClick={() => navigate("/member/MyContact")}
+												>
+													목록으로
+												</button>
+											</td>
+										</tr>
 									</tbody>
+
+
 								</table>
 							</div>
 
@@ -253,33 +344,33 @@ export default function Contact() {
 
 										{/* 이미지 박스 */}
 										<div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
-										{board.attachments?.length > 0 ? (
-										  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
-										    {board.attachments.map((img, idx) => {
-										      console.log("이미지 URL:", img.img_url); // 이제 찍힘
-										      return (
-										        <div
-										          key={idx}
-										          style={{
-										            width: "120px",
-										            height: "120px",
-										            borderRadius: "6px",
-										            overflow: "hidden",
-										            border: "1px solid #ccc",
-										          }}
-										        >
-										          <img
-										            src={img.img_url} // 서버에서 내려주는 URL 그대로
-										            alt={img.origin_name || "img"}
-										            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-										          />
-										        </div>
-										      );
-										    })}
-										  </div>
-										) : (
-										  <p>등록된 이미지가 없습니다.</p>
-										)}
+											{board.attachments?.length > 0 ? (
+												<div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
+													{board.attachments.map((img, idx) => {
+														console.log("이미지 URL:", img.img_url); // 이제 찍힘
+														return (
+															<div
+																key={idx}
+																style={{
+																	width: "120px",
+																	height: "120px",
+																	borderRadius: "6px",
+																	overflow: "hidden",
+																	border: "1px solid #ccc",
+																}}
+															>
+																<img
+																	src={img.img_url} // 서버에서 내려주는 URL 그대로
+																	alt={img.origin_name || "img"}
+																	style={{ width: "100%", height: "100%", objectFit: "cover" }}
+																/>
+															</div>
+														);
+													})}
+												</div>
+											) : (
+												<p>등록된 이미지가 없습니다.</p>
+											)}
 										</div>
 									</div>
 								))}

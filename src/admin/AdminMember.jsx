@@ -8,7 +8,7 @@ import Nmx3 from "../images/nmx3.png";
 import Nmx4 from "../images/nmx4.png";
 import Nmx5 from "../images/nmx5.png";
 import Nmx6 from "../images/nmx6.png";
-
+import AdminSidebar from "./AdminSidebar"
 const profileImages = [Nmx1, Nmx2, Nmx3, Nmx4, Nmx5, Nmx6];
 const date = new Date();
 
@@ -41,49 +41,7 @@ export default function Member() {
 
   return (
     <div className="member-Member-page">
-      <div className="member-left">
-        <div className="admin-Member-box1">
-          <strong>관리자</strong><span> 님 반갑습니다!</span><br /><br />
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <Link to="/admin/AdminMember" className="member-Member-click">
-                    회원 관리
-                  </Link>
-                </td>
-              </tr>
-              <tr><td>보안 관리</td></tr>
-              <tr>
-                <td>공지사항 관리</td>
-                <td className="admin-btn">공지 등록</td>
-              </tr>
-              <tr>
-                <td>
-                  <Link to="/admin/AdminContact2" className="member-mytick">
-                    1:1 문의사항 관리
-                  </Link>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Link to="/admin/AdminInven" className="member-mytick">
-                    재고 관리
-                  </Link>
-                </td>
-                <td>
-                  <Link to="/admin/AdminInven2" className="admin-btn2">
-                    상품 등록
-                  </Link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <hr className="member-box1-bottom" />
-          <br /><br />
-          <span className="member-box1-logout">로그아웃</span>
-        </div>
-      </div>
+     <AdminSidebar />{/* ← 공통 사이드바 호출 */}
 
       <div className="member-right">
         <div className="member-Member-box2">

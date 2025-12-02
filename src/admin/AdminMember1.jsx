@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import "../css/style.css";
 import Nmx7 from "../images/nmx7.png";
 import Heart from "../images/heart.png";
-
+import AdminSidebar from "./AdminSidebar"
 // 티켓 상태 버튼 색상
 const ticketStatusClass = status => status === "배송 중" ? "admin-con-btn" : "admin-con-btn1";
 const refundStatusClass = status => status === "미환불" ? "admin-member-refund" : "admin-member-refund-complete";
@@ -81,25 +81,7 @@ export default function MemberDetail() {
 
 	return (
 		<div className="member-Member-page">
-			<div className="member-left">
-				<div className="admin-Member-box1">
-					<strong>관리자</strong><span> 님 반갑습니다!</span><br /><br />
-					<table>
-						<tbody>
-							<tr><td><Link to="/admin/AdminMember" className="member-Member-click">회원 관리</Link></td></tr>
-							<tr><td>보안 관리</td></tr>
-							<tr><td>공지사항 관리</td><td className="admin-btn">공지 등록</td></tr>
-							<tr><td><Link to="/admin/AdminContact2" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
-							<tr><td><Link to="/admin/AdminInven" className="member-mytick">재고 관리</Link></td>
-								<td><Link to="/admin/AdminInven2" className="admin-btn2">상품 등록</Link></td></tr>
-						</tbody>
-					</table>
-					<hr className="member-box1-bottom" />
-					<br /><br />
-					<span className="member-box1-logout">로그아웃</span>
-				</div>
-			</div>
-
+			<AdminSidebar />{/* ← 공통 사이드바 호출 */}
 			<div className="member-right">
 				<div className="member-myTk-box2">
 					<div className="mytick-main-box">

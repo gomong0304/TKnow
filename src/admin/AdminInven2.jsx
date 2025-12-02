@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "../css/style.css";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
-
+import AdminSidebar from "./AdminSidebar"
 export default function AdminInven2() {
 	const navigate = useNavigate();
 
@@ -84,24 +84,7 @@ export default function AdminInven2() {
 
 	return (
 		<form className="member-Member-page" onSubmit={handleSubmit}>
-			<div className="member-left">
-				<div className="admin-Member-box1">
-					<strong>관리자</strong><span> 님 반갑습니다!</span><br /><br />
-					<table>
-						<tbody>
-							<tr><td><Link to="/admin/AdminMember" className="member-mytick">회원 관리</Link></td></tr>
-							<tr><td>보안 관리</td></tr>
-							<tr><td>공지사항 관리</td><td className="admin-btn">공지 등록</td></tr>
-							<tr><td><Link to="/admin/AdminContact2" className="member-mytick">1:1 문의사항 관리</Link></td></tr>
-							<tr><td><Link to="/admin/AdminInven" className="member-Member-click">재고 관리</Link></td>
-								<td><Link to="/admin/AdminInven2" className="admin-btn2">상품 등록</Link></td></tr>
-						</tbody>
-					</table>
-					<hr className="member-box1-bottom" /><br /><br />
-					<span className="member-box1-logout">로그아웃</span>
-				</div>
-			</div>
-
+			<AdminSidebar />{/* ← 공통 사이드바 호출 */}
 			<div className="member-right">
 				<div className="member-myTk-box2">
 					<div className="costs-main-box">

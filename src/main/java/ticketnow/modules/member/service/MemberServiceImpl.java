@@ -22,7 +22,6 @@ import ticketnow.modules.member.dto.MemberResponseDTO;
 import ticketnow.modules.member.mapper.MemberMapper;
 import ticketnow.modules.common.domain.ImageVO;
 import ticketnow.modules.common.constant.ImageType;
-
 /**
  * Member 비즈니스 서비스 - 트랜잭션 경계에서 Mapper호출 - 비밀번호 해시, 기본 ROLE, 소프트삭제 등 도메인 규칙 담당 -
  * 모든 퍼블릭 메서드에 입력/출력/영향행수 디버깅 로그 포함
@@ -43,11 +42,19 @@ public class MemberServiceImpl implements MemberService {
 	private MemberResponseDTO toResponse(MemberVO vo) {
 		if (vo == null)
 			return null;
-		return MemberResponseDTO.builder().memberId(vo.getMemberId()).memberName(vo.getMemberName())
-				.memberEmail(vo.getMemberEmail()).memberPhone(vo.getMemberPhone()).memberZip(vo.getMemberZip())
-				.memberAddr1(vo.getMemberAddr1()).memberAddr2(vo.getMemberAddr2()).memberGrade(vo.getMemberGrade())
-				.memberRole(vo.getMemberRole()).createdAt(vo.getCreatedAt()).updatedAt(vo.getUpdatedAt())
-				.deletedAt(vo.getDeletedAt()).build();
+		return MemberResponseDTO.builder().memberId(vo.getMemberId())
+				.memberName(vo.getMemberName())
+				.memberEmail(vo.getMemberEmail())
+				.memberPhone(vo.getMemberPhone())
+				.memberZip(vo.getMemberZip())
+				.memberAddr1(vo.getMemberAddr1())
+				.memberAddr2(vo.getMemberAddr2())
+				.memberGrade(vo.getMemberGrade())
+				.memberRole(vo.getMemberRole())
+				.createdAt(vo.getCreatedAt())
+				.updatedAt(vo.getUpdatedAt())
+				.deletedAt(vo.getDeletedAt())
+				.build();
 	}
 
 	// 요청 파라미터 방어 로깅 (null/빈 값 탐지용)
@@ -177,8 +184,29 @@ public class MemberServiceImpl implements MemberService {
 		long total = memberMapper.countMembers();
 		log.debug("[MemberService][PAGE] total={}, fetched={}", total, list.size());
 
-		// 3) 매핑
-		List<MemberResponseDTO> rows = list.stream().map(this::toResponse).collect(Collectors.toList());
+		// 3) 매핑 + 프로필 이미지 조회 
+		List<MemberResponseDTO> rows = list.stream().map(vo -> {
+		    MemberResponseDTO dto = toResponse(vo);
+
+		    // ===== 프로필 이미지 조회 (목록용) =====
+		    String profileImageUrl = null;
+		    List<ImageVO> images = imageMapper.selectImagesByMember(vo.getMemberId());
+
+		    if (images != null && !images.isEmpty()) {
+		        ImageVO profile = images.stream()
+		                .filter(img -> img.getImageType() == ImageType.MEMBER_PROFILE
+		                        && Boolean.TRUE.equals(img.getIsPrimary()))
+		                .findFirst()
+		                .orElse(images.get(0));
+
+		        profileImageUrl = profile.getImgUrl();
+		    }
+
+		    dto.setProfileImageUrl(profileImageUrl);
+		    // ============================
+
+		    return dto;
+		}).collect(Collectors.toList());
 
 		// 4) 응답 DTO 구성 (PageResponseDTO: list/totalCount/page/size)
 		PageResponseDTO<MemberResponseDTO> resp = new PageResponseDTO<>();

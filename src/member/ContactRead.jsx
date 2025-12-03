@@ -272,48 +272,54 @@ export default function Contact() {
 											<th>답변</th>
 											<td>
 												{replies && replies.length > 0 ? (
-													<div className="reply-list">
-														{replies.map((reply) => (
-															<div key={reply.replyId} className="reply-item">
-																<div className="reply-meta">
-																	<span className="reply-admin">관리자</span>
-																	<span className="reply-date">
-																		{reply.createdAt && Array.isArray(reply.createdAt)
-																			? new Date(
-																				reply.createdAt[0],
-																				reply.createdAt[1] - 1,
-																				reply.createdAt[2],
-																				reply.createdAt[3] || 0,
-																				reply.createdAt[4] || 0
-																			).toLocaleString()
-																			: ""}
-																	</span>
-																</div>
-																<div className="reply-content">{reply.content}</div>
-																{reply.attachments && reply.attachments.length > 0 && (
-																	<div className="reply-images">
-																		{reply.attachments.map((img, idx) => (
-																			<img
-																				key={idx}
-																				src={resolveImageUrl(img.imageUrl)}
-																				alt={`reply-img-${idx + 1}`}
-																				className="reply-image"
-																			/>
-																		))}
-																	</div>
-																)}
-															</div>
-														))}
-													</div>
-												) : (
-													<span>등록된 답변이 없습니다.</span>
-												)}
+  <div className="reply-list">
+    {replies.map((reply) => {
+      const createdAtText =
+        Array.isArray(reply.createdAt) && reply.createdAt.length >= 5
+          ? new Date(
+              reply.createdAt[0] || 0,
+              (reply.createdAt[1] || 1) - 1,
+              reply.createdAt[2] || 1,
+              reply.createdAt[3] || 0,
+              reply.createdAt[4] || 0
+            ).toLocaleString()
+          : "";
+
+      return (
+        <div  className="reply-item">
+          <div className="reply-content">{reply.content}</div>
+
+ 
+          {createdAtText && (
+            <div className="reply-date">{createdAtText}</div>
+          )}
+
+          {/* 관리자 첨부파일 미리보기 */}
+          {reply.attachments && reply.attachments.length > 0 && (
+            <div className="reply-images">
+              {reply.attachments.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={resolveImageUrl(img.imageUrl)}
+                  alt={`reply-img-${idx + 1}`}
+                  className="reply-image"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+) : (
+  <span>등록된 답변이 없습니다.</span>
+)}
 											</td>
 										</tr>
 
 										{/* 목록 버튼 */}
 										<tr>
-											<td colSpan="2">
+											 <td colSpan="2" style={{ textAlign: "center" }}>
 												<button
 													type="button"
 													className="conts-conts-btn"

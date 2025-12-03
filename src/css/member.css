@@ -262,3 +262,59 @@
 	text-decoration: none;
 	color: #808080;
 }
+
+
+/* ======== 문의 답변 ======== */
+.reply-list {
+  margin-top: 0px;
+  gap: 10px;
+  padding-top: 10px;
+  padding-bottom: 30px;
+}
+
+.reply-item {
+  margin-top: 0px;
+  padding-top: 0px;
+  padding-bottom: 10px;
+}
+
+/* 관리자 표시 영역 */
+.reply-header {
+  margin-bottom: 6px;
+}
+
+.reply-author {
+  font-weight: bold;
+}
+
+/* 핑크 배경 안에 들어가는 답변 내용 */
+.reply-content {
+  background-color: #fff1f6;
+  padding: 12px 14px;
+  border-radius: 8px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* 내용 아래, 약간 더 진한 핑크 계열 날짜/시간 */
+.reply-date {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #f09dbd; /* #FFA6C9보다 조금 진한 톤 */
+}
+
+/* 첨부 이미지 미리보기 */
+.reply-images {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reply-image {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  object-fit: cover;
+}

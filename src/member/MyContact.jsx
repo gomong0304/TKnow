@@ -1,5 +1,6 @@
 // src/member/MyContact.jsx
 import React, { useEffect, useState } from "react";
+import "../css/member.css";
 import "../css/style.css";
 import { Link, useParams,useNavigate } from "react-router-dom";
 import api from "../api";
@@ -22,21 +23,18 @@ export default function MyContact() {
   }, []);
 
   return (
-    <div className="member-Member-page">
+    <div className="member-Member-page-1">
       
       <MemberSidebar active="myContact" />
 
       <div className="member-right">
-        <div className="member-myTk-box2">
-
-          <div className="mytick-main-box">
-            <strong>내 문의 내역</strong>
-            <br /><br />
+        <div className="member-myTk-box2-1">
+            <strong>&nbsp;&nbsp;내 문의 내역</strong>
 
 			    {inquiries.map((inq) => (
 			        <div
 			          key={inq.boardId}
-			          className="member-mycont-Box"
+			          className="member-mycont-Box-1"
 			          style={{ cursor: "pointer" }}
 			          onClick={() => navigate(`/member/ContactRead/${inq.boardId}`)} // 클릭 시 이동
 			        >
@@ -57,7 +55,7 @@ export default function MyContact() {
             <div className="member-myCont-plus">
               <strong> + </strong> <span> 내 문의 목록 더 보기 </span>
             </div><br />
-          </div>
+          
         </div><br />
 
         <div className="member-myCont-box">

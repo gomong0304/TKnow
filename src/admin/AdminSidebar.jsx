@@ -1,5 +1,6 @@
 // src/admin/AdminSidebar.jsx
 import React from "react";
+import "../css/admin.css";
 import "../css/style.css";
 import { Link, useLocation } from "react-router-dom";
 export default function AdminSidebar({ adminName }) {

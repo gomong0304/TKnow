@@ -1,5 +1,6 @@
 // src/admin/AdminMember.jsx
 import React, { useEffect, useState } from "react";
+import "../css/admin.css";
 import "../css/style.css";
 import { Link, useNavigate } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";

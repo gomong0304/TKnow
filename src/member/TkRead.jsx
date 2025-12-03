@@ -1,5 +1,6 @@
 // src/member/TkRead.jsx
 import React, { useState, useEffect } from "react";
+import "../css/member.css";
 import "../css/style.css";
 import { Link, useParams } from "react-router-dom";
 import Ticket from "../images/ticket.png";

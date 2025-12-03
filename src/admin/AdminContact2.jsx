@@ -1,5 +1,6 @@
 // src/admin/AdminContact2.jsx
 import React, { useEffect, useState } from "react";
+import "../css/admin.css";
 import "../css/style.css";
 import { Link } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar"

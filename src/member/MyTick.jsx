@@ -1,5 +1,6 @@
 // src/member/MyTick.jsx
 import React, { useEffect, useState } from "react";
+import "../css/member.css";
 import "../css/style.css";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";

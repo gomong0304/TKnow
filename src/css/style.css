@@ -2068,13 +2068,6 @@ map {
 	margin-bottom: 10px;
 }
 
-.admin-botom-picture p {
-	color: #FFA6C9;
-	font-weight: bold;
-	font-size: 30px;
-	display: inline-block;
-	margin-bottom: 10px;
-}
 
 .member-pick-picture {
 	position: relative;
@@ -2138,136 +2131,8 @@ map {
 	display: flex;
 }
 
-.member-Member-remove {
-	display: flow;
-	width: 800px;
-	text-align: center;
-	color: #808080;
-	font-size: 15px;
-}
 
-.member-Member-noticeBox {
-	width: 800px;
-}
 
-.member-Member-noticeBox button {
-	width: 266px;
-	height: 140px;
-	max-width: 266px;
-	font-size: 20px;
-	background-color: white;
-	border: 1px solid #D9D9D9;
-	color: #808080;
-}
-
-.member-noticeBox-top1 {
-	border-radius: 10px 0px 0px 0px;
-}
-
-.member-noticeBox-top3 {
-	border-radius: 0px 10px 0px 0px;
-}
-
-.member-noticeBox-bottom {
-	width: 40px;
-	min-width: 99.75%;
-	max-height: 70px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 0px 0px 10px 10px;
-	color: black !important;
-	background: white;
-}
-
-.member-mytick {
-	text-decoration: none;
-	color: #808080;
-}
-
-.member-Member-click {
-	text-decoration: none;
-	color: #FFA6C9;
-	font-weight: bold;
-}
-
-.member-Member {
-	text-decoration: none;
-	color: #808080;
-}
-
-.mytick-main-box {
-	border: 1px solid #D9D9D9;
-	border-radius: 10px;
-	padding: 30px;
-	width: 800px;
-	font-size: 20px;
-}
-
-.member-ticket-plus {
-	border: 1px solid #D9D9D9;
-	border-radius: 50px;
-	text-align: center;
-	padding: 12px 40px 20px 40px;
-	width: auto;
-	place-self: anchor-center;
-}
-
-.member-ticket-plus strong {
-	color: #FFA6C9;
-	font-size: 30px;
-	white-space: nowrap;
-}
-
-.member-Member-conBox {
-	border: 3px solid #FFA6C9;
-	border-radius: 20px;
-	white-space: nowrap;
-	height: auto;
-	position: relative;
-	padding: 50px;
-	height: 312px;
-	width: 600px;
-	min-width: 740px;
-	display: flex;
-	align-items: center;
-	text-decoration: none;
-	margin-bottom: 20px;
-}
-
-.member-Member-conBox:nth-child(2) { /* 공부 색상 차이 */
-	border-left-color: #D9D9D9; /* 두 번째 파랑 */
-}
-
-.member-Member-conBox1 {
-	border: 3px solid #FFA6C9;
-	border-radius: 20px;
-	white-space: nowrap;
-	height: auto;
-	position: relative;
-	padding: 50px;
-	height: 312px;
-	width: 600px;
-	min-width: 800px;
-	display: flex;
-	align-items: center;
-	text-decoration: none;
-}
-
-.member-Member-conBox2 {
-	border: 1px solid #D9D9D9;
-	border-radius: 20px;
-	white-space: nowrap;
-	height: auto;
-	position: relative;
-	padding: 50px;
-	height: 312px;
-	width: 740px;
-	min-width: 740px;
-	display: flex;
-	align-items: center;
-	text-decoration: none;
-}
 
 .tkRead-main-box {
 	top: 20px;
@@ -2281,20 +2146,7 @@ map {
 	margin-bottom: -30px;
 }
 
-.member-Member-conBox span {
-	display: flex;
-	background: #FFA6C9;
-	width: 180px;
-	text-align: center;
-	padding: 10px 10px 10px 10px;
-	border-radius: 10px;
-	color: white;
-	font-weight: bold;
-	position: relative;
-	place-content: center;
-	top: 10px;
-	left: 250px;
-}
+
 
 .cons-list {
 	display: flex;
@@ -2523,22 +2375,6 @@ map {
 	position: relative;
 }
 
-.member-mycont-Box {
-	border: 1px solid #D9D9D9;
-	border-radius: 20px;
-	white-space: nowrap;
-	height: auto;
-	position: relative;
-	padding: 20px;
-	height: auto;
-	width: 740px;
-	min-width: 740px;
-	display: block;
-	align-items: center;
-	margin-top: 10px;
-	justify-content: center;
-}
-
 .tkRead-sion-img {
 	width: 738px;
 }
@@ -2547,20 +2383,7 @@ map {
 	width: 738px;
 }
 
-.member-myCont-plus {
-	border: 1px solid #D9D9D9;
-	border-radius: 50px;
-	text-align: center;
-	padding: 12px 40px 20px 40px;
-	width: auto;
-	place-self: anchor-center;
-}
 
-.member-myCont-plus strong {
-	color: #FFA6C9;
-	font-size: 30px;
-	white-space: nowrap;
-}
 
 .cont-cont-list {
 	white-space: pre-line;
@@ -2571,44 +2394,6 @@ map {
 	color: #FFA6C9;
 	white-space: pre-line;
 	width: 720px;
-}
-
-.member-myCont-box {
-	width: 900px;
-	padding: 1px;
-	display: flex;
-}
-
-.member-myCont-but1 {
-	text-align: center;
-	place-content: center;
-	width: 399px;
-	height: 200px;
-	max-width: 427.5px;
-	font-size: 30px;
-	background-color: white;
-	border: 1px solid #D9D9D9;
-	color: #808080;
-	border-radius: 10px 0px 0px 10px;
-	font-size: 30px;
-	text-decoration: none;
-	display: block;
-}
-
-.member-myCont-but2 {
-	text-align: center;
-	place-content: center;
-	text-align: center;
-	display: block;
-	width: 399px;
-	height: 200px;
-	max-width: 427.5px;
-	font-size: 30px;
-	background-color: white;
-	border: 1px solid #D9D9D9;
-	color: #808080;
-	border-radius: 0px 10px 10px 0px;
-	text-decoration: none;
 }
 
 .cont-conts-list th {
@@ -2827,64 +2612,6 @@ map {
 	position: absolute;
 }
 
-.admin-Member-memImg {
-	width: 100px;
-}
-
-.admin-Member-conBox {
-	border: 3px solid #FFA6C9;
-	border-radius: 20px;
-	white-space: nowrap;
-	height: 180px;
-	position: relative;
-	padding: 20px 50px 20px 50px;
-	width: 800px;
-	min-width: 800px;
-	display: flex;
-	align-items: center;
-	text-decoration: none;
-	margin-bottom: 20px;
-}
-
-.admin-Member-Box1 span {
-	position: relative;
-	top: 0px;
-	left: 520px;
-	color: white;
-	background: #FFA6C9;
-	padding: 4px 30px 4px 30px;
-	border-radius: 5px;
-	font-weight: bold;
-	font-size: 20px;
-}
-
-.admin-Member-Box {
-	position: relative;
-	left: 40px;
-}
-
-.admin-Member-BoxTb {
-	top: 30px;
-	left: 200px;
-	position: absolute;
-}
-
-.admin-Member-BoxTb th {
-	font-size: 20px;
-	color: black;
-}
-
-.admin-Member-BoxTb td {
-	color: black;
-	font-size: 20px;
-}
-
-.admin-Member-Box1 table {
-	text-align: left;
-	line-height: 40px;
-	width: 400px;
-}
-
 /* table td:first-child { 
 	width: 140px;
 	white-space: nowrap;
@@ -2910,198 +2637,6 @@ map {
 }
 
 
-.admin-Member-conBoxnoe {
-	border: 1px solid #D9D9D9;
-	border-radius: 20px;
-	white-space: nowrap;
-	height: 180px;
-	position: relative;
-	padding: 20px 50px 20px 50px;
-	width: 800px;
-	min-width: 800px;
-	display: flex;
-	align-items: center;
-	text-decoration: none;
-	margin-bottom: 20px;
-}
-
-.admin-member-plus {
-	border: 1px solid #D9D9D9;
-	border-radius: 50px;
-	text-align: center;
-	padding: 12px 40px 20px 40px;
-	width: 250px;
-	height: 80px;
-	place-self: anchor-center;
-	top: 20px;
-	left: 400px;
-	position: relative;
-}
-
-.admin-member-plus strong {
-	color: #FFA6C9;
-	font-size: 30px;
-}
-
-.admin-Member-box1 {
-	position: relative;
-	left: 280px;
-	padding: 40px;
-	border: 1px solid #D9D9D9;
-	border-radius: 10px;
-	width: 350px;
-	height: 450px;
-	min-width: 350px;
-	background: white;
-	box-sizing: border-box;
-	background: white;
-	min-width: 300px;
-}
-
-.admin-Member-box1 strong {
-	font-size: 25px;
-	color: #FFA6C9;
-}
-
-.admin-Member-box1 span {
-	font-weight: bold;
-}
-
-.admin-Member-box1 table {
-	line-height: 40px;
-}
-
-.admin-Member-box1 td {
-	font-size: 18px;
-	font-weight: regular;
-	color: #808080;
-}
-
-.admin-btn {
-	background: #FFA6C9 !important;
-	color: white !important;
-	padding: 0px 15px 0px 15px;
-	font-size: 14px !important;
-	border-radius: 10px !important;
-	height: 10px !important;
-	text-decoration: none;
-}
-
-.admin-btn2 {
-	background: #FFA6C9 !important;
-	color: white !important;
-	padding: 10px 15px 10px 15px;
-	font-size: 14px !important;
-	border-radius: 10px !important;
-	height: 10px !important;
-	text-decoration: none;
-	border-spacing: 10px;
-}
-
-.admin-botom-picture {
-	position: relative;
-	flex: 1;
-	width: 150px;
-	text-align: center;
-	max-width: 150px;
-}
-
-.admin-levelBox-text {
-	top: -100px;
-	position: relative;
-	left: 200px;
-	bottom: 128px;
-	text-align: left;
-	line-height: 35px;
-}
-
-.admin-levelBox-text strong {
-	font-size: 45px;
-	color: #FFA6C9;
-}
-
-.admin-levelBox-text span, .admin-levelBox-text table {
-	color: #808080;
-}
-
-.admin-admin-pickBox {
-	border: 1px solid #D9D9D9;
-	border-radius: 10px;
-	padding: 50px;
-	height: 280px;
-	width: 800px;
-	gap: 40px;
-	display: flex;
-	align-self: center;
-	justify-content: space-between;
-}
-
-.admin-admin-pickBox span {
-	color: #808080;
-	font-weight: bold;
-	font-size: 20px;
-	display: inline-block;
-	margin-bottom: 10px;
-}
-
-.admin-admin-pickBox p {
-	color: #FFA6C9;
-	font-weight: bold;
-	font-size: 30px;
-	display: inline-block;
-	margin-bottom: 10px;
-}
-
-.admin-botom-img {
-	width: 100px;
-}
-
-.admin-botom-img1 {
-	width: 89px;
-}
-
-.admin-cont-list {
-	padding: 40px;
-	display: grid;
-	position: relative;
-	left: 30px;
-}
-
-.admin-member-memBox {
-	border: 1px solid white;
-	border-radius: 20px;
-	padding: 0px 0px 0px 0px;
-	height: auto; 	
-}
-
-.admin-member-memList {
-	/*	padding: 30px;*/
-	display: grid;
-	position: relative;
-	left: 30px;
-	
-}
-
-.admin-member-memList-a{
-	/*	padding: 30px;*/
-	display: grid;
-	position: relative;
-	left: 30px;
-	height: 200px;
-}
-
-.admin-member-memList span {
-	background: white;
-	color: black;
-	font-weight: bold;
-	width: 180px;
-	margin-top: 5px;
-	text-align: center;
-	font-size: 28px;
-	left: 40px;
-	position: relative;
-}
-
 .member-tkRead-my {
 	position: relative;
 	top: 70px;
@@ -3111,50 +2646,6 @@ map {
 	border-spacing: 30px 3px;
 }
 
-.admin-member-memBox3 {
-	place-self: anchor-center;
-	border: 1px solid #D9D9D9;
-	border-radius: 20px;
-	white-space: nowrap;
-	height: auto;
-	position: relative;
-	padding: 30px 25px 30px 30px;
-	height: auto;
-	width: 600px;
-	min-width: 600px;
-	display: flex;
-	flex-direction: column;
-	text-align-last: left;
-	margin-top: 10px;
-	text-align: leftl;
-	place-self: anchor-center;
-}
-
-.admin-con-btn {
-	background: #FFA6C9;
-	text-align-last: center;
-	color: white;
-	font-size: 12px;
-	padding: 0px 15px 0px 15px;
-	line-height: 20px;
-	vertical-align: middle;
-	border-radius: 10px;
-}
-
-.admin-con-btn1 {
-	background: #D9D9D9;
-	text-align-last: center;
-	color: white;
-	font-size: 12px;
-	padding: 0px 15px 0px 15px;
-	line-height: 20px;
-	vertical-align: middle;
-	border-radius: 10px;
-}
-
-.admin-member-memBox3 table {
-	border-spacing: 0px 15px;
-}
 
 .member-ticket-plus {
 	border: 1px solid #D9D9D9;
@@ -3169,146 +2660,6 @@ map {
 	color: #FFA6C9;
 	font-size: 30px;
 	white-space: nowrap;
-}
-
-.admin-member-memBox4 {
-	border: 1px solid #D9D9D9;
-	border-radius: 20px;
-	padding: 20px 25px;
-	width: 600px;
-	display: flex;
-	flex-direction: column;
-	gap: 15px;
-	place-self: anchor-center;
-	text-decoration: none;
-	color: black;
-	text-align: left;
-}
-
-.admin-member-top {
-    justify-content: center;   /* 수평 가운데 정렬 */
-    width: 100%;
-}
-
-.admin-Member-heartImg {
-	width: 80px;
-	height: auto;
-}
-
-.admin-Member-purPer {
-	background: #FFA6C9;
-	padding: 0 15px;
-	width: 130px;
-	border-radius: 5px;
-	color: white !important;
-	font-weight: bold;
-	text-align: center;
-	margin-top: 8px;
-	padding: 10px 10px 10px 10px;
-	border: 0px solid;
-}
-
-/* AdminMember1 - 회원정보 카드 높이 보정용 */
-.member-tkRead-dayBox.admin-member-info-dayBox table {
-	position: static;    /* relative + bottom, left 값 제거 */
-	left: 0;
-	right: 0;
-	bottom: 0;
-	line-height: 32px;   /* 너무 넓은 줄간격 약간 줄이기 */
-	margin-left: 0px;   /* 프로필 이미지와 간격만 살짝 띄우기 */
-}
-
-.member-tkRead-my.admin-member-info-my {
-	position: static;  /* top: 70px 제거 */
-	top: 0;
-	margin-left: 35px;
-}
-
-
-.admin-levelBox1-text {
-	line-height: 1.5;
-	top: -10px;
-   left: 0 !important;      /* 왼쪽으로 밀리는 것 제거 */
-    text-align: center !important;
-	place-items: center;
-}
-
-.admin-levelBox1-text strong {
-	color: #FFA6C9;
-	font-size: 40px;
-}
-
-.admin-levelBox1-text span {
-	font-size: 20px;
-}
-
-.admin-cons-list {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-.admin-cons-list th {
-	color: black;
-	text-align: left;
-	padding-bottom: 3px;
-}
-
-.admin-cons-list td {
-	font-size: 13px;
-}
-
-.admin-member-refund {
-	background: #FFA6C9;
-	color: white !important;
-	padding: 0px 20px 0px 30px;
-	font-size: 12px;
-	border-radius: 10px;
-}
-
-.admin-Member-pointBox {
-	border: 1px solid #D9D9D9;
-	border-radius: 10px;
-	padding: 50px;
-	height: auto;
-	width: 600px;
-	place-self: anchor-center;
-	 text-align: center !important;
-}
-
-.admin-Member-pointBox span,
-.admin-Member-pointBox strong {
-    display: inline-block;
-    text-align: center;
-}
-
-.admin-Member-pointBox span {
-	color: #808080;
-}
-
-.admin-Member-pointBox Strong {
-	color: #808080;
-}
-
-.admin-member-memBox5 {
-	border: 1px solid #D9D9D9;
-	border-radius: 20px;
-	padding: 20px 25px;
-	width: 600px;
-	display: flex;
-	flex-direction: column;
-	gap: 15px;
-	place-self: anchor-center;
-	text-decoration: none;
-	color: black;
-	text-align: left;
-}
-
-.admin-member-memBox4 table {
-	border-spacing: 0px 25px;
-}
-
-.admin-member-memBox5 table {
-	border-spacing: 0px 25px;
 }
 
 .AdConts-table {
@@ -3331,33 +2682,6 @@ map {
 	line-height: 10px;
 	gap: 20px;
 	border: 1px solid #D9D9D9;
-}
-
-.Admin-conts-list {
-	text-align: left;
-}
-
-.admin-cont-phone1 {
-	width: 250px !important;
-	justify-content: center;
-	gap: 30px;
-	text-align: center;
-	padding: 15px;
-	border-radius: 10px;
-	line-height: 10px;
-	border: 1px solid #D9D9D9;
-}
-
-.admin-cont-phone2 {
-	width: 250px !important;
-	justify-content: center;
-	gap: 30px;
-	text-align: center;
-	padding: 15px;
-	border-radius: 10px;
-	line-height: 10px;
-	border: 1px solid #D9D9D9;
-	margin-left: 10px;
 }
 
 .Ad-conts-resNum {
@@ -3398,24 +2722,6 @@ map {
 	text-align: center;
 }
 
-.admin-inven-row {
-	margin-bottom: 8px;
-	display: flex;
-	justify-content: space-between;
-	width: 500px;
-}
-
-.admin-inven-3 {
-	color: #FFA6C9;
-	font-weight: bold;
-	font-size: 35px;
-	margin-bottom: 10px;
-	position: relative;
-	left: 200px;
-	width: 300px;
-	text-align: right;
-}
-
 .inven-main-box2 {
 	border: 1px solid #D9D9D9;
 	border-radius: 10px;
@@ -3429,17 +2735,6 @@ map {
 
 .AdConts-table {
 	border-spacing: 10px;
-}
-
-.admin-inven-phone1 {
-	width: 99.6px !important;
-	justify-content: center;
-	gap: 30px;
-	text-align: left;
-	padding: 15px;
-	border-radius: 10px;
-	line-height: 10px;
-	border: 1px solid #D9D9D9;
 }
 
 .logoutBtn {
@@ -3550,49 +2845,4 @@ map {
   border-top: 1px solid #ddd;
   margin-top: 30px;
   margin-bottom: 30px;
-}
-
-/*=============== AdminMember1.jsx용 =============== */
-/* 회원 상세 카드 가로폭 통일 */
-.mytick-main-box,
-.admin-member-memBox3,
-.admin-Member-pointBox,
-.admin-member-memBox4,
-.admin-member-memBox5 {
-	width: 800px;
-}
-
-/* 회원정보 카드 가로 레이아웃 */
-.mytick-main-box {
-	display: flex;          /* 가로 정렬 */
-	align-items: center;    /* 세로 가운데 정렬 */
-	gap: 40px;              /* 사진 영역 ↔ 정보 테이블 간 간격 */
-}
-
-/* 왼쪽 프로필 박스 크기 유지 */
-.admin-member-memBox {
-	flex-shrink: 0;
-}
-
-/* 오른쪽 정보 테이블 영역 남는 공간 채우기 */
-.member-tkRead-dayBox.admin-member-info-dayBox {
-	flex: 1;
-}
-
-/* 등급/환불 카드 전체 가운데 정렬 */
-.admin-member-memBox4 {
-    text-align: center !important; /* 텍스트와 테이블 가운데 정렬 */
-    align-items: center;           /* 내부 요소(이미지·div 등)도 가운데 */
-}
-
-/* 환불 내역도 가운데 정렬 */
-.admin-member-memBox4 table {
-    margin: 0 auto;                /* 가운데 정렬 */
-}
-
-
-/*=============== AdminContact2.jsx용 =============== */
-/* 전체 문의 내역 페이지는 세로 1열로 정렬 */
-.admin-contact-main-box {
-  display: block;              /* AdminMember1에서 준 flex 해제 */
 }

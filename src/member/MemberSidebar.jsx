@@ -1,6 +1,7 @@
 // src/member/MemberSidebar.jsx
 
 import React, { useState, useEffect } from "react";
+import "../css/member.css";
 import "../css/style.css";
 import { Link, useLocation } from "react-router-dom";   // ✅ useLocation 추가
 import api from "../api";

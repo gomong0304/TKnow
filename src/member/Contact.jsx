@@ -1,6 +1,7 @@
 // src/member/contact.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "../css/member.css";
 import "../css/style.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../api";

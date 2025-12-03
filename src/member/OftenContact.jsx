@@ -1,5 +1,6 @@
 // src/member/OftenContact.jsx
 import React, { useState } from "react";
+import "../css/member.css";
 import "../css/style.css";
 import { Link } from "react-router-dom";
 import Seach from "../images/seach.png";

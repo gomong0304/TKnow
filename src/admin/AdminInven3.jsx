@@ -1,5 +1,6 @@
 // src/admin/AdminInven3.jsx
 import React, { useState, useEffect } from "react";
+import "../css/admin.css";
 import "../css/style.css";
 import { data, Link, useNavigate, useParams } from "react-router-dom";
 import api from "../api";

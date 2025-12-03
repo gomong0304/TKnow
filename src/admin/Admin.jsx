@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "../css/admin.css";
 import "../css/style.css";
 import { Link } from "react-router-dom";
-import Kkw from "../images/kkw.png";
+import Propile from "../images/propile.png";
 import ProMod from "../images/pro_mod.png";
 import User from "../images/user.png";
 import Inventory1 from "../images/inventory1.png";
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
         <div className="member-Member-box2">
           <div className="member-pro-box">
             <div className="member-Member-propile-imgBox">
-              <img src={Kkw} alt="프로필 사진" className="member-Member-proImg" />
+              <img src={Propile} alt="프로필 사진" className="member-Member-proImg" />
               <img src={ProMod} alt="프로필 편집" className="member-Member-prMod" />
 
               <div className="member-propile-table">

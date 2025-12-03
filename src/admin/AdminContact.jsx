@@ -297,18 +297,61 @@ export default function AdminContactDetail() {
                     </tr>
                     {board.replies && board.replies.length > 0 ? (
                       board.replies.map((reply, idx) => (
-                        <tr key={reply.replyId || idx}>
-                          <td colSpan={2}>
-                            {reply.replyContent || reply.content} (
-                            {reply.adminId || reply.memberId || "관리자"})
-                          </td>
-                        </tr>
+                        <React.Fragment key={reply.replyId || idx}>
+                          {/* 댓글 내용 */}
+                          <tr>
+                            <td colSpan={2}>
+                              {reply.replyContent || reply.content} (
+                              {reply.adminId || reply.memberId || "관리자"})
+                            </td>
+                          </tr>
+
+                          {/* 댓글별 첨부파일 미리보기 */}
+                          {reply.attachments &&
+                            reply.attachments.length > 0 && (
+                              <tr>
+                                <td colSpan={2}>
+                                  {reply.attachments.map((img, imgIdx) => {
+                                    const url = resolveImageUrl(
+                                      img.imageUrl || img.imgUrl
+                                    );
+                                    const label =
+                                      img.originalName ||
+                                      img.orginName ||
+                                      `댓글 첨부파일 ${imgIdx + 1}`;
+
+                                    return (
+                                      <div
+                                        key={imgIdx}
+                                        style={{ marginTop: "5px" }}
+                                      >
+                                        <a
+                                          href={url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          {label}
+                                        </a>
+                                        <br />
+                                        <img
+                                          src={url}
+                                          alt={label}
+                                          style={{ maxWidth: "200px" }}
+                                        />
+                                      </div>
+                                    );
+                                  })}
+                                </td>
+                              </tr>
+                            )}
+                        </React.Fragment>
                       ))
                     ) : (
                       <tr>
                         <td colSpan={2}>등록된 댓글이 없습니다.</td>
                       </tr>
                     )}
+
 
                     {/* ===== 댓글 작성 ===== */}
                     <tr>

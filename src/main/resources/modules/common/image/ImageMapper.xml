@@ -9,16 +9,16 @@
     - 테이블명/컬럼명은 schema.sql과 정확히 일치해야 합니다.
   -->
 
-  <insert id="insertImage" parameterType="ticketnow.modules.common.domain.ImageVO">
+    <insert id="insertImage" parameterType="ticketnow.modules.common.domain.ImageVO">
     INSERT INTO image
       (img_uuid, img_ext, orgin_name, file_name, img_url, img_type, img_sort, is_primary,
-       board_id, member_id, ticket_id, created_at, updated_at)
+       board_id, member_id, ticket_id, reply_id, created_at, updated_at)
     VALUES
       (#{imageUuid}, #{imageExt}, #{orginName}, #{fileName}, #{imgUrl}, #{imageType},
        #{imageSort}, #{isPrimary},
-       #{board.boardId}, #{member.memberId}, #{ticket.ticketId},
-       NOW(), NOW())
+       #{board.boardId}, #{member.memberId}, #{ticket.ticketId}, #{reply.replyId}, NOW(), NOW())
   </insert>
+
 
   <update id="updateImageMeta" parameterType="ticketnow.modules.common.domain.ImageVO">
   UPDATE image

@@ -1897,6 +1897,7 @@ map {
 .member-Member-dayBox table {
 	text-align: left;
 	line-height: 40px;
+
 }
 
 .member-Member-dayBox span {
@@ -2309,7 +2310,23 @@ map {
 	padding: 20px;
 	width: 860px;
 	font-size: 20px;
+	display: flex;
+    flex-direction: column; /* 세로 방향 정렬 */
+    gap: 20px; /* 섹션 간 간격 추가 (선택 사항) */
 }
+/*AdminMember1.jsx*/
+.member-myTk-box2 {
+	border: 1px solid #D9D9D9;
+	border-radius: 10px;
+	padding: 20px;
+	width: 860px;
+	font-size: 20px;
+	display: flex;
+    flex-direction: column; /* 세로 방향 정렬 */
+    gap: 20px;             /* 섹션 간 간격 */
+    align-items: center;   /* 자식 카드들을 가로 기준 가운데 정렬 */
+}
+
 
 .member-tkRead-dayBox table {
 	right: 60px;
@@ -3053,9 +3070,8 @@ map {
 .admin-member-memBox {
 	border: 1px solid white;
 	border-radius: 20px;
-	height: 350px;
 	padding: 0px 0px 0px 0px;
-	;
+	height: auto; 	
 }
 
 .admin-member-memList {
@@ -3063,6 +3079,15 @@ map {
 	display: grid;
 	position: relative;
 	left: 30px;
+	
+}
+
+.admin-member-memList-a{
+	/*	padding: 30px;*/
+	display: grid;
+	position: relative;
+	left: 30px;
+	height: 200px;
 }
 
 .admin-member-memList span {
@@ -3161,9 +3186,8 @@ map {
 }
 
 .admin-member-top {
-	display: flex;
-	align-items: center;
-	gap: 20px;
+    justify-content: center;   /* 수평 가운데 정렬 */
+    width: 100%;
 }
 
 .admin-Member-heartImg {
@@ -3184,10 +3208,29 @@ map {
 	border: 0px solid;
 }
 
+/* AdminMember1 - 회원정보 카드 높이 보정용 */
+.member-tkRead-dayBox.admin-member-info-dayBox table {
+	position: static;    /* relative + bottom, left 값 제거 */
+	left: 0;
+	right: 0;
+	bottom: 0;
+	line-height: 32px;   /* 너무 넓은 줄간격 약간 줄이기 */
+	margin-left: 0px;   /* 프로필 이미지와 간격만 살짝 띄우기 */
+}
+
+.member-tkRead-my.admin-member-info-my {
+	position: static;  /* top: 70px 제거 */
+	top: 0;
+	margin-left: 35px;
+}
+
+
 .admin-levelBox1-text {
 	line-height: 1.5;
 	top: -10px;
-	left: 30px;
+   left: 0 !important;      /* 왼쪽으로 밀리는 것 제거 */
+    text-align: center !important;
+	place-items: center;
 }
 
 .admin-levelBox1-text strong {
@@ -3229,6 +3272,13 @@ map {
 	height: auto;
 	width: 600px;
 	place-self: anchor-center;
+	 text-align: center !important;
+}
+
+.admin-Member-pointBox span,
+.admin-Member-pointBox strong {
+    display: inline-block;
+    text-align: center;
 }
 
 .admin-Member-pointBox span {
@@ -3500,4 +3550,49 @@ map {
   border-top: 1px solid #ddd;
   margin-top: 30px;
   margin-bottom: 30px;
+}
+
+/*=============== AdminMember1.jsx용 =============== */
+/* 회원 상세 카드 가로폭 통일 */
+.mytick-main-box,
+.admin-member-memBox3,
+.admin-Member-pointBox,
+.admin-member-memBox4,
+.admin-member-memBox5 {
+	width: 800px;
+}
+
+/* 회원정보 카드 가로 레이아웃 */
+.mytick-main-box {
+	display: flex;          /* 가로 정렬 */
+	align-items: center;    /* 세로 가운데 정렬 */
+	gap: 40px;              /* 사진 영역 ↔ 정보 테이블 간 간격 */
+}
+
+/* 왼쪽 프로필 박스 크기 유지 */
+.admin-member-memBox {
+	flex-shrink: 0;
+}
+
+/* 오른쪽 정보 테이블 영역 남는 공간 채우기 */
+.member-tkRead-dayBox.admin-member-info-dayBox {
+	flex: 1;
+}
+
+/* 등급/환불 카드 전체 가운데 정렬 */
+.admin-member-memBox4 {
+    text-align: center !important; /* 텍스트와 테이블 가운데 정렬 */
+    align-items: center;           /* 내부 요소(이미지·div 등)도 가운데 */
+}
+
+/* 환불 내역도 가운데 정렬 */
+.admin-member-memBox4 table {
+    margin: 0 auto;                /* 가운데 정렬 */
+}
+
+
+/*=============== AdminContact2.jsx용 =============== */
+/* 전체 문의 내역 페이지는 세로 1열로 정렬 */
+.admin-contact-main-box {
+  display: block;              /* AdminMember1에서 준 flex 해제 */
 }

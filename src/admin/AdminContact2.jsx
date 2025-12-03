@@ -29,50 +29,59 @@ export default function AdminAllInquiries() {
   }, []);
 
   return (
-    <div className="member-Member-page">
-      <AdminSidebar />{/* ← 공통 사이드바 호출 */}
-      <div className="member-right">
-        <div className="member-myTk-box2">
-          <div className="mytick-main-box">
-            <strong>회원 문의 내역</strong>
-            <br /><br />
+    // src/admin/AdminContact2.jsx
 
-            {inquiries.length === 0 ? (
-              <p>문의 내역이 없습니다.</p>
-            ) : (
-              inquiries.map((inq, idx) => (
-                <div className="member-mycont-Box" key={idx}>
-                  <div className="cont-cont-list">
-                    {/* 상세 보기 링크 */}
-                    <Link to={`/admin/AdminContact/${inq.boardId}`} className="cont-link" style={{ textDecoration: "none", color: "inherit" }}>
-                      <strong>[문의]</strong>
-                      <span> {inq.title}</span>
-                      <span style={{marginLeft: "10px", color:"#555" }}>({inq.memberId})</span>
-                    </Link>
+<div className="member-Member-page">
+  <AdminSidebar />
+  <div className="member-right">
+    <div className="member-myTk-box2">
+      {/* ⬇ 여기만 수정 */}
+      <div className="mytick-main-box admin-contact-main-box">
+        <strong>회원 문의 내역</strong>
+        <br /><br />
 
-                    {inq.reply ? (
-                      <p>
-                        <strong>[답변]</strong>
-                        <span> {inq.reply} </span>
-                      </p>
-                    ) : (
-                      <p>
-                        <strong>[답변대기]</strong>
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
+        {inquiries.length === 0 ? (
+          <p>문의 내역이 없습니다.</p>
+        ) : (
+          inquiries.map((inq, idx) => (
+            <div className="member-mycont-Box" key={idx}>
+              <div className="cont-cont-list">
+                <Link
+                  to={`/admin/AdminContact/${inq.boardId}`}
+                  className="cont-link"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <strong>[문의]</strong>
+                  <span> {inq.title}</span>
+                  <span style={{ marginLeft: "10px", color: "#555" }}>
+                    ({inq.memberId})
+                  </span>
+                </Link>
 
-            <br />
-            <div className="member-myCont-plus">
-              <strong> + </strong> <span> 문의 목록 더 보기 </span>
-            </div><br />
-          </div>
-        </div><br />
+                {inq.reply ? (
+                  <p>
+                    <strong>[답변]</strong>
+                    <span> {inq.reply} </span>
+                  </p>
+                ) : (
+                  <p>
+                    <strong>[답변대기]</strong>
+                  </p>
+                )}
+              </div>
+            </div>
+          ))
+        )}
 
+        <br />
+        <div className="member-myCont-plus">
+          <strong> + </strong> <span> 문의 목록 더 보기 </span>
+        </div>
+        <br />
       </div>
     </div>
+  </div>
+</div>
+
   );
 }

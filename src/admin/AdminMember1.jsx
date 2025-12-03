@@ -1,10 +1,24 @@
 // src/admin/AdminMember1.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
 import "../css/style.css";
-import Nmx7 from "../images/nmx7.png";
+import { useParams, Link } from "react-router-dom";
+import AdminSidebar from "./AdminSidebar";
+import Pro from "../images/propile.png";
 import Heart from "../images/heart.png";
-import AdminSidebar from "./AdminSidebar"
+import api from "../api";
+
+
+//  api의 baseURL을 이용해서 이미지 URL 만드는 공통 함수
+const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
+
+const resolveImageUrl = (path) => {
+	if (!path) return Pro;
+	if (path.startsWith("http://") || path.startsWith("https://")) {
+		return path;
+	}
+	return `${BASE_URL}${path}`;
+};
+
 // 티켓 상태 버튼 색상
 const ticketStatusClass = status => status === "배송 중" ? "admin-con-btn" : "admin-con-btn1";
 const refundStatusClass = status => status === "미환불" ? "admin-member-refund" : "admin-member-refund-complete";
@@ -83,163 +97,166 @@ export default function MemberDetail() {
 		<div className="member-Member-page">
 			<AdminSidebar />{/* ← 공통 사이드바 호출 */}
 			<div className="member-right">
-				<div className="member-myTk-box2">
+								<div className="member-myTk-box2">
 					<div className="mytick-main-box">
-						<br /><br />
 						<div className="admin-member-memBox">
 							<div className="admin-member-memList">
-								<br /><br />
-								<img src={Nmx7} alt="콘서트_썸네일" className="member-tkRead-consImg" />
-								<span>{member?.memberName || "회원"}</span>
-							</div>
-
-							<div className="member-tkRead-dayBox">
-								<div className="member-tkRead-my">
-									<table>
-										<tbody>
-											<tr><th>아이디</th><td>{member?.memberId || "정보 없음"}</td></tr>
-											<tr><th>이메일</th><td>{member?.memberEmail || "정보 없음"}</td></tr>
-											<tr><th>이름</th><td>{member?.memberName || "정보 없음"}</td></tr>
-											<tr><th>휴대 전화 번호</th><td>{member?.memberPhone || "정보 없음"}</td></tr>
-											<tr><th>가입일</th><td>{formattedDate}</td></tr>
-										</tbody>
-									</table>
-								</div>
+								<img
+									src={resolveImageUrl(member?.profileImageUrl)}
+									alt="회원_프로필"
+									className="member-tkRead-consImg"
+								/>					
 							</div>
 						</div>
 
-						<br />
-
-						<div className="admin-member-memBox3">
-							<table className="admin-member-text1">
-								<tbody>
-									<tr><th>2025 투모로우바이투게더 단독 콘서트〈# :  유화〉</th><td className="admin-con-btn1">배송 중</td></tr>
-									<tr><th>2025 엔시티위시 단독 콘서트〈WISH’s〉</th><td className="admin-con-btn1">배송중</td></tr>
-									<tr><th>2025 아일릿 팬미팅〈글릿즈럽〉</th><td className="admin-con-btn">배송 완료</td></tr>
-									<tr><th>2025 백현 단독 콘서트〈럽백 is 백현〉</th><td className="admin-con-btn">배송 완료</td></tr>
-									<tr><th>2025 알파드라이브 첫 팬미팅</th><td className="admin-con-btn">배송 완료</td></tr>
-								</tbody>
-							</table><br/>
-							<div className="member-ticket-plus">
-															<strong> + </strong> <span> 티켓 목록 더 보기 </span>
-														</div>
-						</div>
-						
-
-						<br />
-
-						<div className="admin-member-memBox4">
-							<div className="admin-member-top">
-								<img src={Heart} alt="등급_사진" className="admin-Member-heartImg" />
-
-								<div className="admin-levelBox1-text">
-									<span>{member?.memberName || "회원"}</span><span>&nbsp;님의 등급은</span>
-									<strong>Silver</strong><span>&nbsp;입니다</span>
-
-									<table>
-										<tbody>
-											<tr><th>주문 건</th><td>｜</td><td>100 건</td>
-												<th>주문 금액</th><td>｜</td><td>425,414,441 원</td></tr>
-										</tbody>
-									</table>
-
-									<div style={{ marginTop: "20px" }}>
-										<button onClick={sendCoupon} className="admin-Member-purPer">쿠폰 전송</button>
-									</div>
-								</div>
-							</div>
-
-							<table className="admin-cons-list">
-								<tbody>
-									<tr><th colSpan="9">2025 알디원 첫 콘서트 〈알디원플래닛〉</th> <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-										<th className="admin-member-refund">미환불</th></tr>
-
-									<tr>
-										<td>2025. 10. 15 결제 완료</td><td>｜</td>
-										<td>230,000 원</td><td>｜</td>
-										<td>신용카드</td><td>｜</td>
-										<td>2025. 10. 20 환불</td><td>｜</td>
-										<td>단순변심</td>
-									</tr>
-								</tbody>
-							</table>
-
-							<table className="admin-cons-list">
-								<tbody>
-									<tr><th colSpan="9">2025 알디원 첫 콘서트 〈알디원플래닛〉</th> <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-										<th className="admin-member-refund">미환불</th></tr>
-									<tr>
-										<td>2025. 10. 15 결제 완료</td><td>｜</td>
-										<td>230,000 원</td><td>｜</td>
-										<td>신용카드</td><td>｜</td>
-										<td>2025. 10. 20 환불</td><td>｜</td>
-										<td>단순변심</td>
-									</tr>
-								</tbody>
-							</table>
-
-							<table className="admin-cons-list">
-								<tbody>
-									<tr><th colSpan="9">2025 알디원 첫 콘서트 〈알디원플래닛〉</th> <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-										<th className="admin-member-refund">미환불</th></tr>
-									<tr>
-										<td>2025. 10. 15 결제 완료</td><td>｜</td>
-										<td>230,000 원</td><td>｜</td>
-										<td>신용카드</td><td>｜</td>
-										<td>2025. 10. 20 환불</td><td>｜</td>
-										<td>단순변심</td>
-									</tr>
-								</tbody>
-							</table>
-							<br />
-							<div className="member-ticket-plus">
-								<strong> + </strong> <span> 환불 목록 더 보기 </span>
+						{/* 여기부터 className 변경 */}
+						<div className="member-tkRead-dayBox admin-member-info-dayBox">
+							<div className="member-tkRead-my admin-member-info-my">
+								<table>
+									<tbody>
+										<tr><th>이름</th><td>{member?.memberName || "정보 없음"}</td></tr>
+										<tr><th>아이디</th><td>{member?.memberId || "정보 없음"}</td></tr>
+										<tr><th>이메일</th><td>{member?.memberEmail || "정보 없음"}</td></tr>
+										<tr><th>연락처</th><td>{member?.memberPhone || "정보 없음"}</td></tr>
+										<tr><th>가입일</th><td>{formattedDate}</td></tr>
+									</tbody>
+								</table>
 							</div>
 						</div>
-						<br />
-
-						<div className="admin-Member-pointBox">
-							<span>보유 포인트</span>&nbsp;&nbsp;<strong className="member-poins-live">100,392,102 P</strong><br />
-							<span>소멸 예정 포인트 (30 일 이내)</span>&nbsp;&nbsp;<strong>12</strong><strong>P</strong><br />
-							<span>포인트 프로모션 등록&nbsp;&nbsp;&nbsp;&gt;</span>
-						</div>
-						<br />
-
-						<Link to="/admin/AdminContact/" className="admin-member-memBox4">
-							<table className="admin-member-text1">
-								<tbody>
-									<tr><th>[티켓] 티켓을 언제쯤 주나요 ㅡ ㅡ 기다리기 힘드네요 </th><td className="admin-con-btn1">미답변</td></tr>
-									<tr><th>[회원] 회원 탈퇴는 어떻게 하죠</th><td className="admin-con-btn1">미답변</td></tr>
-									<tr><th>[회원] 회원가입을 하려고 하는데 연동 가능한가요?</th><td className="admin-con-btn1">미답변</td></tr>
-									<tr><th>[티켓] 티켓 배송으로 받고 싶어요 ㅜㅜ</th><td className="admin-con-btn">답변 완료</td></tr>
-									<tr><th>[티켓] 위시 콘서트 현장 수령으로 바꾸고 싶어여</th><td className="admin-con-btn">답변 완료</td></tr>
-								</tbody>
-							</table>
-							<br /><br />
-							<div className="member-ticket-plus">
-								<strong> + </strong> <span> 회원 문의 목록 더 보기 </span>
-							</div>
-						</Link>
-						<br />
-
-						<div className="admin-member-memBox5">
-							<table className="admin-member-text1">
-								<tbody>
-									<tr><th>[위시] 진심 이 콘서트 안 간다? 후회할 것 같습니다 제</th><td className="admin-con-btn1">미답변</td></tr>
-									<tr><th>[라이즈] 제 인생은 이 콘 보기 전과 후로 나뉨 ㅜㅜ</th><td className="admin-con-btn1">미답변</td></tr>
-									<tr><th>[아일릿] 아일릿 나의 사랑 나의 여신 나의 사랑</th><td className="admin-con-btn1">미답변</td></tr>
-									<tr><th>[투어스] 42 멤버십 결제했어요 저는 오늘부터 사이입니다</th><td className="admin-con-btn">답변 완료</td></tr>
-									<tr><th>[기타] 왜 알디원 잘생긴 거 말 안 했음? 인생 손해 봤다</th><td className="admin-con-btn">답변 완료</td></tr>
-								</tbody>
-							</table>
-							<br /><br />
-							<div className="member-ticket-plus">
-								<strong> + </strong> <span> 리뷰 목록 더 보기 </span>
-							</div>
-						</div>
-
-						<br />
 					</div>
+
+
+					<br />
+
+					<div className="admin-member-memBox3">
+						<table className="admin-member-text1">
+							<tbody>
+								<tr><th>2025 투모로우바이투게더 단독 콘서트〈# :  유화〉</th><td className="admin-con-btn1">배송 중</td></tr>
+								<tr><th>2025 엔시티위시 단독 콘서트〈WISH’s〉</th><td className="admin-con-btn1">배송중</td></tr>
+								<tr><th>2025 아일릿 팬미팅〈글릿즈럽〉</th><td className="admin-con-btn">배송 완료</td></tr>
+								<tr><th>2025 백현 단독 콘서트〈럽백 is 백현〉</th><td className="admin-con-btn">배송 완료</td></tr>
+								<tr><th>2025 알파드라이브 첫 팬미팅</th><td className="admin-con-btn">배송 완료</td></tr>
+							</tbody>
+						</table><br />
+						<div className="member-ticket-plus">
+							<strong> + </strong> <span> 티켓 목록 더 보기 </span>
+						</div>
+					</div>
+
+
+					<br />
+
+					<div className="admin-member-memBox4">
+						<div className="admin-member-top">
+							<img src={Heart} alt="등급_사진" className="admin-Member-heartImg" />
+
+							<div className="admin-levelBox1-text">
+								<span>{member?.memberName || "회원"}</span><span>&nbsp;님의 등급은</span>
+								<strong>Silver</strong><span>&nbsp;입니다</span>
+
+								<table>
+									<tbody>
+										<tr><th>주문 건</th><td>｜</td><td>100 건</td>
+											<th>주문 금액</th><td>｜</td><td>425,414,441 원</td></tr>
+									</tbody>
+								</table>
+
+								<div style={{ marginTop: "20px" }}>
+									<button onClick={sendCoupon} className="admin-Member-purPer">쿠폰 전송</button>
+								</div>
+							</div>
+						</div>
+
+						<table className="admin-cons-list">
+							<tbody>
+								<tr><th colSpan="9">2025 알디원 첫 콘서트 〈알디원플래닛〉</th> <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+									<th className="admin-member-refund">미환불</th></tr>
+
+								<tr>
+									<td>2025. 10. 15 결제 완료</td><td>｜</td>
+									<td>230,000 원</td><td>｜</td>
+									<td>신용카드</td><td>｜</td>
+									<td>2025. 10. 20 환불</td><td>｜</td>
+									<td>단순변심</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<table className="admin-cons-list">
+							<tbody>
+								<tr><th colSpan="9">2025 알디원 첫 콘서트 〈알디원플래닛〉</th> <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+									<th className="admin-member-refund">미환불</th></tr>
+								<tr>
+									<td>2025. 10. 15 결제 완료</td><td>｜</td>
+									<td>230,000 원</td><td>｜</td>
+									<td>신용카드</td><td>｜</td>
+									<td>2025. 10. 20 환불</td><td>｜</td>
+									<td>단순변심</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<table className="admin-cons-list">
+							<tbody>
+								<tr><th colSpan="9">2025 알디원 첫 콘서트 〈알디원플래닛〉</th> <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+									<th className="admin-member-refund">미환불</th></tr>
+								<tr>
+									<td>2025. 10. 15 결제 완료</td><td>｜</td>
+									<td>230,000 원</td><td>｜</td>
+									<td>신용카드</td><td>｜</td>
+									<td>2025. 10. 20 환불</td><td>｜</td>
+									<td>단순변심</td>
+								</tr>
+							</tbody>
+						</table>
+						<br />
+						<div className="member-ticket-plus">
+							<strong> + </strong> <span> 환불 목록 더 보기 </span>
+						</div>
+					</div>
+					<br />
+
+					<div className="admin-Member-pointBox">
+						<span>보유 포인트</span>&nbsp;&nbsp;<strong className="member-poins-live">100,392,102 P</strong><br />
+						<span>소멸 예정 포인트 (30 일 이내)</span>&nbsp;&nbsp;<strong>12</strong><strong>P</strong><br />
+						<span>포인트 프로모션 등록&nbsp;&nbsp;&nbsp;&gt;</span>
+					</div>
+					<br />
+
+					<Link to="/admin/AdminContact/" className="admin-member-memBox4">
+						<table className="admin-member-text1">
+							<tbody>
+								<tr><th>[티켓] 티켓을 언제쯤 주나요 ㅡ ㅡ 기다리기 힘드네요 </th><td className="admin-con-btn1">미답변</td></tr>
+								<tr><th>[회원] 회원 탈퇴는 어떻게 하죠</th><td className="admin-con-btn1">미답변</td></tr>
+								<tr><th>[회원] 회원가입을 하려고 하는데 연동 가능한가요?</th><td className="admin-con-btn1">미답변</td></tr>
+								<tr><th>[티켓] 티켓 배송으로 받고 싶어요 ㅜㅜ</th><td className="admin-con-btn">답변 완료</td></tr>
+								<tr><th>[티켓] 위시 콘서트 현장 수령으로 바꾸고 싶어여</th><td className="admin-con-btn">답변 완료</td></tr>
+							</tbody>
+						</table>
+						<br /><br />
+						<div className="member-ticket-plus">
+							<strong> + </strong> <span> 회원 문의 목록 더 보기 </span>
+						</div>
+					</Link>
+					<br />
+
+					<div className="admin-member-memBox5">
+						<table className="admin-member-text1">
+							<tbody>
+								<tr><th>[위시] 진심 이 콘서트 안 간다? 후회할 것 같습니다 제</th><td className="admin-con-btn1">미답변</td></tr>
+								<tr><th>[라이즈] 제 인생은 이 콘 보기 전과 후로 나뉨 ㅜㅜ</th><td className="admin-con-btn1">미답변</td></tr>
+								<tr><th>[아일릿] 아일릿 나의 사랑 나의 여신 나의 사랑</th><td className="admin-con-btn1">미답변</td></tr>
+								<tr><th>[투어스] 42 멤버십 결제했어요 저는 오늘부터 사이입니다</th><td className="admin-con-btn">답변 완료</td></tr>
+								<tr><th>[기타] 왜 알디원 잘생긴 거 말 안 했음? 인생 손해 봤다</th><td className="admin-con-btn">답변 완료</td></tr>
+							</tbody>
+						</table>
+						<br /><br />
+						<div className="member-ticket-plus">
+							<strong> + </strong> <span> 리뷰 목록 더 보기 </span>
+						</div>
+					</div>
+
+					<br />
 				</div>
 			</div>
 		</div>

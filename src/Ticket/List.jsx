@@ -1,5 +1,6 @@
 // src/Ticket/List.jsx
 import React, { useState, useEffect } from "react";
+import "../css/ticket.css";
 import "../css/style.css";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
@@ -46,11 +47,11 @@ export default function List() {
 			
 			<div className="tkList2">
 			<Link to="/Ticket/List"><button className="tkLists">티켓 전체 보기</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">에스엠</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">하이브</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">제이와이피</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">웨이크원</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">기타</button></Link>
+			<Link to="/Ticket/List"><button className="tkLists">콘서트</button></Link>
+			<Link to="/Ticket/List"><button className="tkLists">팬미팅</button></Link>
+			<Link to="/Ticket/List"><button className="tkLists">뮤지컬</button></Link>
+			<Link to="/Ticket/List"><button className="tkLists">연극</button></Link>
+			<Link to="/Ticket/List"><button className="tkLists">전시 / 체험</button></Link>
 			</div>
 			<br/><br/>
 			

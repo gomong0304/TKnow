@@ -1,6 +1,7 @@
 // src/Ticket/TicketBuy.jsx
 import React, { useState, useEffect } from "react";
 import "../css/style.css";
+import "../css/ticket.css";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import Cons from "../images/cons.png";

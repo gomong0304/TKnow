@@ -643,49 +643,8 @@
 	font-weight: bold;
 }
 
-.ticket-buy-top {
-	width: 1440;
-	position: relative;
-	white-space: nowrap;
-}
 
-.ticket-buy-button1 {
-	padding: 40px;
-	width: 288px;
-	height: 101px;
-	background: #FFA6C9;
-	border: 1px solid #FFA6C9;
-	font-size: 55px;
-	font-weight: bold;
-	color: #FFE500;
-	top: 500px;
-	left: 101px;
-	display: inline-flex;
-	align-items: center;
-}
 
-.ticket-buy-button-text1 {
-	bottom: 45px;
-	font-size: 32px;
-	font-weight: bold;
-	color: white;
-	margin-top: 5px;
-}
-
-.ticket-buy-button2 {
-	padding: 40px;
-	width: 288px;
-	height: 101px;
-	background: #D7D7D7;
-	border: 1px solid #BEBEBE;
-	font-size: 55px;
-	font-weight: bold;
-	color: #808080;
-	top: 500px;
-	left: 101px;
-	display: inline-flex;
-	align-items: center;
-}
 
 .ticket-buy-button-text2 {
 	bottom: 45px;
@@ -797,22 +756,6 @@
 	font-size: 14px;
 }
 
-.ticket-next-btn {
-	display: block;
-	width: 555px;
-	padding: 15px;
-	background-color: #FFA6C9;
-	color: white;
-	font-size: 27px;
-	border: none;
-	border-radius: 10px;
-	cursor: pointer;
-	text-align: center;
-	text-decoration: none;
-	font-weight: bold;
-	justify-self: anchor-center;
-	gap: 300px
-}
 
 .ticket-buy-note {
 	width: 843px;
@@ -826,15 +769,6 @@
 	min-height: 269px;
 }
 
-.ticket-buy-middle-box {
-	position: relative;
-	right: -10px;
-}
-
-.ticket-buy-middle-box1 {
-	display: flex;
-	gap: 12px;
-}
 
 .ticket-buy-note-text p {
 	font-size: 14px;
@@ -969,112 +903,7 @@
 	text-align: center;
 }
 
-.ticket-stage-buttons {
-	justify-content: space-between;
-	justify-self: anchor-center;
-	gap: 10px;
-}
 
-.ticket-stage-button2 {
-	display: flex;
-	gap: 20px;
-	padding: 15px;
-	bottom: 50px;
-}
-
-.ticket-stage-back {
-	flex: 1;
-	color: black;
-	background-color: white;
-	border: 1px solid #D7D7D7;
-	padding: 15px;
-	border-radius: 10px;
-	cursor: pointer;
-	font-weight: bold;
-	text-decoration: none;
-	font-size: 23px;
-	text-align: center;
-}
-
-.ticket-stage-next3 {
-	flex: 1;
-	color: white;
-	background-color: #ffa6c9;
-	padding: 15px;
-	border-radius: 10px;
-	cursor: pointer;
-	font-weight: bold;
-	text-decoration: none;
-	font-size: 23px;
-	text-align: center;
-}
-
-.ticket-stage-complete {
-	flex: 1;
-	background-color: white;
-	color: white;
-	border: 1px solid #D7D7D7;
-	padding: 15px;
-	border-radius: 10px;
-	cursor: pointer;
-	font-weight: bold;
-	font-size: 16px;
-}
-
-.ticket-buy-main {
-	position: relative;
-	top: 0;
-	left: 0;
-	width: 100%;
-	max-width: 1450px;
-	padding: 0 0px;
-	box-sizing: border-box;
-	height: 100vh;
-	overflow-y: auto;
-}
-
-.ticket-buy-main * {
-	box-sizing: border-box;
-}
-
-.ticket-buy-page {
-	padding: 0px;
-	background-color: #fff;
-}
-
-.ticket-stage-main {
-	max-width: 1450px;
-	position: relative;
-	top: 0;
-	left: 0;
-	width: 100%;
-	/* 	min-width: 1450px; */
-	padding: 0 0px;
-	box-sizing: border-box;
-	/* 	height: 100vh; */
-	overflow-y: auto;
-}
-
-.ticket-stage-main * {
-	box-sizing: border-box;
-}
-
-.ticket-stage-pink {
-	font-size: 38px;
-	border-bottom: 1px solid white;
-}
-
-.ticket-stage-pink2 {
-	font-size: 18px;
-}
-
-.ticket-stage-grade h4 {
-	text-align: justify;
-}
-
-.ticket-stage-selected h4 {
-	text-align: justify;
-}
 
 map {
 	display: none;
@@ -1189,98 +1018,13 @@ map {
 	gap: 5px;
 }
 
-.ticket-buy3-box {
-	border: 1px solid #D7D7D7;
-	border-radius: 12px;
-	padding: 20px;
-	min-height: 50px;
-	width: 842px;
-	right: 500px;
-	justify-items: anchor-center;
-}
-
-.ticket-buy3-note {
-	width: 842px;
-	right: 400px;
-	display: block;
-	margin-top: 229px;
-	font-size: 18px;
-	border: 1px solid #D7D7D7;
-	border-radius: 10px;
-	padding: 20px;
-	min-height: 246px;
-}
-
-.ticket-buy4-box2 {
-	border: 1px solid #D7D7D7;
-	border-radius: 10px;
-	padding: 20px;
-	min-height: 50px;
-	width: 320px;
-	height: 776px;
-}
-
-.ticket-buy4-box3 {
-	border: 1px solid #D7D7D7;
-	border-radius: 12px;
-	padding: 20px;
-	min-height: 500px;
-	width: 510px;
-	right: 720px;
-	justify-content: center;
-}
-
-.ticket-buy4-input2 {
-	width: 100px;
-	text-align: center;
-}
-
-.ticket-buy4-text1 {
-	color: #808080;
-	font-size: 16px;
-	margin-top: 10px;;
-	line-height: 1.6;
-	align-self: flex-start;
-}
-
-.ticket-buy-table2 {
-	text-align: justify;
-	padding: 1px 1px 1px 10px;
-	line-height: 27px;
-}
-
-.ticket-buy-table2 th {
-	text-align: justify;
-	padding: 1px 1px 1px 10px;
-}
-
-.ticket-buy-total {
-	border-radius: 10px;
-	margin-top: 12px;
-	background: #eee;
-	padding: 10px 10px 10px 20px;
-	display: flex;
-	justify-content: right;
-	align-items: center;
-}
-
 .ticket-price {
+
 	display: flex;
 	align-items: baseline;
 	gap: 5px;
 }
 
-.ticket-buy-total strong {
-	color: #FFE500;
-	font-size: 38px;
-	padding: 0px 0px 0px 106px;
-}
-
-.ticket-buy-total span {
-	padding: 10px 20px 10px 15px;
-	font-size: 26px;
-	font-weight: 600;
-}
 
 .ticket-buy-total p {
 	color: white;
@@ -1297,66 +1041,8 @@ map {
 	justify-content: center;
 }
 
-.custom-radio input {
-	display: none;
-}
 
-.custom-radio span {
-	position: relative;
-	padding-left: 30px;
-	cursor: pointer;
-}
 
-.custom-radio span::before {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 15px;
-	height: 15px;
-	border: 1px solid #D9D9D9;
-	border-radius: 50%;
-	background: white;
-}
-
-.custom-radio input:checked+span::before {
-	background: white;
-	border-color: #FFA6C9;
-}
-
-.custom-radio input:checked+span::after {
-	content: "";
-	position: absolute;
-	left: 8.5px;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	width: 10px;
-	height: 10px;
-	background: #FFA6C9;
-	border-radius: 50%;
-}
-
-.ticket-buy3-box2 {
-	width: 800px;
-	gap: 30px;
-	padding: 10px;
-	background: #D9D9D9;
-	border-radius: 10px;
-	gap: 30px;
-	justify-items: anchor-center;
-}
-
-.ticket-buy3-box th {
-	padding: 10px 30px 10px 0px;
-	text-align: justify;
-	align-items: center;
-}
-
-.ticket-buy3-box td {
-	padding: 10px 100px 10px 0px;
-	align-content: baseline;
-}
 
 .ticket-buy4-box4 strong {
 	color: #808080;
@@ -1411,9 +1097,7 @@ map {
 	font-weight: bold;
 }
 
-.ticket-buy3-note-text p {
-	font-size: 15px;
-}
+
 
 .ticket-buy3-cupPluBtn {
 	padding: 5px 20px 5px 20px;

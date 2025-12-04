@@ -1,5 +1,6 @@
 // src/Ticket/TicketBuy5.jsx
 import React, { useState, useEffect } from "react";
+import "../css/ticket.css";
 import "../css/style.css";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import Cons from "../images/cons.png";

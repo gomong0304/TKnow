@@ -1,5 +1,6 @@
 // src/Ticket/TicketBuy3.jsx
 import React, { useEffect, useState } from "react";
+import "../css/ticket.css";
 import "../css/style.css";
 import api from "../api";
 import { Link, useParams, useLocation } from "react-router-dom";

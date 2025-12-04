@@ -1,5 +1,6 @@
 // src/Ticket/Read.jsx
 import React, { useState, useEffect } from "react";
+import "../css/ticket.css";
 import "../css/style.css";
 import { Link, useParams } from "react-router-dom";
 import Boy from "../images/boy.png"; 

@@ -1,5 +1,6 @@
 // src/main/TopTK.jsx
 import React, { useState, useEffect } from "react";
+import "../css/ticket.css";
 import "../css/style.css";
 import { useNavigate, Link } from "react-router-dom";
 import MainEvent from "../images/event.png";

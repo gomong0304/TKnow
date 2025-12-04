@@ -77,7 +77,7 @@ const BASE = process.env.REACT_APP_API_BASE;
 
   return (
     <div className="toptk">
-      <div className="liveTopTk">실시간 인기 티켓</div>
+      <div className="liveTopTk">실시간 예매 티켓</div>
       <br />
       <br />
 
@@ -112,7 +112,7 @@ const BASE = process.env.REACT_APP_API_BASE;
               className="top"
               onClick={() => navigate(`/ticket/${t.ticketId}`)} // 백틱 → 괄호
             >
-              <div className="rank">{index + 1}</div>
+            
               <img
                 src={imageUrl}
                 alt={t.title || "티켓 이미지"}
@@ -121,7 +121,7 @@ const BASE = process.env.REACT_APP_API_BASE;
                   //  무한 루프 방지 - 이미 DefaultImage면 실행 안 함
                   if (e.target.src === DefaultImage) return;
                   
-                  console.error("❌ 이미지 로드 실패:", {
+                  console.error(" 이미지 로드 실패:", {
                     ticketId: t.ticketId,
                     title: t.title,
                     originalUrl: t.mainImageUrl

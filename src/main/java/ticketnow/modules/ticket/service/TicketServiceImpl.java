@@ -149,17 +149,26 @@ public class TicketServiceImpl implements TicketService {
 		if (dto == null) {
 			// 존재하지 않으면 도메인 예외(여기서는 IllegalStateException 사용)
 			log.warn("[Ticket][GET] not found id={}", ticketId);
-			throw new IllegalStateException("티켓이 존재하지 않습니다: " + ticketId);
+			 throw new IllegalArgumentException("티켓을 찾을 수 없습니다: id=" + ticketId);
 		}
+		 // 대표 이미지 1장(primary) 조회 → mainImageUrl 설정
+	    ImageVO primary = imageMapper.selectPrimaryImageByTicket(ticketId);
+	    if (primary != null) {
+	        dto.setMainImageUrl(primary.getImgUrl());
+	    }
 		
-		// 대표 이미지 주입: 티켓 기준 대표 이미지 1건 조회
-		ImageVO primary = imageMapper.selectPrimaryImageByTicket(dto.getTicketId());
-		if (primary != null && primary.getImgUrl() != null) {
-		    dto.setMainImageUrl(primary.getImgUrl());
-		} else {
-		    // 대표 이미지가 없는 티켓은 빈 문자열로 내려서 프론트에서 기본 이미지 처리
-		    dto.setMainImageUrl("");
-		}
+		//   상품 설명용 이미지(detailImageUrl) 설정
+	    // - 같은 티켓의 모든 이미지를 가져와서
+	    //   대표이미지가 아닌 것 중 첫 번째를 detailImageUrl로 사용
+	    List<ImageVO> images = imageMapper.selectImagesByTicket(ticketId);
+	    if (images != null && !images.isEmpty()) {
+	        images.stream()
+	                .filter(img -> primary == null 
+	                        || !Objects.equals(img.getImageUuid(), primary.getImageUuid()))
+	                .findFirst()
+	                .ifPresent(detail -> dto.setDetailImageUrl(detail.getImgUrl()));
+	    }
+
 
 		log.debug("[Ticket][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
 		return dto;

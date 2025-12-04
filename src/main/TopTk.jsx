@@ -83,22 +83,19 @@ const BASE = process.env.REACT_APP_API_BASE;
 
       <div className="tkList1">
         <Link to="/Ticket/List">
-          <button className="tkList">티켓 전체 보기</button>
+          <button className="tkList">티켓 전체보기</button>
         </Link>
         <Link to="/Ticket/List">
-          <button className="tkList">에스엠</button>
+          <button className="tkList">콘서트</button>
         </Link>
         <Link to="/Ticket/List">
-          <button className="tkList">하이브</button>
+          <button className="tkList">뮤지컬/연극</button>
         </Link>
         <Link to="/Ticket/List">
-          <button className="tkList">제이와이피</button>
+          <button className="tkList">스포츠</button>
         </Link>
         <Link to="/Ticket/List">
-          <button className="tkList">웨이크원</button>
-        </Link>
-        <Link to="/Ticket/List">
-          <button className="tkList">기타</button>
+          <button className="tkList">전시 / 체험</button>
         </Link>
       </div>
       <br />

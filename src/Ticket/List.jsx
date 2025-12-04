@@ -48,9 +48,8 @@ export default function List() {
 			<div className="tkList2">
 			<Link to="/Ticket/List"><button className="tkLists">티켓 전체 보기</button></Link>
 			<Link to="/Ticket/List"><button className="tkLists">콘서트</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">팬미팅</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">뮤지컬</button></Link>
-			<Link to="/Ticket/List"><button className="tkLists">연극</button></Link>
+			<Link to="/Ticket/List"><button className="tkLists">뮤지컬 / 연극</button></Link>
+			<Link to="/Ticket/List"><button className="tkLists">스포츠</button></Link>
 			<Link to="/Ticket/List"><button className="tkLists">전시 / 체험</button></Link>
 			</div>
 			<br/><br/>

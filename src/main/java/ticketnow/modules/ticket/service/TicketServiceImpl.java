@@ -19,7 +19,7 @@ import ticketnow.modules.common.service.image.FileService;
 import ticketnow.modules.ticket.constant.TicketStatus;
 import ticketnow.modules.ticket.dto.*;
 import ticketnow.modules.ticket.mapper.TicketMapper;
-
+import ticketnow.modules.common.mapper.image.ImageMapper; 
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -28,8 +28,11 @@ public class TicketServiceImpl implements TicketService {
 	/** MyBatis Mapper (DB CRUD) */
 	private final TicketMapper ticketMapper;
 
-	// ★ 추가: 공통 이미지 업로드 서비스
+	// 공통 이미지 업로드 서비스
 	private final FileService fileService;
+	
+	// 티켓 대표 이미지 조회용 Mapper
+	private final ImageMapper imageMapper;
 
 	// =================================================================================
 	// 생성
@@ -149,10 +152,14 @@ public class TicketServiceImpl implements TicketService {
 			throw new IllegalStateException("티켓이 존재하지 않습니다: " + ticketId);
 		}
 		
-		// ★ 추가: mainImageUrl null 방지 (필드가 항상 JSON에 포함되도록)
-	    if (dto.getMainImageUrl() == null) {
-	        dto.setMainImageUrl("");  // TODO: 나중에 실제 대표 이미지 URL로 교체
-	    }
+		// 대표 이미지 주입: 티켓 기준 대표 이미지 1건 조회
+		ImageVO primary = imageMapper.selectPrimaryImageByTicket(dto.getTicketId());
+		if (primary != null && primary.getImgUrl() != null) {
+		    dto.setMainImageUrl(primary.getImgUrl());
+		} else {
+		    // 대표 이미지가 없는 티켓은 빈 문자열로 내려서 프론트에서 기본 이미지 처리
+		    dto.setMainImageUrl("");
+		}
 
 		log.debug("[Ticket][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
 		return dto;
@@ -177,14 +184,18 @@ public class TicketServiceImpl implements TicketService {
 		List<TicketResponseDTO> rows = ticketMapper.selectTicketDTOPage(offset, size);
 		long total = ticketMapper.countTickets();
 
-		// ★ 추가: 각 항목 mainImageUrl null 방지
-	    if (rows != null) {
-	        for (TicketResponseDTO dto : rows) {
-	            if (dto.getMainImageUrl() == null) {
-	                dto.setMainImageUrl("");  // TODO: 나중에 실제 대표 이미지 URL로 교체
-	            }
-	        }
-	    }
+		//  각 항목에 대표 이미지 URL 주입
+		if (rows != null) {
+		    for (TicketResponseDTO dto : rows) {
+		        ImageVO primary = imageMapper.selectPrimaryImageByTicket(dto.getTicketId());
+		        if (primary != null && primary.getImgUrl() != null) {
+		            dto.setMainImageUrl(primary.getImgUrl());
+		        } else {
+		            dto.setMainImageUrl(""); // 없으면 프론트에서 기본 이미지 사용
+		        }
+		    }
+		}
+
 
 	    // 표준 페이징 응답 조립
 	    PageResponseDTO<TicketResponseDTO> resp = new PageResponseDTO<>();

@@ -103,14 +103,14 @@ const BASE = process.env.REACT_APP_API_BASE;
 
       <div className="TopList">
         {tickets.slice(0, 5).map((t, index) => {
-          // ✅ 이미지 URL 미리 계산
+          // 이미지 URL 미리 계산
           const imageUrl = resolveImageUrl(t.mainImageUrl);
 
           return (
             <div
               key={t.ticketId}
               className="top"
-              onClick={() => navigate(`/ticket/${t.ticketId}`)} // ✅ 백틱 → 괄호
+              onClick={() => navigate(`/ticket/${t.ticketId}`)} // 백틱 → 괄호
             >
               <div className="rank">{index + 1}</div>
               <img
@@ -118,7 +118,7 @@ const BASE = process.env.REACT_APP_API_BASE;
                 alt={t.title || "티켓 이미지"}
                 className="ticket-img"
                 onError={(e) => {
-                  // ✅ 무한 루프 방지 - 이미 DefaultImage면 실행 안 함
+                  //  무한 루프 방지 - 이미 DefaultImage면 실행 안 함
                   if (e.target.src === DefaultImage) return;
                   
                   console.error("❌ 이미지 로드 실패:", {
@@ -127,10 +127,10 @@ const BASE = process.env.REACT_APP_API_BASE;
                     originalUrl: t.mainImageUrl
                   });
                   
-                  e.target.src = DefaultImage; // ✅ import한 이미지로 교체
+                  e.target.src = DefaultImage; //  import한 이미지로 교체
                 }}
               />
-              <strong style={{ fontSize: "25px" }}>{t.title}</strong>
+             <p/> <strong style={{ fontSize: "25px" }}>{t.title}</strong>
               <p style={{ fontSize: "20px", color: "#454545", fontWeight: "bold" }}>
                 {t.venueName || "장소 미정"}
               </p>

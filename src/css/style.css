@@ -107,14 +107,22 @@
 
 .TopList {
 	display: flex;
-	grid-template-columns: repeat(auto-fit, 250px);
+	flex-wrap: wrap;
 	gap: 35px;
 	justify-content: center;
 	min-width: 120px;
 }
+/* TopTK.jsx의 각 카드(.top) 한 장의 폭을 이미지 폭과 동일하게 고정 */
+.top {
+	width: 250px;              /* 이미지 폭과 동일하게 고정 */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;        /* 번호, 제목, 장소, 날짜 모두 가운데 정렬 */
+}
 
 .TopList img {
-	width: 250px;
+	width: 100%;
 	height: auto;
 }
 
@@ -1125,9 +1133,13 @@ map {
 	color: #808080;
 }
 
+/* 썸네일 이미지 상세 설정 (이미 있던 코드 유지) */
 .ticket-img {
-	position: relative;
-	display: inline-block;
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+	border-radius: 8px;
+	margin-bottom: 10px;
 }
 
 .ticket-base-img {

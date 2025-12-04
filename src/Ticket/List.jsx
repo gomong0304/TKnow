@@ -69,10 +69,10 @@ export default function List() {
 			        src={t.mainImageUrl || "/default.jpg"}
 			        alt={t.title || "티켓 이미지"}
 			        className="ticket-img"
-			      />
+			      />	<p/>
 			      <strong>{t.title}</strong>
-			      <p>{t.venueName || "장소 미정"}</p>
-			      <span>{formatDate(t.ticketDate)}</span>
+			      	<p/>{t.venueName || "장소 미정"}
+			     	<p/> <span>{formatDate(t.ticketDate)}</span>
 			    </div>
 			  ))}
 			</div></div>

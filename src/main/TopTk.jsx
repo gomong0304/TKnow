@@ -6,10 +6,14 @@ import MainEvent from "../images/event.png";
 import DefaultImage from "../images/top5.png"; //  기본 이미지 import
 import api from "../api";
 
+
+
 export default function TopTk() {
+
   const [tickets, setTickets] = useState([]);
   const navigate = useNavigate();
-  const BASE = process.env.REACT_APP_API_URL || "http://localhost:9090/ticketnow";
+const BASE = process.env.REACT_APP_API_BASE;
+
 
   //  이미지 URL 처리 함수 (오타 모두 수정!)
   const resolveImageUrl = (imageUrl) => {
@@ -24,7 +28,7 @@ export default function TopTk() {
     }
 
     // 상대 경로인 경우 BASE URL 붙이기
-    return `${BASE}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
+        return `${BASE}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
   };
 
   useEffect(() => {

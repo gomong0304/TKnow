@@ -1,5 +1,5 @@
 // src/Ticket/TicketBuy6.jsx
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../css/style.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cons from "../images/cons.png";
@@ -7,8 +7,13 @@ import Ticket from "../images/ticket.png";
 import TKNOW_w from "../images/TKNOW_w.png";
 import { QRCodeCanvas } from "qrcode.react";
 import axios from "axios";
+import api from "../api";
+
+const API_BASE = (process.env.REACT_APP_API_BASE || api.defaults.baseURL || "").replace(/\/$/, "");
+
 
 export default function TicketBuy6() {
+
   const location = useLocation();
   const navigate = useNavigate();
   const [paymentInfo, setPaymentInfo] = useState(null);
@@ -31,8 +36,7 @@ export default function TicketBuy6() {
     setPaymentInfo(info);
   }, [location]);
 
-  // 결제 요청 - Buy6 페이지 로딩 시 바로 결제 시뮬
-  useEffect(() => {
+    useEffect(() => {
     if (!paymentInfo || !paymentInfo.orderId) return;
 
     const token = localStorage.getItem("accessToken");
@@ -44,14 +48,14 @@ export default function TicketBuy6() {
       amount: paymentInfo.totalPrice,
     };
 
-    if (paymentInfo.paymentMethod === "신용카드") {
-      payUrl = "http://localhost:9090/ticketnow/pay/card/approve";
+     if (paymentInfo.paymentMethod === "신용카드") {
+      payUrl = `${API_BASE}/pay/card/approve`;
       payData.cardCompany = paymentInfo.cardType;
     } else if (paymentInfo.paymentMethod === "무통장") {
-      payUrl = "http://localhost:9090/ticketnow/pay/vbank/issue";
+      payUrl = `${API_BASE}/pay/vbank/issue`;
       payData.bankName = "신한";
     } else {
-      payUrl = "http://localhost:9090/ticketnow/pay/card/approve";
+      payUrl = `${API_BASE}/pay/card/approve`;
       payData.cardCompany = "일반";
     }
 
@@ -62,6 +66,7 @@ export default function TicketBuy6() {
       .then(res => console.log("결제 정보 DB 저장 완료:", res.data))
       .catch(err => console.error("결제 저장 실패:", err));
   }, [paymentInfo]);
+
 
   // 주문 데이터 DB 저장 + 창 닫기 / 홈 이동
   const handleClose = async () => {
@@ -97,15 +102,16 @@ export default function TicketBuy6() {
     console.log("  discount3:", discount3);
     console.log("  total:", total);
 
-    try {
+      try {
       const response = await axios.post(
-        "http://localhost:9090/ticketnow/orders",  
+        `${API_BASE}/orders`,
         orderData,
         {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         }
       );
       console.log("주문 데이터 DB 저장 완료:", response.data);
+
       
       // 성공 시 창 닫기 또는 홈 이동
       if (window.opener) {

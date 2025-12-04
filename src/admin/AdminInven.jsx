@@ -4,7 +4,12 @@ import "../css/admin.css";
 import "../css/style.css";
 import { Link, useNavigate } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar"
+import api from "../api";
+
+const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
+
 export default function AdminInven() {
+
 	const [tickets, setTickets] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
@@ -15,9 +20,9 @@ export default function AdminInven() {
 		const fetchTickets = async () => {
 			try {
 				const token = localStorage.getItem("accessToken");
-				
+
 				// 티켓 정보 불러오기
-				const res = await fetch("http://localhost:9090/ticketnow/tickets?page=1&size=100", {
+				const res = await fetch(`${BASE_URL}/tickets?page=1&size=100`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 						"Content-Type": "application/json",
@@ -30,6 +35,7 @@ export default function AdminInven() {
 
 				const data = await res.json();
 				console.log("서버 티켓 목록:", data);
+
 
 				// 응답 구조에 맞게 데이터 추출
 				if (Array.isArray(data)) {
@@ -59,12 +65,13 @@ export default function AdminInven() {
 
 		try {
 			const token = localStorage.getItem("accessToken");
-			const res = await fetch(`http://localhost:9090/ticketnow/tickets/${ticketId}`, {
+			const res = await fetch(`${BASE_URL}/tickets/${ticketId}`, {
 				method: "DELETE",
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			});
+
 
 			if (!res.ok) throw new Error("삭제 실패");
 
@@ -75,15 +82,16 @@ export default function AdminInven() {
 		}
 	};
 
+
 	const handleClick = (ticketId) => {
 		navigate(`/admin/AdminInven3/${ticketId}`);
 	};
-	
+
 	const statusLabel = {
-	  ON_SALE: "판매중",
-	  SOLD_OUT: "매진",
-	  SCHEDULED: "오픈 예정",
-	  CLOSED: "판매 종료",
+		ON_SALE: "판매중",
+		SOLD_OUT: "매진",
+		SCHEDULED: "오픈 예정",
+		CLOSED: "판매 종료",
 	};
 
 	return (
@@ -115,31 +123,31 @@ export default function AdminInven() {
 									</thead>
 
 									<tbody>
-									  {tickets.length > 0 ? (
-									    tickets.map((t) => (
-									      <tr
-									        key={t.ticketId}
-									        onClick={() => handleClick(t.ticketId)}
-									        style={{ cursor: "pointer" }}
-									      >
-									        <td>{t.ticketId}</td>
-									        <td>{t.title}</td>
-									        <td>{t.price?.toLocaleString()}</td>
-									        <td>{t.remainingSeats || t.totalSeats}</td>
+										{tickets.length > 0 ? (
+											tickets.map((t) => (
+												<tr
+													key={t.ticketId}
+													onClick={() => handleClick(t.ticketId)}
+													style={{ cursor: "pointer" }}
+												>
+													<td>{t.ticketId}</td>
+													<td>{t.title}</td>
+													<td>{t.price?.toLocaleString()}</td>
+													<td>{t.remainingSeats || t.totalSeats}</td>
 
-									        {/* 상태 표시 부분 */}
-									        <td className={
-									          t.ticketStatus === "ON_SALE"
-									            ? "admin-con-btn"
-									            : "admin-con-btn1"
-									        }>
-									          {statusLabel[t.ticketStatus] || "알수없음"}
-									        </td>
-									      </tr>
-									    ))
-									  ) : (
-									    <tr><td colSpan="5">불러올 티켓이 없습니다</td></tr>
-									  )}
+													{/* 상태 표시 부분 */}
+													<td className={
+														t.ticketStatus === "ON_SALE"
+															? "admin-con-btn"
+															: "admin-con-btn1"
+													}>
+														{statusLabel[t.ticketStatus] || "알수없음"}
+													</td>
+												</tr>
+											))
+										) : (
+											<tr><td colSpan="5">불러올 티켓이 없습니다</td></tr>
+										)}
 									</tbody>
 								</table>
 								<br /><br />

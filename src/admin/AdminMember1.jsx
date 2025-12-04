@@ -11,23 +11,23 @@ import api from "../api";
 const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
 
 const resolveImageUrl = (path) => {
-  // 1) 값이 없으면 기본 프로필
-  if (!path) {
-    return Pro;
-  }
+	// 1) 값이 없으면 기본 프로필
+	if (!path) {
+		return Pro;
+	}
 
-  // 2) 이미 절대 URL 이면 그대로 사용
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
+	// 2) 이미 절대 URL 이면 그대로 사용
+	if (path.startsWith("http://") || path.startsWith("https://")) {
+		return path;
+	}
 
-  // 3) /uploads, /static 같이 슬래시로 시작하는 경우 → baseURL 뒤에 그대로 붙이기
-  if (path.startsWith("/")) {
-    return `${BASE_URL}${path}`;
-  }
+	// 3) /uploads, /static 같이 슬래시로 시작하는 경우 → baseURL 뒤에 그대로 붙이기
+	if (path.startsWith("/")) {
+		return `${BASE_URL}${path}`;
+	}
 
-  // 4) 그 외에는 / 하나 끼워서 붙이기
-  return `${BASE_URL}/${path}`;
+	// 4) 그 외에는 / 하나 끼워서 붙이기
+	return `${BASE_URL}/${path}`;
 };
 
 
@@ -55,12 +55,12 @@ export default function MemberDetail() {
 		// 회원 기본 정보와 주문 내역 동시에 가져오기
 		Promise.all([
 			// 회원 기본 정보
-			fetch(`http://localhost:9090/ticketnow/members/${memberId}`, {
+			fetch(`${BASE_URL}/members/${memberId}`, {
 				headers: { Authorization: `Bearer ${token}` },
 			}).then(res => res.ok ? res.json() : null),
 
 			// 주문 내역 (티켓)
-			fetch(`http://localhost:9090/ticketnow/orders/member/${memberId}?page=1&size=100`, {
+			fetch(`${BASE_URL}/orders/member/${memberId}?page=1&size=100`, {
 				headers: { Authorization: `Bearer ${token}` },
 			}).then(res => res.ok ? res.json() : null)
 		])
@@ -109,7 +109,7 @@ export default function MemberDetail() {
 		<div className="member-Member-page">
 			<AdminSidebar />{/* ← 공통 사이드바 호출 */}
 			<div className="member-right">
-								<div className="member-myTk-box2">
+				<div className="member-myTk-box2">
 					<div className="mytick-main-box">
 						<div className="admin-member-memBox">
 							<div className="admin-member-memList">
@@ -117,7 +117,11 @@ export default function MemberDetail() {
 									src={resolveImageUrl(member?.profileImageUrl)}
 									alt="회원_프로필"
 									className="member-tkRead-consImg"
-								/>					
+									onError={(e) => {
+										e.target.onerror = null;
+										e.target.src = Pro; // 상세 화면에서도 기본 이미지로
+									}}
+								/>
 							</div>
 						</div>
 

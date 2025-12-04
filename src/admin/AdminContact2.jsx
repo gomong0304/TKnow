@@ -4,30 +4,36 @@ import "../css/admin.css";
 import "../css/style.css";
 import { Link } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar"
+import api from "../api";
+
+const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
+
 export default function AdminAllInquiries() {
+
   const [inquiries, setInquiries] = useState([]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+ useEffect(() => {
+  const token = localStorage.getItem("accessToken");
 
-    if (!token) {
-      console.warn("로그인이 필요합니다.");
-      return;
+  if (!token) {
+    console.warn("로그인이 필요합니다.");
+    return;
+  }
+
+  // 여기 URL만 관리자를 위한 전체 목록으로 변경
+  fetch(`${BASE_URL}/admin/boards`, {
+    headers: {
+      Authorization: `Bearer ${token}`
     }
-
-    // 여기 URL만 관리자를 위한 전체 목록으로 변경
-    fetch("http://localhost:9090/ticketnow/admin/boards", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("전체 문의 내역:", data);
+      setInquiries(data.list || []);
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("전체 문의 내역:", data);
-        setInquiries(data.list || []);
-      })
-      .catch((err) => console.error("문의 불러오기 실패:", err));
-  }, []);
+    .catch((err) => console.error("문의 불러오기 실패:", err));
+}, []);
+
 
   return (
     // src/admin/AdminContact2.jsx

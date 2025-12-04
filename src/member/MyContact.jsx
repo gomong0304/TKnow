@@ -5,22 +5,27 @@ import "../css/style.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import api from "../api";
 import MemberSidebar from "./MemberSidebar";
+
+const API_BASE = process.env.REACT_APP_API_BASE;
+
 export default function MyContact() {
+
   const [inquiries, setInquiries] = useState([]);
   const { boardId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
+  const token = localStorage.getItem("accessToken");
+  if (!token) return;
 
-    fetch("http://localhost:9090/ticketnow/boards/my", {
+   fetch(`${API_BASE}/boards/my`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.json())
-      .then((data) => setInquiries(data.list || []))
-      .catch((err) => console.error("문의 불러오기 실패:", err));
-  }, []);
+    .then((res) => res.json())
+    .then((data) => setInquiries(data.list || []))
+    .catch((err) => console.error("문의 불러오기 실패:", err));
+}, []);
+
 
   return (
     <div className="member-Member-page-1">

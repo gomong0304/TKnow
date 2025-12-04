@@ -49,7 +49,7 @@ export default function Member() {
   const [recentOrder, setRecentOrder] = useState(null);
   const [profileUrl, setProfileUrl] = useState(""); // 프로필 이미지 URL
 
-   useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem("accessToken"); // 받은 토큰
     const localMemberId = localStorage.getItem("memberId"); // 로그인한 아이디
 
@@ -175,10 +175,17 @@ export default function Member() {
         <div className="member-Member-box2">
           <div className="member-pro-box">
             <div className="member-Member-propile-imgBox">
+
               <img
                 src={profileUrl ? profileUrl : Pro}
                 alt="프로필_사진"
                 className="member-Member-proImg"
+                onError={(e) => {
+                  // 무한 onError 루프 방지
+                  e.target.onerror = null;
+                  // 이미지 로딩 실패 시 기본 프로필로 교체
+                  e.target.src = Pro;
+                }}
               />
               <button
                 onClick={handleChangeImage}

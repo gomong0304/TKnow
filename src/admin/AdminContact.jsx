@@ -27,7 +27,6 @@ export default function AdminContactDetail() {
   const [replyFiles, setReplyFiles] = useState([]); // 댓글 첨부 파일
   const [replyError, setReplyError] = useState("");
 
-  // 게시글 + 댓글 불러오기 (재사용 함수)
   const fetchBoardDetail = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -38,7 +37,7 @@ export default function AdminContactDetail() {
 
     try {
       const res = await fetch(
-        `http://localhost:9090/ticketnow/admin/boards/${boardId}`,
+        `${BASE_URL}/admin/boards/${boardId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -49,7 +48,8 @@ export default function AdminContactDetail() {
       }
 
       const data = await res.json();
-      console.log("게시글 상세:", data);
+      console.log("문의 상세:", data);
+      setBoard(data.data || data);
 
       // data.board 형태일 수도 있으니 방어적으로 처리
       const core = data.board || data;
@@ -79,7 +79,6 @@ export default function AdminContactDetail() {
         image: core.image || core.images || [],
       });
 
-
     } catch (err) {
       console.error("게시글 불러오기 실패:", err);
       setBoard(null);
@@ -87,6 +86,7 @@ export default function AdminContactDetail() {
       setLoading(false);
     }
   };
+
 
   // 최초 로딩
   useEffect(() => {
@@ -123,12 +123,12 @@ export default function AdminContactDetail() {
       }
 
       const res = await fetch(
-        `http://localhost:9090/ticketnow/admin/boards/${boardId}/replies`,
+        `${BASE_URL}/admin/boards/${boardId}/replies`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
-            // ❗ Content-Type 은 FormData 사용 시 자동 설정
+            //  Content-Type 은 FormData 사용 시 자동 설정
           },
           body: formData,
         }

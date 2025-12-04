@@ -78,10 +78,14 @@ export default function Member() {
                   }
                 >
                   <img
-                    src={profileSrc}
-                    alt="멤버_상세"
-                    className="admin-Member-memImg"
-                  />
+                      src={profileSrc}
+                      alt="멤버_상세"
+                      className="admin-Member-memImg"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = Pro; // 관리자 목록에서도 기본 프로필로 대체
+                      }}
+                    />
                   <div className="admin-Member-Box1">
                     <span>신규</span>
                     <div className="admin-Member-BoxTb">

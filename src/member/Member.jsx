@@ -14,20 +14,32 @@ import ILLIT from "../images/pick_illit.png";
 import Ht from "../images/ht.png";
 import api from "../api";
 import MemberSidebar from "./MemberSidebar";
-//  api의 baseURL을 이용해서 이미지 URL 만드는 공통 함수
+
 const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
 
 const resolveImageUrl = (path) => {
-  if (!path) return "";
+  // 1) 값이 없으면 기본 프로필
+  if (!path) {
+    return Pro;
+  }
+
+  // 2) 이미 절대 URL 이면 그대로 사용
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
 
-  return `${BASE_URL}${path}`;
+  // 3) /uploads, /static 같이 슬래시로 시작하는 경우 → baseURL 뒤에 그대로 붙이기
+  if (path.startsWith("/")) {
+    return `${BASE_URL}${path}`;
+  }
+
+  // 4) 그 외에는 / 하나 끼워서 붙이기
+  return `${BASE_URL}/${path}`;
 };
 
+
 export default function Member() {
-  const navigate = useNavigate(); // 
+  const navigate = useNavigate();
 
   const [memberId, setMemberId] = useState("");
   const [memberEmail, setMemberEmail] = useState("");
@@ -37,25 +49,18 @@ export default function Member() {
   const [recentOrder, setRecentOrder] = useState(null);
   const [profileUrl, setProfileUrl] = useState(""); // 프로필 이미지 URL
 
-  useEffect(() => {
+   useEffect(() => {
     const token = localStorage.getItem("accessToken"); // 받은 토큰
     const localMemberId = localStorage.getItem("memberId"); // 로그인한 아이디
-
-    // 0) localStorage 에 저장된 프로필 경로가 있으면 먼저 적용 (계정별 저장)
-    let savedPath = null;
-    if (localMemberId) {
-      savedPath = localStorage.getItem(`profileImagePath_${localMemberId}`);
-      if (savedPath) {
-        setProfileUrl(resolveImageUrl(savedPath));
-      }
-    }
 
     // 토큰이나 아이디가 없으면 여기서 종료
     if (!localMemberId || !token) return;
 
-    // 1) 회원 정보 가져오기
+    setMemberId(localMemberId);
+
+    // 1) 회원 정보 가져오기 - 항상 서버 응답을 기준으로 사용
     api
-      .get(`members/${localMemberId}`, {
+      .get(`/members/${localMemberId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -64,22 +69,20 @@ export default function Member() {
         setMemberName(res.data.memberName || "");
         setMemberPhone(res.data.memberPhone || "");
 
-        // ⚠ 이미 localStorage 에 값이 없을 때만 서버에서 온 값을 사용
-        if (!savedPath && res.data.profileImageUrl) {
+        if (res.data.profileImageUrl) {
           const imageUrl = resolveImageUrl(res.data.profileImageUrl);
-          setProfileUrl(imageUrl);
-
-          if (localMemberId) {
-            localStorage.setItem(
-              `profileImagePath_${localMemberId}`,
-              res.data.profileImageUrl
-            );
-          }
+          setProfileUrl(imageUrl);          // ✅ 서버 값 그대로 사용
+        } else {
+          setProfileUrl("");                // ✅ 서버에 프로필이 없으면 기본 이미지 사용
         }
       })
-      .catch((err) => console.error("회원정보 조회 실패:", err));
+      .catch((err) => {
+        console.error("회원정보 조회 실패:", err);
+        // 실패 시에는 기본이미지 사용
+        setProfileUrl("");
+      });
 
-    // 2) 최근 주문 1건 조회
+    // 2) 최근 주문 1건 조회 (기존 그대로)
     api
       .get("orders?page=1&size=1", {
         headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +106,8 @@ export default function Member() {
       .catch((err) => console.error("최근 주문 조회 실패:", err));
   }, []);
 
-  // 
+
+  // 로그아웃
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -113,16 +117,9 @@ export default function Member() {
     alert("로그아웃 되었습니다");
     navigate("/"); // 메인페이지로 이동
     window.location.replace("/");
-
-    // App.js의 RequireAuth가 해당 라우트가 렌더링 될 때 만 토큰을 검사함
-    // 마이페이지에 이미 들어와 있는 상태에서 로그아웃을 누르면 localStorage의 토큰을 지움
-    // RequireAuth 는 다시 렌더링되지 않기 때문에 토큰이 사라진걸 모르는 상태
-    // 원래는 navigate("/")가 라우팅을 바꿔줘야 하는데 실제 실행환경에서 제대로 동작하지 않아서 URL이 살아있는 상태가 됨
-    // RequireAuth가 개입할 기회가 사라짐. 로그아웃을 해도 새로고침 전까지 토큰만 사라진 상태로 이전 화면에 그대로 남아있음.
-    // 로그아웃 후에는 SPA 라우팅 + 강제 페이지 이동을 둘 다 걸어 두어 무조건 메인으로 보내는 방식으로 해둠
   };
+  // 프로필 변경 함수
 
-  // 프로필 변경 함수 (useEffect 밖)
   const handleChangeImage = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -139,49 +136,24 @@ export default function Member() {
         const token = localStorage.getItem("accessToken");
         const memberId = localStorage.getItem("memberId");
 
-        const res = await api.post(
-          `/members/${memberId}/profile-image`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        // 1) 프로필 이미지 업로드
+        await api.post(`members/${memberId}/profile-image`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-        console.log("업로드 응답:", res.data);
+        // 2) 업로드 직후, 항상 서버에서 최종 회원 정보를 다시 조회
+        const memberRes = await api.get(`members/${memberId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        // 1) 응답 배열에서 '대표 회원 프로필' 이미지를 우선 선택
-        let imgPath = null;
-
-        if (Array.isArray(res.data)) {
-          const profileDto = res.data.find(
-            (img) =>
-              img.imageType === "MEMBER_PROFILE" && img.isPrimary === true
-          );
-
-          // 대표 프로필이 있으면 그걸, 없으면 첫 번째 항목이라도 사용
-          if (profileDto && profileDto.imageUrl) {
-            imgPath = profileDto.imageUrl;
-          } else if (res.data[0] && res.data[0].imageUrl) {
-            imgPath = res.data[0].imageUrl;
-          }
-        }
-
-        if (!imgPath) {
-          alert("서버에서 이미지 URL을 돌려주지 않았습니다.");
-          return;
-        }
-
-        const imageUrl = resolveImageUrl(imgPath);
-
-        // 화면에 즉시 반영
-        setProfileUrl(imageUrl);
-
-        // 새로고침 후에도 유지되도록 localStorage 에 저장 (계정별로 분리)
-        if (memberId) {
-          localStorage.setItem(`profileImagePath_${memberId}`, imgPath);
+        if (memberRes.data.profileImageUrl) {
+          const imageUrl = resolveImageUrl(memberRes.data.profileImageUrl);
+          setProfileUrl(imageUrl);         //  서버 최종 값으로 화면 갱신
+        } else {
+          setProfileUrl("");               //  서버에 값 없으면 기본 이미지
         }
 
         alert("프로필 이미지가 변경되었습니다.");
@@ -194,9 +166,11 @@ export default function Member() {
     input.click();
   };
 
+
+
   return (
     <div className="member-Member-page">
-       <MemberSidebar active="myContact" />
+      <MemberSidebar active="myContact" />
       <div className="member-right">
         <div className="member-Member-box2">
           <div className="member-pro-box">

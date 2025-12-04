@@ -55,20 +55,31 @@ export default function AdminContactDetail() {
       const core = data.board || data;
 
       setBoard({
+        // 기존 응답 전체를 먼저 펼쳐서 넣기
         ...core,
-        // 이메일/연락처
+
+        // 이메일/연락처 (회원/관리자 공통 대응)
         email: core.email || core.memberEmail || "",
         phone: core.phone || core.memberPhone || "",
+
+        // 혹시 JSX에서 memberEmail / memberPhone 을 참조하는 경우도 대비
+        memberEmail: core.email || core.memberEmail || "",
+        memberPhone: core.phone || core.memberPhone || "",
+
         // 문의 유형/주문 티켓
         categoryType: core.categoryType || core.category || "",
         orderTicketId:
           core.orderTicketId || core.orderId || core.ticketId || "",
+
         // 첨부파일/댓글
         attachments: data.attachments || core.attachments || [],
         replies: data.replies || core.replies || [],
+
         // 예전 구조(image 배열)이 있으면 같이 살려두기
         image: core.image || core.images || [],
       });
+
+
     } catch (err) {
       console.error("게시글 불러오기 실패:", err);
       setBoard(null);

@@ -7,15 +7,26 @@ import AdminSidebar from "./AdminSidebar";
 import api from "../api";
 import Pro from "../images/propile.png"; // 기본 프로필 이미지
 
-//  api의 baseURL을 이용해서 이미지 URL 만드는 공통 함수
 const BASE_URL = (api.defaults.baseURL || "").replace(/\/$/, "");
 
 const resolveImageUrl = (path) => {
-  if (!path) return Pro; // 경로가 없으면 기본 이미지
+  // 1) 값이 없으면 기본 프로필
+  if (!path) {
+    return Pro;
+  }
+
+  // 2) 이미 절대 URL 이면 그대로 사용
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
-  return `${BASE_URL}${path}`;
+
+  // 3) /uploads, /static 같이 슬래시로 시작하는 경우 → baseURL 뒤에 그대로 붙이기
+  if (path.startsWith("/")) {
+    return `${BASE_URL}${path}`;
+  }
+
+  // 4) 그 외에는 / 하나 끼워서 붙이기
+  return `${BASE_URL}/${path}`;
 };
 
 
@@ -23,12 +34,12 @@ const date = new Date();
 
 export default function Member() {
   const [members, setMembers] = useState([]);
-
+ const [loading, setLoading] = useState(false);
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
     api
-      .get("/members?page=1&size=6", {
+      .get("members?page=1&size=6", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
       .then((res) => {

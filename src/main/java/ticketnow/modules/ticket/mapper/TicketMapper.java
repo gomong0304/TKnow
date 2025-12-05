@@ -26,7 +26,16 @@ public interface TicketMapper {
 
     // 부분 수정
     int updateTicketFromMap(Map<String, Object> params);
+    
+    // 티켓 상태만 단순 변경 (예: 자동 판매 종료)
+    int updateTicketStatus(@Param("ticketId") Long ticketId,
+                           @Param("ticketStatus") String ticketStatus);
+    
+    // 티켓 생성 시 좌석 일괄 생성
+    int insertSeatsForTicket(@Param("ticketId") Long ticketId,
+                             @Param("seats") List<Map<String, Object>> seats);
 
+    
     // 소프트 삭제 대체: 상태 CLOSED 전환
     // int softDeleteTicket(@Param("ticketId") Long ticketId);
     

@@ -21,3 +21,8 @@ ALTER TABLE ticket
   ADD COLUMN venueAddress VARCHAR(255) NOT NULL COMMENT '공연장 주소' AFTER venueName;
   ============================================================= 
   
+  [2025.12.06]
+  2025.12.06 ticket 테이블에 공연장 주소 삭제
+  ALTER TABLE ticket
+	DROP COLUMN venueAddress;
+  

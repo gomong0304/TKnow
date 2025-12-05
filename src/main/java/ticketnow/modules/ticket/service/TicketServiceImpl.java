@@ -68,7 +68,6 @@ public class TicketServiceImpl implements TicketService {
 	    p.put("endAt", req.getEndAt());
 	    p.put("venueName", req.getVenueName());
 	    p.put("category", req.getCategory());
-	    p.put("venueAddress", req.getVenueAddress());
 	    p.put("totalSeats", req.getTotalSeats());
 	    p.put("remainingSeats", req.getTotalSeats()); // 디폴트: 남은 좌석 = 총좌석
 	    p.put("price", req.getPrice());
@@ -332,10 +331,10 @@ public class TicketServiceImpl implements TicketService {
 		p.put("startAt", req.getStartAt());
 		p.put("endAt", req.getEndAt());
 		p.put("venueName", req.getVenueName());
-		p.put("venueAddress", req.getVenueAddress());
 		p.put("totalSeats", req.getTotalSeats());
 		p.put("remainingSeats", req.getRemainingSeats());
 		p.put("price", req.getPrice());
+
 
 		if (req.getTicketStatus() != null) {
 			// ENUM 유효성은 컨트롤러/서비스단에서 미리 검증하거나 DB 제약으로 보완 가능

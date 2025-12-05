@@ -36,7 +36,6 @@ public class TicketCreateRequestDTO {
     @NotBlank(message = "상세 설명은 필수입니다.")
     private String ticketDetail;
     
-    private String venueAddress;
 
     @Min(value = 1, message = "총 좌석 수는 1 이상이어야 합니다.")
     private int totalSeats;

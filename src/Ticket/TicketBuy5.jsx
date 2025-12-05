@@ -15,14 +15,14 @@ export default function TicketBuy5() {
 	// Buy4에서 넘어온 정보
 	const {
 		selectedSeat,
-		normalCount = 1,    
-		discount1Count = 0,   
-		discount2Count = 0,   
-		discount3Count = 0,   
+		normalCount = 1,
+		discount1Count = 0,
+		discount2Count = 0,
+		discount3Count = 0,
 		totalPrice,
 		basePrice,
-		serviceFee = 0,       
-		deliveryFee = 0,    
+		serviceFee = 0,
+		deliveryFee = 0,
 		discountPrice,
 		totalSeatCount,
 		ticketDate,
@@ -30,7 +30,7 @@ export default function TicketBuy5() {
 		ticketTitle,
 		ticketImage,
 		cancelDate,
-		deliveryMethod = "현장수령", 
+		deliveryMethod = "현장수령",
 		name,
 		birthdate,
 		phone,
@@ -41,7 +41,7 @@ export default function TicketBuy5() {
 	const [paymentMethod, setPaymentMethod] = useState("신용카드");
 	const [cardType, setCardType] = useState("일반");
 
-	// 가짜 결제 처리
+		// 가짜 결제 처리
 	const handlePayment = async () => {
 		if (!paymentMethod) {
 			alert("결제 수단을 선택해주세요");
@@ -49,9 +49,19 @@ export default function TicketBuy5() {
 		}
 
 		// totalCount 계산 추가
-		const totalCount = normalCount + discount1Count + discount2Count + discount3Count;
+		const totalCount =
+			normalCount + discount1Count + discount2Count + discount3Count;
 
-		console.log("💳 결제 정보 생성:");
+		// 총 결제 금액 안전 계산
+		const finalTotalPrice =
+			typeof totalPrice === "number"
+				? totalPrice
+				: (basePrice || 0) +
+				  (serviceFee || 0) +
+				  (deliveryFee || 0) -
+				  (discountPrice || 0);
+
+		console.log(" 결제 정보 생성:");
 		console.log("  normalCount:", normalCount);
 		console.log("  discount1Count:", discount1Count);
 		console.log("  discount2Count:", discount2Count);
@@ -60,56 +70,99 @@ export default function TicketBuy5() {
 
 		// 결제 정보 localStorage에 저장
 		const paymentInfo = {
-		  orderId: `ORDER_${Date.now()}`,
-		  ticketId: id,
-		  selectedSeat,
-		  seatIdList: selectedSeat?.dbId ? [selectedSeat.dbId] : [], 
-		  seatInfo: selectedSeat?.seatInfo || `F2 구역 - ${selectedSeat?.row}열 - ${selectedSeat?.number}`,
-		  normalCount,           
-		  discount1Count,        
-		  discount2Count,       
-		  discount3Count,     
-		  totalCount,           
-		  totalPrice,
-		  deliveryMethod,
-		  name,
-		  birthdate,
-		  phone,
-		  email,
-		  paymentMethod,
-		  cardType: paymentMethod === "신용카드" ? cardType : null,
-		  paymentDate: new Date().toISOString(),
-		  status: "SUCCESS",
-		  ticketTitle,
-		  ticketVenue,
-		  ticketDate,
-		  cancelDate,
-		  basePrice, 
-		  serviceFee,
-		  deliveryFee
+			orderId: `ORDER_${Date.now()}`,
+			ticketId: id,
+
+			// 좌석 정보
+			selectedSeat,
+			seatIdList: selectedSeat?.dbId
+				? [selectedSeat.dbId]
+				: Array.isArray(location.state?.seatIdList)
+				? location.state.seatIdList
+				: [],
+			seatInfo: selectedSeat
+				? `F2 구역 - ${selectedSeat.row}열 - ${selectedSeat.number}`
+				: "F2 구역 - B열 - 129",
+
+			// 인원 수
+			normalCount,
+			discount1Count,
+			discount2Count,
+			discount3Count,
+			totalCount,
+
+			// 금액 관련
+			basePrice,
+			serviceFee,
+			deliveryFee,
+			discountPrice,
+			totalPrice: finalTotalPrice,
+
+			// 배송/예약자 정보
+			deliveryMethod,
+			name,
+			birthdate,
+			phone,
+			email,
+
+			// 결제 정보
+			paymentMethod,
+			cardType: paymentMethod === "신용카드" ? cardType : null,
+			paymentDate: new Date().toISOString(),
+			status: "SUCCESS",
+
+			// 티켓 정보
+			ticketTitle,
+			ticketVenue,
+			ticketDate,
+			cancelDate,
 		};
 
 		console.log("💾 저장할 결제 정보:", paymentInfo);
 
-		localStorage.setItem('lastPayment', JSON.stringify(paymentInfo));
+		localStorage.setItem("lastPayment", JSON.stringify(paymentInfo));
 
-		// 결제 수단에 따른 메시지
-		let message = "";
+		// ✅ 신용카드인 경우 → 가상 PG 풀스크린 페이지로 이동
 		if (paymentMethod === "신용카드") {
-			message = `${cardType} 카드로 ${totalPrice?.toLocaleString()}원 결제가 완료되었습니다!`;
+			navigate(`/Ticket/CardPG/${id}`, {
+				state: paymentInfo,
+			});
+			return;
+		}
+
+		// 그 외 결제수단은 기존처럼 바로 처리 (가상 처리)
+		let message = "";
+		const formattedAmount = finalTotalPrice.toLocaleString();
+
+		if (paymentMethod === "카카오페이") {
+			message = `카카오페이로 ${formattedAmount}원 결제가 완료되었습니다!`;
+		} else if (paymentMethod === "계좌이체") {
+			message = `계좌이체로 ${formattedAmount}원 결제가 완료되었습니다!`;
+		} else if (paymentMethod === "가상계좌") {
+			message = `가상계좌로 ${formattedAmount}원 결제가 완료되었습니다!`;
 		} else if (paymentMethod === "무통장") {
-			message = `가상계좌가 발급되었습니다.\n신한은행 110-123-456789\n입금자: ${name}\n금액: ${totalPrice?.toLocaleString()}원`;
+			message = `무통장 입금으로 ${formattedAmount}원 결제가 완료되었습니다!`;
+		} else if (paymentMethod === "토스페이") {
+			message = `토스페이로 ${formattedAmount}원 결제가 완료되었습니다!`;
+		} else if (paymentMethod === "PAYCO") {
+			message = `PAYCO로 ${formattedAmount}원 결제가 완료되었습니다!`;
+		} else if (paymentMethod === "휴대폰") {
+			message = `휴대폰 결제로 ${formattedAmount}원 결제가 완료되었습니다!`;
+		} else if (paymentMethod === "포인트") {
+			message = `포인트로 ${formattedAmount}원 결제가 완료되었습니다!`;
 		} else {
-			message = `${paymentMethod}로 ${totalPrice?.toLocaleString()}원 결제가 완료되었습니다!`;
+			message = `${formattedAmount}원 결제가 완료되었습니다!`;
 		}
 
 		alert(message);
 
 		// 결제 완료 페이지로 이동
 		navigate(`/Ticket/Buy6/${id}`, {
-			state: paymentInfo
+			state: paymentInfo,
 		});
 	};
+
+
 
 	return (
 		<div className="ticket-buy-main">

@@ -41,142 +41,149 @@ export default function AdminInven2() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setError("");
-		setLoading(true);
+  	  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
+    try {
+      // ===== 1) 필수값 검증 =====
+      if (!title.trim()) {
+        setError("상품명을 입력해주세요.");
+        setLoading(false);
+        return;
+      }
 
-		try {
-			// ===== 1) 필수값 검증 =====
-			if (!title.trim()) {
-				setError("상품명을 입력해주세요.");
-				setLoading(false);
-				return;
-			}
+      if (!category) {
+        setError("카테고리를 선택해주세요.");
+        setLoading(false);
+        return;
+      }
 
-			if (!category) {
-				setError("카테고리를 선택해주세요.");
-				setLoading(false);
-				return;
-			}
+      // 날짜/시간 필수 입력 체크 (시작일시만 입력)
+      if (
+        !startAt.year ||
+        !startAt.month ||
+        !startAt.day ||
+        !startAt.hour ||
+        !startAt.minute
+      ) {
+        setError("공연 시작 일시를 모두 입력해주세요.");
+        setLoading(false);
+        return;
+      }
 
-			// 날짜/시간 필수 입력 체크
-			if (!startAt.year || !startAt.month || !startAt.day || !startAt.hour || !startAt.minute) {
-				setError("공연 시작 일시를 모두 입력해주세요.");
-				setLoading(false);
-				return;
-			}
+      // LocalDateTime 으로 변환 가능한 문자열 생성 (yyyy-MM-dd'T'HH:mm:ss)
+      const pad2 = (v) => String(v || "").padStart(2, "0");
 
-			if (!endAt.year || !endAt.month || !endAt.day || !endAt.hour || !endAt.minute) {
-				setError("공연 종료 일시를 모두 입력해주세요.");
-				setLoading(false);
-				return;
-			}
+      // 시작일시는 사용자가 입력한 그대로
+      const startDateTime = `${startAt.year}-${pad2(startAt.month)}-${pad2(
+        startAt.day
+      )}T${pad2(startAt.hour)}:${pad2(startAt.minute)}:00`;
 
-			// LocalDateTime 으로 변환 가능한 문자열 생성 (yyyy-MM-dd'T'HH:mm:ss)
-			const pad2 = (v) => String(v || "").padStart(2, "0");
+      // 종료일시는 "시작일의 23:59:59" 로 자동 설정
+      const endDateTime = `${startAt.year}-${pad2(startAt.month)}-${pad2(
+        startAt.day
+      )}T23:59:59`;
 
-			const startDateTime = `${startAt.year}-${pad2(startAt.month)}-${pad2(startAt.day)}T${pad2(startAt.hour)}:${pad2(startAt.minute)}:00`;
-			const endDateTime = `${endAt.year}-${pad2(endAt.month)}-${pad2(endAt.day)}T${pad2(endAt.hour)}:${pad2(endAt.minute)}:00`;
+      // 숫자 검증
+      const totalSeatsVal = parseInt(totalSeats, 10);
+      if (isNaN(totalSeatsVal) || totalSeatsVal < 1) {
+        setError("총 좌석 수는 1 이상이어야 합니다.");
+        setLoading(false);
+        return;
+      }
 
-			// 숫자 검증
-			const totalSeatsVal = parseInt(totalSeats, 10);
-			if (isNaN(totalSeatsVal) || totalSeatsVal < 1) {
-				setError("총 좌석 수는 1 이상이어야 합니다.");
-				setLoading(false);
-				return;
-			}
+      const priceVal = parseFloat(price);
+      if (isNaN(priceVal) || priceVal <= 0) {
+        setError("기본 가격은 0보다 큰 값이어야 합니다.");
+        setLoading(false);
+        return;
+      }
 
-			const priceVal = parseFloat(price);
-			if (isNaN(priceVal) || priceVal <= 0) {
-				setError("기본 가격은 0보다 큰 값이어야 합니다.");
-				setLoading(false);
-				return;
-			}
+      if (!ticketDetail.trim()) {
+        setError("상품 상세 설명을 입력해주세요.");
+        setLoading(false);
+        return;
+      }
 
-			if (!ticketDetail.trim()) {
-				setError("상품 상세 설명을 입력해주세요.");
-				setLoading(false);
-				return;
-			}
+      // 이미지 최소 1장 (DTO @NotEmpty(images)와 맞추기)
+      if (!mainImage && !detailImage) {
+        setError("이미지는 최소 1장 이상 첨부해야 합니다.");
+        setLoading(false);
+        return;
+      }
 
-			// 이미지 최소 1장 (DTO @NotEmpty(images)와 맞추기)
-			if (!mainImage && !detailImage) {
-				setError("이미지는 최소 1장 이상 첨부해야 합니다.");
-				setLoading(false);
-				return;
-			}
+      // ===== 2) FormData 구성 =====
+      const formData = new FormData();
 
-			// ===== 2) FormData 구성 =====
-			const formData = new FormData();
+      // --- DTO와 매핑되는 필드 ---
+      formData.append("title", title);
+      formData.append("category", category);
+      formData.append("startAt", startDateTime);   // ★ LocalDateTime 파싱 가능한 문자열
+      formData.append("endAt", endDateTime);       // ★ 시작일 기준 23:59:59 자동 설정
+      formData.append("venueName", venueName);
+      if (venueAddress) formData.append("venueAddress", venueAddress);
+      formData.append("totalSeats", String(totalSeatsVal));
+      formData.append("price", String(priceVal));
+      formData.append("ticketDetail", ticketDetail);
 
-			// --- DTO와 매핑되는 필드 ---
-			formData.append("title", title);
-			formData.append("category", category);
-			formData.append("startAt", startDateTime);   // ★ LocalDateTime 파싱 가능한 문자열
-			formData.append("endAt", endDateTime);       // ★ LocalDateTime 파싱 가능한 문자열
-			formData.append("venueName", venueName);
-			if (venueAddress) formData.append("venueAddress", venueAddress);
-			formData.append("totalSeats", String(totalSeatsVal));
-			formData.append("price", String(priceVal));
-			formData.append("ticketDetail", ticketDetail);
+      // --- 추가로 쌓아두었던 값들(백엔드 DTO에는 아직 없지만, 보내도 무시됨) ---
+      if (ageLimit) formData.append("ageLimit", ageLimit);
+      if (benefit) formData.append("benefit", benefit);
+      if (promotion) formData.append("promotion", promotion);
+      if (ticketStatus) formData.append("ticketStatus", ticketStatus);
 
-			// --- 추가로 쌓아두었던 값들(백엔드 DTO에는 아직 없지만, 보내도 무시됨) ---
-			if (ageLimit) formData.append("ageLimit", ageLimit);
-			if (benefit) formData.append("benefit", benefit);
-			if (promotion) formData.append("promotion", promotion);
-			if (ticketStatus) formData.append("ticketStatus", ticketStatus);
+      // ===== 3) 이미지 파일 (List<MultipartFile> images) =====
+      if (mainImage) {
+        formData.append("images", mainImage);
+      }
+      if (detailImage) {
+        formData.append("images", detailImage);
+      }
 
-			// ===== 3) 이미지 파일 (List<MultipartFile> images) =====
-			if (mainImage) {
-				formData.append("images", mainImage);
-			}
-			if (detailImage) {
-				formData.append("images", detailImage);
-			}
+      console.log("전송 FormData (텍스트 필드):", {
+        title,
+        category,
+        startAt: startDateTime,
+        endAt: endDateTime,
+        venueName,
+        venueAddress,
+        totalSeats: totalSeatsVal,
+        price: priceVal,
+        ticketDetail,
+      });
+      console.log("전송 이미지:", {
+        mainImage: mainImage && mainImage.name,
+        detailImage: detailImage && detailImage.name,
+      });
 
-			console.log("전송 FormData (텍스트 필드):", {
-				title,
-				category,
-				startAt: startDateTime,
-				endAt: endDateTime,
-				venueName,
-				venueAddress,
-				totalSeats: totalSeatsVal,
-				price: priceVal,
-				ticketDetail,
-			});
-			console.log("전송 이미지:", {
-				mainImage: mainImage && mainImage.name,
-				detailImage: detailImage && detailImage.name,
-			});
+      // ===== 4) 서버로 POST 요청 =====
+      const res = await api.post("/tickets", formData, {
+        headers: {
+          // axios + FormData 사용 시 Content-Type은 생략해도 되지만,
+          // 명시해도 브라우저가 boundary 포함해서 설정합니다.
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-			// ===== 4) 서버로 POST 요청 =====
-			const res = await api.post("/tickets", formData, {
-				headers: {
-					// axios + FormData 사용 시 Content-Type은 생략해도 되지만,
-					// 명시해도 브라우저가 boundary 포함해서 설정합니다.
-					"Content-Type": "multipart/form-data",
-				},
-			});
+      console.log("상품 등록 응답:", res.data);
+      alert("상품 등록 완료");
+      navigate("/admin/AdminInven");
+    } catch (err) {
+      console.error("상품 등록 오류:", err);
+      // GlobalExceptionHandler에서 내려주는 message 사용
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "상품 등록 중 오류가 발생했습니다.";
+      setError(msg);
+      alert("상품 등록 실패: " + msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-			console.log("상품 등록 응답:", res.data);
-			alert("상품 등록 완료");
-			navigate("/admin/AdminInven");
-		} catch (err) {
-			console.error("상품 등록 오류:", err);
-			// GlobalExceptionHandler에서 내려주는 message 사용
-			const msg =
-				err.response?.data?.message ||
-				err.response?.data?.error ||
-				"상품 등록 중 오류가 발생했습니다.";
-			setError(msg);
-			alert("상품 등록 실패: " + msg);
-		} finally {
-			setLoading(false);
-		}
-	};
 
 
   return (
@@ -272,7 +279,7 @@ export default function AdminInven2() {
 
                     <tr>
                       <th>
-                        공연 시작 일시 <span style={{ color: "red" }}>*</span>
+                        공연 일시 <span style={{ color: "red" }}>*</span>
                       </th>
                     </tr>
                     <tr>
@@ -335,73 +342,6 @@ export default function AdminInven2() {
                         />
                       </td>
                     </tr>
-
-                    <tr>
-                      <th>
-                        공연 종료 일시 <span style={{ color: "red" }}>*</span>
-                      </th>
-                    </tr>
-                    <tr>
-                      <td>
-                        <input
-                          type="text"
-                          placeholder="YYYY"
-                          className="admin-inven-phone1"
-                          value={endAt.year}
-                          maxLength="4"
-                          onChange={(e) =>
-                            setEndAt({ ...endAt, year: e.target.value })
-                          }
-                          required
-                        />
-                        <input
-                          type="text"
-                          placeholder="MM"
-                          className="admin-inven-phone1"
-                          value={endAt.month}
-                          maxLength="2"
-                          onChange={(e) =>
-                            setEndAt({ ...endAt, month: e.target.value })
-                          }
-                          required
-                        />
-                        <input
-                          type="text"
-                          placeholder="DD"
-                          className="admin-inven-phone1"
-                          value={endAt.day}
-                          maxLength="2"
-                          onChange={(e) =>
-                            setEndAt({ ...endAt, day: e.target.value })
-                          }
-                          required
-                        />
-                        <input
-                          type="text"
-                          placeholder="HH"
-                          className="admin-inven-phone1"
-                          value={endAt.hour || ""}
-                          maxLength="2"
-                          onChange={(e) =>
-                            setEndAt({ ...endAt, hour: e.target.value })
-                          }
-                          required
-                        />
-                        :
-                        <input
-                          type="text"
-                          placeholder="mm"
-                          className="admin-inven-phone1"
-                          value={endAt.minute || ""}
-                          maxLength="2"
-                          onChange={(e) =>
-                            setEndAt({ ...endAt, minute: e.target.value })
-                          }
-                          required
-                        />
-                      </td>
-                    </tr>
-
                     <tr>
                       <th>
                         공연 장소 <span style={{ color: "red" }}>*</span>
@@ -418,21 +358,6 @@ export default function AdminInven2() {
                         />
                       </td>
                     </tr>
-
-                    <tr>
-                      <th>공연장 주소</th>
-                    </tr>
-                    <tr>
-                      <td>
-                        <input
-                          type="text"
-                          className="Ad-conts-resNum"
-                          value={venueAddress}
-                          onChange={(e) => setVenueAddress(e.target.value)}
-                        />
-                      </td>
-                    </tr>
-
                     <tr>
                       <th>
                         총 좌석 수 <span style={{ color: "red" }}>*</span>
@@ -453,7 +378,7 @@ export default function AdminInven2() {
 
                     <tr>
                       <th>
-                        기본 가격 <span style={{ color: "red" }}>*</span>
+                        판매 가격 <span style={{ color: "red" }}>*</span>
                       </th>
                     </tr>
                     <tr>
@@ -476,22 +401,6 @@ export default function AdminInven2() {
                         />
                       </td>
                     </tr>
-
-                    <tr>
-                      <th>매입 원가</th>
-                    </tr>
-                    <tr>
-                      <td>
-                        <input
-                          type="number"
-                          min="0"
-                          className="Ad-conts-resNum"
-                          value={ticketCost}
-                          readOnly
-                        />
-                      </td>
-                    </tr>
-
                     <tr>
                       <th>상품 상세 설명</th>
                     </tr>

@@ -37,94 +37,89 @@ export default function TicketBuy6() {
     setPaymentInfo(info);
   }, [location]);
 
-    useEffect(() => {
-    if (!paymentInfo || !paymentInfo.orderId) return;
-
-    const token = localStorage.getItem("accessToken");
-
-    let payUrl = "";
-    let payData = {
-      ordersId: paymentInfo.orderId,
-      memberId: localStorage.getItem("memberId") || 1,
-      amount: paymentInfo.totalPrice,
-    };
-
-     if (paymentInfo.paymentMethod === "신용카드") {
-      payUrl = `${API_BASE}/pay/card/approve`;
-      payData.cardCompany = paymentInfo.cardType;
-    } else if (paymentInfo.paymentMethod === "무통장") {
-      payUrl = `${API_BASE}/pay/vbank/issue`;
-      payData.bankName = "신한";
-    } else {
-      payUrl = `${API_BASE}/pay/card/approve`;
-      payData.cardCompany = "일반";
+    // 주문 데이터 DB 저장 + 결제 데이터 DB 저장 + 창 닫기 / 홈 이동
+  const handleClose = async () => {
+    if (!paymentInfo?.seatIdList || paymentInfo.seatIdList.length === 0) {
+      alert("좌석이 선택되지 않았습니다.");
+      return;
     }
 
-    axios
-      .post(payUrl, payData, {
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      })
-      .then(res => console.log("결제 정보 DB 저장 완료:", res.data))
-      .catch(err => console.error("결제 저장 실패:", err));
-  }, [paymentInfo]);
-
-
-  // 주문 데이터 DB 저장 + 창 닫기 / 홈 이동
-  const handleClose = async () => {
-	if (!paymentInfo?.seatIdList || paymentInfo.seatIdList.length === 0) {
-	    alert("좌석이 선택되지 않았습니다.");
-	    return;
-	}
-
-    const token = localStorage.getItem("accessToken");
-
-    // 수량 검증 추가
+    // 수량 검증
     if (total < 1) {
       alert("주문 수량이 올바르지 않습니다.");
       return;
     }
 
-    // 백엔드 DTO에 맞춰 필드명 변경
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
+    // 💰 결제 금액 안전 계산 (Buy5에서 넘어온 값이 undefined 인 경우 대비)
+    const finalTotalPrice =
+      typeof paymentInfo.totalPrice === "number"
+        ? paymentInfo.totalPrice
+        : (paymentInfo.basePrice || 0) +
+          (paymentInfo.serviceFee || 0) +
+          (paymentInfo.deliveryFee || 0) -
+          (paymentInfo.discountPrice || 0);
+
+    // 백엔드 OrdersCreateRequestDTO 에 맞는 필드명
     const orderData = {
-      ordersTotalAmount: paymentInfo.totalPrice, 
-      ordersTicketQuantity: total,    
-      seatIdList: paymentInfo.seatIdList
+      ordersTotalAmount: finalTotalPrice,
+      ordersTicketQuantity: total,
+      seatIdList: paymentInfo.seatIdList,
     };
 
-    console.log("📤 주문 데이터 전송:");
-    console.log("  ordersTotalAmount:", orderData.ordersTotalAmount);
-    console.log("  ordersTicketQuantity:", orderData.ordersTicketQuantity);
-    console.log("  seatIdList:", orderData.seatIdList);
-    
-    console.log(" 수량 계산:");
-    console.log("  normal:", normal);
-    console.log("  discount1:", discount1);
-    console.log("  discount2:", discount2);
-    console.log("  discount3:", discount3);
-    console.log("  total:", total);
+    console.log(" 주문 데이터 전송:", orderData);
 
-      try {
-      const response = await axios.post(
-        `${API_BASE}/orders`,
-        orderData,
-        {
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        }
-      );
-      console.log("주문 데이터 DB 저장 완료:", response.data);
+    try {
+      // 1) 주문 생성 (/orders)
+      const orderResponse = await api.post("/orders", orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      
-      // 성공 시 창 닫기 또는 홈 이동
-      if (window.opener) {
-        window.close();
-      } else {
-        navigate("/");
+      const createdOrdersId = orderResponse.data;
+      console.log(" 주문 생성 성공 ordersId =", createdOrdersId);
+
+      // 2) 결제 수단 확인 - 현재는 신용카드만 실제 가상 모듈 연동
+      if (paymentInfo.paymentMethod !== "신용카드") {
+        alert("현재는 신용카드 결제만 실제 처리됩니다.");
+        navigate("/member/myticket");
+        return;
       }
-    } catch (err) {
-      console.error("주문 저장 실패:", err.response?.data || err);
+
+      // 3) 카드 결제 가상 모듈 호출용 DTO (CardApproveRequestDTO 매핑)
+      const cardApproveRequest = {
+        ordersId: createdOrdersId,
+        amount: finalTotalPrice,
+        cardCompany: paymentInfo.cardType || "BC카드",
+        maskedCardNo: paymentInfo.maskedCardNo || "1234-****-****-5678",
+        agreeTerms: true,
+      };
+
+      console.log(" 카드 결제 가상 모듈 호출:", cardApproveRequest);
+
+      const payResponse = await api.post("/pay/card/approve", cardApproveRequest, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("✅ 카드 결제 성공:", payResponse.data);
+
+      alert("예매가 완료되었습니다.");
+      navigate("/member/myticket");
+    } catch (error) {
+      console.error("❌ 주문/결제 처리 중 오류:", error);
       alert("주문 저장에 실패했습니다. 다시 시도해주세요.");
     }
   };
+
 
   if (!paymentInfo || !paymentInfo.orderId) {
     return (

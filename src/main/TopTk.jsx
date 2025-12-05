@@ -13,7 +13,7 @@ export default function TopTk() {
 
   const [tickets, setTickets] = useState([]);
   const navigate = useNavigate();
-const BASE = process.env.REACT_APP_API_BASE;
+  const BASE = process.env.REACT_APP_API_BASE;
 
 
   //  이미지 URL 처리 함수 (오타 모두 수정!)
@@ -29,7 +29,7 @@ const BASE = process.env.REACT_APP_API_BASE;
     }
 
     // 상대 경로인 경우 BASE URL 붙이기
-        return `${BASE}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
+    return `${BASE}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
   };
 
   useEffect(() => {
@@ -37,10 +37,10 @@ const BASE = process.env.REACT_APP_API_BASE;
       .get("/tickets")
       .then((res) => {
         const list = res.data.data || res.data.list || [];
-        
-        console.log("📦 전체 응답:", res.data);
-        console.log("📦 티켓 리스트:", list);
-        
+
+        console.log(" 전체 응답:", res.data);
+        console.log(" 티켓 리스트:", list);
+
         // ✅ 각 티켓의 이미지 URL 상세 확인
         list.forEach((ticket, idx) => {
           console.log(` 티켓 ${idx + 1}:`, {
@@ -51,7 +51,7 @@ const BASE = process.env.REACT_APP_API_BASE;
             모든필드: ticket  // 전체 객체 출력
           });
         });
-        
+
         setTickets(list);
       })
       .catch((err) => {
@@ -74,13 +74,16 @@ const BASE = process.env.REACT_APP_API_BASE;
 
     return `${date.getFullYear()}.${mm}.${dd}`;
   };
+ const visibleTickets = tickets.filter(
+    (t) => t.ticketStatus !== "CLOSED"
+  );
 
   return (
     <div className="toptk">
       <div className="liveTopTk">실시간 예매 티켓</div>
       <br />
       <br />
-   <div className="tkList1">
+      <div className="tkList1">
         <Link to="/Ticket/List">
           <button className="tkList">티켓 전체보기</button>
         </Link>
@@ -98,9 +101,10 @@ const BASE = process.env.REACT_APP_API_BASE;
         </Link>
       </div>
       <br />
+      <br />
 
       <div className="TopList">
-        {tickets.slice(0, 5).map((t, index) => {
+       {visibleTickets.slice(0, 5).map((t, index) => {
           // 이미지 URL 미리 계산
           const imageUrl = resolveImageUrl(t.mainImageUrl);
 
@@ -110,7 +114,7 @@ const BASE = process.env.REACT_APP_API_BASE;
               className="top"
               onClick={() => navigate(`/ticket/${t.ticketId}`)} // 백틱 → 괄호
             >
-            
+
               <img
                 src={imageUrl}
                 alt={t.title || "티켓 이미지"}
@@ -118,17 +122,17 @@ const BASE = process.env.REACT_APP_API_BASE;
                 onError={(e) => {
                   //  무한 루프 방지 - 이미 DefaultImage면 실행 안 함
                   if (e.target.src === DefaultImage) return;
-                  
+
                   console.error(" 이미지 로드 실패:", {
                     ticketId: t.ticketId,
                     title: t.title,
                     originalUrl: t.mainImageUrl
                   });
-                  
+
                   e.target.src = DefaultImage; //  import한 이미지로 교체
                 }}
               />
-             <p/> <strong style={{ fontSize: "25px" }}>{t.title}</strong>
+              <p /> <strong style={{ fontSize: "25px" }}>{t.title}</strong>
               <p style={{ fontSize: "20px", color: "#454545", fontWeight: "bold" }}>
                 {t.venueName || "장소 미정"}
               </p>

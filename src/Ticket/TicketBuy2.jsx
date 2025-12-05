@@ -19,11 +19,11 @@ export default function TicketBuy2() {
   // 1️⃣ F2 이동용 navigate 함수 추가 (기존 handleClick 대신)
   const handleGoF2 = () => {
 	const handleGoF2 = () => {
-	  navigate(`/Fllor/F2/${id}`, { 
+	  navigate(`/Floor/F2/${id}`, { 
 	    state: { selectedSeat, selectedDate, ticket }
 	  });
 	};
-    navigate(`/Fllor/F2/${id}`, { // id 포함해서 navigate
+    navigate(`/Floor/F2/${id}`, { // id 포함해서 navigate
       state: {
         selectedSeat, // TicketBuy2에서 선택한 좌석
         selectedDate,

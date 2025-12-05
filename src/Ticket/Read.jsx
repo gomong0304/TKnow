@@ -168,8 +168,14 @@ export default function Read() {
 									<img
 										src={resolveImageUrl(ticket.mainImageUrl) || Boy}
 										alt={ticket.title}
+										className={
+											ticket.ticketStatus === "CLOSED"
+												? "ticket-img-closed"
+												: undefined
+										}
 									/>
 								</div>
+
 
 								<div className="read-table">
 									<table>
@@ -215,7 +221,7 @@ export default function Read() {
 								</div>
 							</div>
 							<div className="concert-particular">
-								<br/>
+								<br />
 								<strong className="concert-particular-1">공연 시간 정보</strong>
 								{hasSchedule ? (
 									ticket.schedule
@@ -231,33 +237,33 @@ export default function Read() {
 
 								<br />
 								<strong className="concert-particular-1">공연 상세</strong>
-<br />
+								<br />
 
-{/* 상품 설명 이미지 + 상세 설명 */}
-<div className="concert-detail-box">
-  <div className="concert-detail-img-box">
-    <img
-      src={resolveImageUrl(ticket.detailImageUrl) || Boy}
-      alt="공연 상세 이미지"
-      className="concert-detail-img"
-    />
-  </div>
-  <br/>
-  <p className="concert-detail-text">
-    {ticket.ticketDetail || "상품 상세 설명이 준비 중입니다."}
-  </p>
-  <br/>
-</div>
+								{/* 상품 설명 이미지 + 상세 설명 */}
+								<div className="concert-detail-box">
+									<div className="concert-detail-img-box">
+										<img
+											src={resolveImageUrl(ticket.detailImageUrl) || Boy}
+											alt="공연 상세 이미지"
+											className="concert-detail-img"
+										/>
+									</div>
+									<br />
+									<p className="concert-detail-text">
+										{ticket.ticketDetail || "상품 상세 설명이 준비 중입니다."}
+									</p>
+									<br />
+								</div>
 
 
-							<strong className="concert-particular-1">예매자 통계</strong>
-							<br />
-							<div className="sex-ratio">
-								<p className="ratio-text1">{ticket.femaleRatio || "55"} %</p>
-								<img src={ticket.Girl || Girl} alt="여성_썸네일" />
-								<p className="ratio-text2">{ticket.maleRatio || "45"} %</p>
-								<img src={ticket.Boy || Boy} alt="남성_썸네일" />
-							</div>
+								<strong className="concert-particular-1">예매자 통계</strong>
+								<br />
+								<div className="sex-ratio">
+									<p className="ratio-text1">{ticket.femaleRatio || "55"} %</p>
+									<img src={ticket.Girl || Girl} alt="여성_썸네일" />
+									<p className="ratio-text2">{ticket.maleRatio || "45"} %</p>
+									<img src={ticket.Boy || Boy} alt="남성_썸네일" />
+								</div>
 							</div>
 						</section>
 					</div>
@@ -343,7 +349,7 @@ export default function Read() {
 									if (!selectedDate) return;
 									const ticketId = ticket.ticketId; // ticket 객체에서 가져오기
 									window.open(
-										`/Ticket/Buy2/${ticketId}`,
+										`/Ticket/Buy/${ticketId}`,
 										"TicketBuy",
 										"width=1450,height=1024,scrollbars=yes"
 									);

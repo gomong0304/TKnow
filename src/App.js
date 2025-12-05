@@ -18,7 +18,7 @@ import TicketBuy3 from "./Ticket/TicketBuy3";
 import TicketBuy4 from "./Ticket/TicketBuy4";
 import TicketBuy5 from "./Ticket/TicketBuy5";
 import TicketBuy6 from "./Ticket/TicketBuy6";
-import F2 from "./Ticket/FllorF2";
+import F2 from "./Ticket/FloorF2";
 import Login from "./member/Login";
 import Join from "./member/Join";
 import List from "./Ticket/List";
@@ -37,18 +37,20 @@ import AdminContact2 from "./admin/AdminContact2";
 import AdminInven from "./admin/AdminInven";
 import AdminInven2 from "./admin/AdminInven2";
 import AdminInven3 from "./admin/AdminInven3";
+import TicketCardPg from "./Ticket/TicketCardPg";
+
 
 // accessToken이 없으면 alert을 띄우고 메인으로 강제 이동
 // 비회원이 직링 이용시 마이페이지에 접속 가능한 문제 해결
 function RequireAuth({ children }) {
-  const token = localStorage.getItem("accessToken");
+	const token = localStorage.getItem("accessToken");
 
-  if (!token) {
-    alert("로그인이 필요한 서비스입니다.");
-    return <Navigate to="/" replace />;
-  }
+	if (!token) {
+		alert("로그인이 필요한 서비스입니다.");
+		return <Navigate to="/" replace />;
+	}
 
-  return children;
+	return children;
 }
 
 function App() {
@@ -130,31 +132,31 @@ function App() {
 
 
 
-				<Route
-				path="/member/Member/:id"
-				element={
-					<RequireAuth>
-					<>
-						<Header />
-						<Member />
-						<Footer />
-					</>
-					</RequireAuth>
-				}
-				/>
+					<Route
+						path="/member/Member/:id"
+						element={
+							<RequireAuth>
+								<>
+									<Header />
+									<Member />
+									<Footer />
+								</>
+							</RequireAuth>
+						}
+					/>
 
 
 					<Route
-					path="/member/MyTick"
-					element={
-						<RequireAuth>
-						<>
-							<Header />
-							<MyTick />
-							<Footer />
-						</>
-						</RequireAuth>
-					}
+						path="/member/MyTick"
+						element={
+							<RequireAuth>
+								<>
+									<Header />
+									<MyTick />
+									<Footer />
+								</>
+							</RequireAuth>
+						}
 					/>
 
 					<Route
@@ -188,43 +190,43 @@ function App() {
 							</>
 						}
 					/>
-					
-					<Route
-							path="/member/ContactRead/:boardId"
-							element={
-								<>
-									<Header />
-									<ContactRead />
-									<Footer />
-								</>
-							}
-						/>
 
 					<Route
-					path="/member/MyContact"
-					element={
-						<RequireAuth>
-						<>
-							<Header />
-							<MyContact />
-							<Footer />
-						</>
-						</RequireAuth>
-					}
+						path="/member/ContactRead/:boardId"
+						element={
+							<>
+								<Header />
+								<ContactRead />
+								<Footer />
+							</>
+						}
+					/>
+
+					<Route
+						path="/member/MyContact"
+						element={
+							<RequireAuth>
+								<>
+									<Header />
+									<MyContact />
+									<Footer />
+								</>
+							</RequireAuth>
+						}
 					/>
 
 
-				<Route
-					path="/member/OftenContact"
-					element={
-						<RequireAuth>
-						<>
-							<Header />
-							<OftenContact />
-							<Footer />
-						</>
-						</RequireAuth>
-					}
+					<Route
+						path="/member/OftenContact"
+						element={
+							<RequireAuth>
+								<>
+									<Header />
+									<OftenContact />
+									<Footer />
+								</>
+							</RequireAuth>
+						}
 					/>
 
 
@@ -325,8 +327,11 @@ function App() {
 					<Route path="/Ticket/Buy4/:id" element={<TicketBuy4 />} />
 					<Route path="/Ticket/Buy5/:id" element={<TicketBuy5 />} />
 					<Route path="/Ticket/Buy6/:id" element={<TicketBuy6 />} />
-					<Route path="/Fllor/F2/:id" element={<F2 />} />
-
+					<Route path="/Floor/F2/:id" element={<F2 />} />
+					{/* 가상 카드 PG 풀스크린 페이지 */}
+					<Route path="/Ticket/CardPG/:id" element={<TicketCardPg />} />
+					<Route path="/Ticket/Buy6/:id" element={<TicketBuy6 />} />
+					<Route path="/Floor/F2/:id" element={<F2 />} />
 
 				</Routes>
 			</Router>

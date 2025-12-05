@@ -8,7 +8,6 @@ import AdminSidebar from "./AdminSidebar";
 
 export default function AdminInven2() {
   const navigate = useNavigate();
-
   const [title, setTitle] = useState("");
   const [startAt, setStartAt] = useState({
     year: "",
@@ -37,9 +36,8 @@ export default function AdminInven2() {
   const [promotion, setPromotion] = useState("");
   const [mainImage, setMainImage] = useState(null);
   const [detailImage, setDetailImage] = useState(null);
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("CONCERT");
   const [ticketStatus, setTicketStatus] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -47,6 +45,7 @@ export default function AdminInven2() {
 		e.preventDefault();
 		setError("");
 		setLoading(true);
+
 
 		try {
 			// ===== 1) 필수값 검증 =====

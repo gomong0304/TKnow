@@ -215,6 +215,7 @@ export default function Read() {
 								</div>
 							</div>
 							<div className="concert-particular">
+								<br/>
 								<strong className="concert-particular-1">공연 시간 정보</strong>
 								{hasSchedule ? (
 									ticket.schedule
@@ -228,8 +229,7 @@ export default function Read() {
 									<p>공연 일정 정보가 없습니다.</p>
 								)}
 
-								<br /><br />
-
+								<br />
 								<strong className="concert-particular-1">공연 상세</strong>
 <br />
 
@@ -242,9 +242,11 @@ export default function Read() {
       className="concert-detail-img"
     />
   </div>
+  <br/>
   <p className="concert-detail-text">
     {ticket.ticketDetail || "상품 상세 설명이 준비 중입니다."}
   </p>
+  <br/>
 </div>
 
 

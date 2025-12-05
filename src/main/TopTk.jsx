@@ -80,25 +80,23 @@ const BASE = process.env.REACT_APP_API_BASE;
       <div className="liveTopTk">실시간 예매 티켓</div>
       <br />
       <br />
-
-      <div className="tkList1">
+   <div className="tkList1">
         <Link to="/Ticket/List">
           <button className="tkList">티켓 전체보기</button>
         </Link>
-        <Link to="/Ticket/List">
+        <Link to="/Ticket/List?category=CONCERT">
           <button className="tkList">콘서트</button>
         </Link>
-        <Link to="/Ticket/List">
+        <Link to="/Ticket/List?category=MUSICAL">
           <button className="tkList">뮤지컬/연극</button>
         </Link>
-        <Link to="/Ticket/List">
+        <Link to="/Ticket/List?category=SPORTS">
           <button className="tkList">스포츠</button>
         </Link>
-        <Link to="/Ticket/List">
+        <Link to="/Ticket/List?category=EXHIBITION">
           <button className="tkList">전시 / 체험</button>
         </Link>
       </div>
-      <br />
       <br />
 
       <div className="TopList">

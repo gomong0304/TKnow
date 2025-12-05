@@ -89,6 +89,15 @@
 		</set>
 		WHERE ticket_id = #{ticketId}
 	</update>
+	
+		<!-- 단순 상태 변경용 (자동 판매 종료 등) -->
+	<update id="updateTicketStatus" parameterType="map">
+		UPDATE ticket
+		SET ticket_status = #{ticketStatus},
+		    updated_at    = NOW()
+		WHERE ticket_id   = #{ticketId}
+	</update>
+	
 
 
 	<!-- 소프트 삭제 대체: 상태를 CLOSED로 전환 <update id="softDeleteTicket" parameterType="long"> 

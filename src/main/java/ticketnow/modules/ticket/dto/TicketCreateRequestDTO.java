@@ -47,6 +47,9 @@ public class TicketCreateRequestDTO {
     @NotEmpty(message = "이미지는 최소 1장 이상 첨부해야 합니다.")
     private List<MultipartFile> images;
     
+    // 생성 시 선택적으로 전달하는 판매상태 (ON_SALE / SCHEDULED / CLOSED 등)
+    private String ticketStatus;
+    
 }
 
 //================== ★ 추가한 부분: 티켓 생성 시 첨부할 이미지 파일들 ==================

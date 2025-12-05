@@ -70,7 +70,13 @@ public class TicketServiceImpl implements TicketService {
 		p.put("remainingSeats", req.getTotalSeats()); // 디폴트: 남은 좌석 = 총좌석
 		p.put("price", req.getPrice());
 		p.put("ticketDetail", req.getTicketDetail());
-		p.put("ticketStatus", status.name());
+
+		// 생성 요청에 판매상태가 함께 온 경우 우선 사용, 아니면 날짜 기준 기본값 사용
+		if (req.getTicketStatus() != null && !req.getTicketStatus().isBlank()) {
+			p.put("ticketStatus", req.getTicketStatus());
+		} else {
+			p.put("ticketStatus", status.name());
+		}
 
 		log.debug("[Ticket][CREATE][BEFORE] params={}", p); // INSERT 전 파라미터 확인
 		int rows = ticketMapper.insertTicketFromMap(p); // ★ keyProperty로 ticketId 채워짐
@@ -136,6 +142,29 @@ public class TicketServiceImpl implements TicketService {
 	}
 
 	// =================================================================================
+	// 종료일시가 지난 티켓은 자동으로 CLOSED 로 변경
+	// =================================================================================
+
+	private void applyAutoClose(TicketResponseDTO dto) {
+		if (dto == null) {
+			return;
+		}
+		if (dto.getEndAt() == null) {
+			return;
+		}
+		// 이미 CLOSED 이면 처리 불필요
+		if (dto.getTicketStatus() == TicketStatus.CLOSED) {
+			return;
+		}
+		// 종료일시가 현재보다 과거이면 CLOSED 로 전환
+		if (dto.getEndAt().isBefore(LocalDateTime.now())) {
+			ticketMapper.updateTicketStatus(dto.getTicketId(), "CLOSED");
+			dto.setTicketStatus(TicketStatus.CLOSED);
+		}
+	}
+
+	
+	// =================================================================================
 	// 단건
 	// =================================================================================
 	@Override
@@ -169,10 +198,13 @@ public class TicketServiceImpl implements TicketService {
 	                .ifPresent(detail -> dto.setDetailImageUrl(detail.getImgUrl()));
 	    }
 
+		// 종료일시가 지난 경우 자동으로 CLOSED 처리
+		applyAutoClose(dto);
 
 		log.debug("[Ticket][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
 		return dto;
 	}
+
 
 	// =================================================================================
 	// 페이지
@@ -202,6 +234,8 @@ public class TicketServiceImpl implements TicketService {
 		        } else {
 		            dto.setMainImageUrl(""); // 없으면 프론트에서 기본 이미지 사용
 		        }
+		     // 종료일시가 지난 경우 자동으로 CLOSED 처리
+		        applyAutoClose(dto);
 		    }
 		}
 

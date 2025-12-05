@@ -97,7 +97,28 @@
 		    updated_at    = NOW()
 		WHERE ticket_id   = #{ticketId}
 	</update>
-	
+	<!-- 티켓 생성 시 좌석 일괄 생성 -->
+	<insert id="insertSeatsForTicket" parameterType="map">
+		INSERT INTO seat (
+			ticket_id,
+			seat_code,
+			seat_status,
+			seat_class,
+			created_at,
+			updated_at
+		)
+		VALUES
+		<foreach collection="seats" item="s" separator=",">
+			(
+				#{ticketId},
+				#{s.seatCode},
+				#{s.seatStatus},
+				#{s.seatClass},
+				NOW(),
+				NOW()
+			)
+		</foreach>
+	</insert>
 
 
 	<!-- 소프트 삭제 대체: 상태를 CLOSED로 전환 <update id="softDeleteTicket" parameterType="long"> 

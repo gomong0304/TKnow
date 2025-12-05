@@ -141,6 +141,54 @@ public class TicketServiceImpl implements TicketService {
 		return saved;
 	}
 
+	
+	/**=====================================================
+	 * 총 좌석 수에 따라 F1~F4 구역으로 좌석을 자동 생성
+	 * - 총 좌석수: totalSeats
+	 * - 구역: F1, F2, F3, F4 (4개)
+	 * - 각 구역 앞 자리 10%: S석, 나머지: R석
+	 =====================================================*/
+	private void generateSeatsForTicket(Long ticketId, int totalSeats) {
+		if (ticketId == null || totalSeats <= 0) {
+			return;
+		}
+
+		final int ZONE_COUNT = 4;
+		final String[] ZONES = { "F1", "F2", "F3", "F4" };
+
+		int basePerZone = totalSeats / ZONE_COUNT;
+		int remainder = totalSeats % ZONE_COUNT;
+
+		List<Map<String, Object>> seats = new ArrayList<>();
+
+		for (int z = 0; z < ZONE_COUNT; z++) {
+			int zoneSeats = basePerZone + (z < remainder ? 1 : 0);
+			if (zoneSeats <= 0) {
+				continue;
+			}
+
+			// 앞 10%는 최소 1석은 S석으로
+			int sCount = (int) Math.ceil(zoneSeats * 0.1);
+			if (sCount < 1) {
+				sCount = 1;
+			}
+
+			for (int i = 1; i <= zoneSeats; i++) {
+				Map<String, Object> seat = new HashMap<>();
+				// 예: F1-001, F1-002 ...
+				seat.put("seatCode", ZONES[z] + "-" + String.format("%03d", i));
+				seat.put("seatStatus", "AVAILABLE");
+				seat.put("seatClass", i <= sCount ? "S" : "R");
+				seats.add(seat);
+			}
+		}
+
+		if (!seats.isEmpty()) {
+			ticketMapper.insertSeatsForTicket(ticketId, seats);
+		}
+	}
+
+	
 	// =================================================================================
 	// 종료일시가 지난 티켓은 자동으로 CLOSED 로 변경
 	// =================================================================================

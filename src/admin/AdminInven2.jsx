@@ -24,7 +24,6 @@ export default function AdminInven2() {
     minute: "",
   });
   const [venueName, setVenueName] = useState("");
-  const [venueAddress, setVenueAddress] = useState("");
   const [totalSeats, setTotalSeats] = useState("");
   const [price, setPrice] = useState("");
   const [ticketCost, setTicketCost] = useState("");
@@ -123,7 +122,6 @@ export default function AdminInven2() {
       formData.append("startAt", startDateTime);   // ★ LocalDateTime 파싱 가능한 문자열
       formData.append("endAt", endDateTime);       // ★ 시작일 기준 23:59:59 자동 설정
       formData.append("venueName", venueName);
-      if (venueAddress) formData.append("venueAddress", venueAddress);
       formData.append("totalSeats", String(totalSeatsVal));
       formData.append("price", String(priceVal));
       formData.append("ticketDetail", ticketDetail);
@@ -148,7 +146,6 @@ export default function AdminInven2() {
         startAt: startDateTime,
         endAt: endDateTime,
         venueName,
-        venueAddress,
         totalSeats: totalSeatsVal,
         price: priceVal,
         ticketDetail,

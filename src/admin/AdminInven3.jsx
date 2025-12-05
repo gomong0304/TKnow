@@ -13,7 +13,6 @@ export default function AdminInven3() {
 	const [startAt, setStartAt] = useState({ year: "", month: "", day: "", hour: "", minute: "" });
 	const [endAt, setEndAt] = useState({ year: "", month: "", day: "", hour: "", minute: "" });
 	const [venueName, setVenueName] = useState("");
-	const [venueAddress, setVenueAddress] = useState("");
 	const [totalSeats, setTotalSeats] = useState("");
 	const [price, setPrice] = useState("");
 	const [ticketCost, setTicketCost] = useState("");
@@ -45,7 +44,6 @@ export default function AdminInven3() {
 				setTitle(data.title || "");
 				setCategory(data.category || "CONCERT");
 				setVenueName(data.venueName || "");
-				setVenueAddress(data.venueAddress || "");
 				setTotalSeats(data.totalSeats || "");
 				setPrice(data.price || "");
 				setTicketCost(data.ticketCost || "");
@@ -105,7 +103,6 @@ export default function AdminInven3() {
 			  startAt: startDateTime,
 			  endAt: endDateTime,
 			  venueName,
-			  venueAddress,
 			  totalSeats: parseInt(totalSeats) || 0,
 			  price: parseFloat(price) || 0,
 			  ticketCost: ticketCost ? parseFloat(ticketCost) : null,
@@ -255,10 +252,7 @@ export default function AdminInven3() {
 
 										<tr><th>공연 장소 <span style={{ color: 'red' }}>*</span></th></tr>
 										<tr><td><input type="text" className="Ad-conts-resNum" value={venueName} onChange={e => setVenueName(e.target.value)} required /></td></tr>
-
-										<tr><th>공연장 주소</th></tr>
-										<tr><td><input type="text" className="Ad-conts-resNum" value={venueAddress} onChange={e => setVenueAddress(e.target.value)} /></td></tr>
-
+		
 										<tr><th>총 좌석 수 <span style={{ color: 'red' }}>*</span></th></tr>
 										<tr><td><input type="number" min="1" className="Ad-conts-resNum" value={totalSeats} onChange={e => setTotalSeats(e.target.value)} required /></td></tr>
 

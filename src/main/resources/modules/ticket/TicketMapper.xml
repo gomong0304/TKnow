@@ -8,20 +8,20 @@
 	<sql id="ticketDTOColumns">
 		t.ticket_id AS ticketId,
 		t.ticket_title AS title,
-		t.start_at
-		AS startAt,
+		t.start_at AS startAt,
 		t.end_date AS endAt,
 		t.venueName AS venueName,
 		t.venueAddress AS venueAddress,
 		t.ticket_stock AS totalSeats,
 		t.ticket_stock AS remainingSeats,
 		t.ticket_price AS price,
+		t.ticket_category AS ticketCategory,
 		t.ticket_status AS ticketStatus,
+		t.ticket_detail AS ticketDetail,
 		t.created_at AS createdAt,
 		t.updated_at AS updatedAt,
 		NULL AS deletedAt
 	</sql>
-
 	<!-- INSERT: Map 파라미터 기반, PK 자동 채번 -->
 	<insert id="insertTicketFromMap" parameterType="map"
 		useGeneratedKeys="true" keyProperty="ticketId">

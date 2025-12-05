@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.*;
 import ticketnow.modules.ticket.constant.TicketStatus;
+import ticketnow.modules.ticket.constant.TicketCategory;
 
 @Getter @Setter @ToString @Builder
 @AllArgsConstructor @NoArgsConstructor
@@ -31,5 +32,9 @@ public class TicketResponseDTO {
     private String ticketDetail;
     // 상품 설명용 이미지 URL
     private String detailImageUrl;
+    
+    // 티켓 카테고리
+    private TicketCategory ticketCategory;
+
     
 }

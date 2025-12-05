@@ -37,108 +37,118 @@ public class TicketServiceImpl implements TicketService {
 	// =================================================================================
 	// 생성
 	// =================================================================================
+	// =================================================================================
+	// 생성
+	// =================================================================================
 	@Override
 	@Transactional
 	public TicketResponseDTO createTicket(TicketCreateRequestDTO req) {
-		final long t0 = System.nanoTime(); // 경과시간 측정(성능 확인용)
-		log.debug("[Ticket][CREATE][REQ] {}", req); // 입력 파라미터 스냅샷
+	    final long t0 = System.nanoTime(); // 경과시간 측정(성능 확인용)
+	    log.debug("[Ticket][CREATE][REQ] {}", req); // 입력 파라미터 스냅샷
 
-		// 방어 로직: 날짜가 null이면 바로 예외 (NPE 방지)
-		   if (req.getStartAt() == null || req.getEndAt() == null) {
-		        log.error("[Ticket][CREATE] startAt/endAt is null. req={}", req);
-		        throw new IllegalArgumentException("공연 시작/종료 일시가 올바르지 않습니다.");
-		    }
+	    // 방어 로직: 날짜가 null이면 바로 예외 (NPE 방지)
+	    if (req.getStartAt() == null || req.getEndAt() == null) {
+	        log.error("[Ticket][CREATE] startAt/endAt is null. req={}", req);
+	        throw new IllegalArgumentException("공연 시작/종료 일시가 올바르지 않습니다.");
+	    }
 
-		   
-		// 현재 시각 기준으로 초기 상태 결정:
-		// 시작 전: SCHEDULED
-		// 시작 시각 경과: ON_SALE (좌석/판매조건에 따라 추가 정책 가능)
-		// 시작시간 기준으로 기본 상태 보정
-		final TicketStatus status = LocalDateTime.now().isBefore(req.getStartAt()) ? TicketStatus.SCHEDULED
-				: TicketStatus.ON_SALE;
+	    // 현재 시각 기준으로 초기 상태 결정:
+	    // 시작 전: SCHEDULED
+	    // 시작 시각 경과: ON_SALE (좌석/판매조건에 따라 추가 정책 가능)
+	    // 시작시간 기준으로 기본 상태 보정
+	    final TicketStatus status = LocalDateTime.now().isBefore(req.getStartAt())
+	            ? TicketStatus.SCHEDULED
+	            : TicketStatus.ON_SALE;
 
-		// TicketVO를 거치지 않고 Map 파라미터로 INSERT 수행
-		// 장점: VO 게터/세터 의존 제거, 동적 필드/부분 갱신에 유연
-		Map<String, Object> p = new HashMap<>();
-		p.put("title", req.getTitle());
-		p.put("startAt", req.getStartAt());
-		p.put("endAt", req.getEndAt());
-		p.put("venueName", req.getVenueName());
-		p.put("category", req.getCategory());
-		p.put("venueAddress", req.getVenueAddress());
-		p.put("totalSeats", req.getTotalSeats());
-		p.put("remainingSeats", req.getTotalSeats()); // 디폴트: 남은 좌석 = 총좌석
-		p.put("price", req.getPrice());
-		p.put("ticketDetail", req.getTicketDetail());
+	    // TicketVO를 거치지 않고 Map 파라미터로 INSERT 수행
+	    // 장점: VO 게터/세터 의존 제거, 동적 필드/부분 갱신에 유연
+	    Map<String, Object> p = new HashMap<>();
+	    p.put("title", req.getTitle());
+	    p.put("startAt", req.getStartAt());
+	    p.put("endAt", req.getEndAt());
+	    p.put("venueName", req.getVenueName());
+	    p.put("category", req.getCategory());
+	    p.put("venueAddress", req.getVenueAddress());
+	    p.put("totalSeats", req.getTotalSeats());
+	    p.put("remainingSeats", req.getTotalSeats()); // 디폴트: 남은 좌석 = 총좌석
+	    p.put("price", req.getPrice());
+	    p.put("ticketDetail", req.getTicketDetail());
 
-		// 생성 요청에 판매상태가 함께 온 경우 우선 사용, 아니면 날짜 기준 기본값 사용
-		if (req.getTicketStatus() != null && !req.getTicketStatus().isBlank()) {
-			p.put("ticketStatus", req.getTicketStatus());
-		} else {
-			p.put("ticketStatus", status.name());
-		}
+	    // 생성 요청에 판매상태가 함께 온 경우 우선 사용, 아니면 날짜 기준 기본값 사용
+	    if (req.getTicketStatus() != null && !req.getTicketStatus().isBlank()) {
+	        p.put("ticketStatus", req.getTicketStatus());
+	    } else {
+	        p.put("ticketStatus", status.name());
+	    }
 
-		log.debug("[Ticket][CREATE][BEFORE] params={}", p); // INSERT 전 파라미터 확인
-		int rows = ticketMapper.insertTicketFromMap(p); // ★ keyProperty로 ticketId 채워짐
-		log.info("[Ticket][CREATE] rows={}, newId={}", rows, p.get("ticketId"));
+	    log.debug("[Ticket][CREATE][BEFORE] params={}", p); // INSERT 전 파라미터 확인
+	    int rows = ticketMapper.insertTicketFromMap(p); // ★ keyProperty로 ticketId 채워짐
+	    log.info("[Ticket][CREATE] rows={}, newId={}", rows, p.get("ticketId"));
 
-		// MyBatis useGeneratedKeys로 주입된 PK를 안전하게 꺼냄
-		Long newId = (p.get("ticketId") instanceof Number) ? ((Number) p.get("ticketId")).longValue() : null;
+	    // MyBatis useGeneratedKeys로 주입된 PK를 안전하게 꺼냄
+	    Long newId = (p.get("ticketId") instanceof Number)
+	            ? ((Number) p.get("ticketId")).longValue()
+	            : null;
 
-		// ★ 추가: 티켓 생성 시 이미지가 같이 넘어온 경우, 공통 FileService로 업로드
-		if (newId != null && req.getImages() != null && !req.getImages().isEmpty()) {
-			try {
-				// 1) ImageListDTO 구성 (어느 티켓의 이미지인지 지정)
-				ImageListDTO imageReq = ImageListDTO.builder()
-				        .ticketId(newId) // ticket FK
-				        .build();
+	    // 🔹 티켓 생성 시 좌석 자동 생성 (여기가 새로 추가된 부분)
+	    if (newId != null) {
+	        generateSeatsForTicket(newId, req.getTotalSeats());
+	    }
 
-				// newImages 리스트 생성
-				List<NewImageDTO> newImages = new ArrayList<>();
+	    // ★ 추가: 티켓 생성 시 이미지가 같이 넘어온 경우, 공통 FileService로 업로드
+	    if (newId != null && req.getImages() != null && !req.getImages().isEmpty()) {
+	        try {
+	            // 1) ImageListDTO 구성 (어느 티켓의 이미지인지 지정)
+	            ImageListDTO imageReq = ImageListDTO.builder()
+	                    .ticketId(newId) // ticket FK
+	                    .build();
 
-				int sort = 1;
-				for (MultipartFile file : req.getImages()) {
-				    if (file == null || file.isEmpty()) {
-				        continue; // 빈 파일은 스킵
-				    }
+	            // newImages 리스트 생성
+	            List<NewImageDTO> newImages = new ArrayList<>();
 
-				    newImages.add(
-				            NewImageDTO.builder()
-				                    .file(file)
-				                    .isPrimary(sort == 1)     // 첫 번째 이미지를 대표로 설정
-				                    .imageSort(sort)          // 정렬 순서 1,2,3...
-				                    .imageType("TICKET_IMAGE") // ★ 티켓 이미지 타입 명시
-				                    .build()
-				    );
-				    sort++;
-				}
+	            int sort = 1;
+	            for (MultipartFile file : req.getImages()) {
+	                if (file == null || file.isEmpty()) {
+	                    continue; // 빈 파일은 스킵
+	                }
 
-				imageReq.setNewImages(newImages);
+	                newImages.add(
+	                        NewImageDTO.builder()
+	                                .file(file)
+	                                .isPrimary(sort == 1)      // 첫 번째 이미지를 대표로 설정
+	                                .imageSort(sort)           // 정렬 순서 1,2,3...
+	                                .imageType("TICKET_IMAGE") // ★ 티켓 이미지 타입 명시
+	                                .build()
+	                );
+	                sort++;
+	            }
 
-				if (!newImages.isEmpty()) {
-				    List<ImageVO> images = fileService.upsertImages(imageReq);
-					log.debug("[Ticket][CREATE][IMAGE] uploaded {} images for ticketId={}",
-							images != null ? images.size() : 0, newId);
-				} else {
-					log.debug("[Ticket][CREATE][IMAGE] no valid image files to upload for ticketId={}", newId);
-				}
+	            imageReq.setNewImages(newImages);
 
-			} catch (IOException e) {
-				// 파일 처리 예외는 IllegalStateException으로 래핑해서 전파
-				log.error("[Ticket][CREATE][IMAGE] 이미지 업로드 중 오류 발생 ticketId={}", newId, e);
-				throw new IllegalStateException("티켓 이미지 저장 중 오류가 발생했습니다.", e);
-			}
-		} else {
-			log.debug("[Ticket][CREATE][IMAGE] no images in request or ticketId is null.");
-		}
+	            if (!newImages.isEmpty()) {
+	                List<ImageVO> images = fileService.upsertImages(imageReq);
+	                log.debug("[Ticket][CREATE][IMAGE] uploaded {} images for ticketId={}",
+	                        images != null ? images.size() : 0, newId);
+	            } else {
+	                log.debug("[Ticket][CREATE][IMAGE] no valid image files to upload for ticketId={}", newId);
+	            }
 
-		// 최종 저장본을 DTO로 재조회하여 응답 (응답 일관성 보장)
-		TicketResponseDTO saved = ticketMapper.selectTicketDTOById(newId);
-		log.debug("[Ticket][CREATE][AFTER] {}", saved);
-		log.debug("[Ticket][CREATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+	        } catch (IOException e) {
+	            // 파일 처리 예외는 IllegalStateException으로 래핑해서 전파
+	            log.error("[Ticket][CREATE][IMAGE] 이미지 업로드 중 오류 발생 ticketId={}", newId, e);
+	            throw new IllegalStateException("티켓 이미지 저장 중 오류가 발생했습니다.", e);
+	        }
+	    } else {
+	        log.debug("[Ticket][CREATE][IMAGE] no images in request or ticketId is null.");
+	    }
 
-		// [DEBUG TIP] 좌석 합계/잔여 수 논리 검증이 필요하면 여기서 assert/log 추가 가능
-		return saved;
+	    // 최종 저장본을 DTO로 재조회하여 응답 (응답 일관성 보장)
+	    TicketResponseDTO saved = ticketMapper.selectTicketDTOById(newId);
+	    log.debug("[Ticket][CREATE][AFTER] {}", saved);
+	    log.debug("[Ticket][CREATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+
+	    // [DEBUG TIP] 좌석 합계/잔여 수 논리 검증이 필요하면 여기서 assert/log 추가 가능
+	    return saved;
 	}
 
 	

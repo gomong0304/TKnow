@@ -540,3 +540,12 @@
 .admin-contact-main-box {
   display: block;              /* AdminMember1에서 준 flex 해제 */
 }
+/* AdminInven 콘서트명 칸 말줄임 처리 */
+.admin-member-text1 .admin-inven-title {
+  max-width: 260px;      /* 필요하면 숫자만 조정 */
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}

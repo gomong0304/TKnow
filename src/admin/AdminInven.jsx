@@ -93,7 +93,28 @@ export default function AdminInven() {
 		SCHEDULED: "오픈 예정",
 		CLOSED: "판매 종료",
 	};
+	// S석 / R석 기준 평균가격 계산 
+	const calcAveragePrice = (basePrice) => {
+		if (basePrice === null || basePrice === undefined) {
+			return 0;
+		}
+		const sPrice = Number(basePrice);
+		if (Number.isNaN(sPrice)) {
+			return 0;
+		}
+		// R석 = S석의 90% 
+		const rPrice = Math.floor(sPrice * 0.9);
+		// 평균 = (S + R) / 2
+		return Math.round((sPrice + rPrice) / 2);
+	};
 
+	// 잔여석이 0이면 강제로 SOLD_OUT 처리
+	const getEffectiveStatus = (ticket) => {
+		if (ticket && ticket.remainingSeats === 0) {
+			return "SOLD_OUT";
+		}
+		return ticket.ticketStatus;
+	};
 	return (
 		<div className="member-Member-page">
 			<AdminSidebar />{/* ← 공통 사이드바 호출 */}
@@ -124,32 +145,53 @@ export default function AdminInven() {
 
 									<tbody>
 										{tickets.length > 0 ? (
-											tickets.map((t) => (
-												<tr
-													key={t.ticketId}
-													onClick={() => handleClick(t.ticketId)}
-													style={{ cursor: "pointer" }}
-												>
-													<td>{t.ticketId}</td>
-													<td>{t.title}</td>
-													<td>{t.price?.toLocaleString()}</td>
-													<td>{t.remainingSeats || t.totalSeats}</td>
+											tickets.map((t) => {
+												const effectiveStatus = getEffectiveStatus(t);
+												const avgPrice = calcAveragePrice(t.price);
 
-													{/* 상태 표시 부분 */}
-													<td className={
-														t.ticketStatus === "ON_SALE"
-															? "admin-con-btn"
-															: "admin-con-btn1"
-													}>
-														{statusLabel[t.ticketStatus] || "알수없음"}
-													</td>
-												</tr>
-											))
+												return (
+													<tr
+														key={t.ticketId}
+														onClick={() => handleClick(t.ticketId)}
+														style={{ cursor: "pointer" }}
+													>
+														{/* (1-1) 상품번호 그대로 */}
+														<td>{t.ticketId}</td>
+
+														{/* (1-1) 콘서트명: 너무 길면 ... 처리 */}
+														<td className="admin-inven-title">{t.title}</td>
+
+														{/* (1-2) 가격(원): S석/R석 평균 가격 */}
+														<td>{avgPrice.toLocaleString()}</td>
+
+														{/* (1-3) 잔여석(개): 모든 회차 합, 0도 제대로 보이도록 */}
+														<td>
+															{t.remainingSeats !== null && t.remainingSeats !== undefined
+																? t.remainingSeats
+																: t.totalSeats}
+														</td>
+
+														{/* (1-4) 상태: 잔여석 0이면 무조건 매진 처리 */}
+														<td
+															className={
+																effectiveStatus === "ON_SALE"
+																	? "admin-con-btn"
+																	: "admin-con-btn1"
+															}
+														>
+															{statusLabel[effectiveStatus] || "알수없음"}
+														</td>
+													</tr>
+												);
+											})
 										) : (
-											<tr><td colSpan="5">불러올 티켓이 없습니다</td></tr>
+											<tr>
+												<td colSpan="5">불러올 티켓이 없습니다</td>
+											</tr>
 										)}
 									</tbody>
 								</table>
+
 								<br /><br />
 								<div className="member-ticket-plus">
 									<strong> + </strong> <span> 티켓 목록 더 보기 </span>

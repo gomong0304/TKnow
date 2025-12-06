@@ -16,7 +16,7 @@ export default function TicketBuy() {
 
 	// 선택한 티켓 수량
 	const [normalCount, setNormalCount] = useState(0);
-	const [discount1Count, setDiscount1Count] = useState(0); 
+	const [discount1Count, setDiscount1Count] = useState(0);
 	const [discount2Count, setDiscount2Count] = useState(0);
 	const [discount3Count, setDiscount3Count] = useState(0);
 
@@ -43,20 +43,44 @@ export default function TicketBuy() {
 		ageLimit: ticketData?.ageLimit,
 	};
 
-	const cancelDate = new Date(dummyInfo.date.getTime() + 7 * 24 * 60 * 60 * 1000);
+	const cancelDate = new Date(
+		dummyInfo.date.getTime() + 7 * 24 * 60 * 60 * 1000
+	);
+
+	// ===== 좌석 등급/가격 계산 (S석 기준가 → R석 10% 할인) =====
+	// AdminInven2 에서 입력한 ticketData?.price 를 S석 기준가로 사용
+	const sPrice = ticketData?.price || 100_000; // S석 기준가
+	const rPrice = Math.floor(sPrice * 0.9); // R석 = S석보다 10% 저렴
+
+	// 선택된 좌석 등급 파싱 (문자열/객체 모두 대응)
+	let seatGrade = "R";
+	if (selectedSeat) {
+		if (typeof selectedSeat === "string") {
+			// 예: "R석 F2구역 B열 12번"
+			const gradeText = selectedSeat.split(" ")[0] || ""; // "R석", "S석" 형태
+			seatGrade = gradeText.includes("S") ? "S" : "R";
+		} else if (typeof selectedSeat === "object" && selectedSeat.grade) {
+			// F2에서 grade 필드를 객체로 넘긴 경우
+			seatGrade = selectedSeat.grade; // "S" 또는 "R"
+		}
+	}
+
+	// 실제 적용할 기본 좌석 가격 (S 또는 R)
+	const baseSeatPrice = seatGrade === "S" ? sPrice : rPrice;
 
 	// 가격 계산
-	const basePrice = ticketData?.price || 100_000; // 기본가
-	const discountPrice = Math.floor(basePrice * 0.8);
-	const serviceFee = Math.floor(basePrice * 0.1) * totalSeatCount;
+	const discountPrice = Math.floor(baseSeatPrice * 0.8); // 할인가는 기본가의 80%
+	const serviceFee =
+		Math.floor(baseSeatPrice * 0.1) * totalSeatCount; // 수수료: 기본가의 10% × 매수
 	const deliveryFee = ticketData?.deliveryFee || 0;
 	console.log(ticketData);
 
-	const ticketAmount = normalCount * basePrice +
-	                     discount1Count * discountPrice +
-	                     discount2Count * discountPrice +
-	                     discount3Count * discountPrice;
-	
+	const ticketAmount =
+		normalCount * baseSeatPrice +
+		discount1Count * discountPrice +
+		discount2Count * discountPrice +
+		discount3Count * discountPrice;
+
 	// 합계
 	const totalPrice = ticketAmount + serviceFee + deliveryFee;
 
@@ -102,7 +126,7 @@ export default function TicketBuy() {
 						<div className="ticket-buy3-middle-box1">
 							<div className="ticket-buy3-box">
 								<p className="ticket-buy3-box2">
-									<strong>R 석</strong> ｜{" "}
+									<strong>{seatGrade} 석</strong> ｜{" "}
 									<strong style={{ color: "#85292B" }}>
 										좌석 {totalSeatCount} 매
 									</strong>{" "}
@@ -115,11 +139,13 @@ export default function TicketBuy() {
 										<tr>
 											<th>기본가</th>
 											<td>일반</td>
-											<td>{basePrice.toLocaleString()} 원</td>
+											<td>{baseSeatPrice.toLocaleString()} 원</td>
 											<td>
 												<select
 													value={normalCount}
-													onChange={(e) => setNormalCount(Number(e.target.value))}
+													onChange={(e) =>
+														setNormalCount(Number(e.target.value))
+													}
 													disabled={isAnySelected && normalCount === 0}
 												>
 													{renderOptions()}
@@ -135,7 +161,9 @@ export default function TicketBuy() {
 											<td>
 												<select
 													value={discount1Count}
-													onChange={(e) => setDiscount1Count(Number(e.target.value))}
+													onChange={(e) =>
+														setDiscount1Count(Number(e.target.value))
+													}
 													disabled={isAnySelected && discount1Count === 0}
 												>
 													{renderOptions()}
@@ -149,7 +177,9 @@ export default function TicketBuy() {
 											<td>
 												<select
 													value={discount2Count}
-													onChange={(e) => setDiscount2Count(Number(e.target.value))}
+													onChange={(e) =>
+														setDiscount2Count(Number(e.target.value))
+													}
 													disabled={isAnySelected && discount2Count === 0}
 												>
 													{renderOptions()}
@@ -163,7 +193,9 @@ export default function TicketBuy() {
 											<td>
 												<select
 													value={discount3Count}
-													onChange={(e) => setDiscount3Count(Number(e.target.value))}
+													onChange={(e) =>
+														setDiscount3Count(Number(e.target.value))
+													}
 													disabled={isAnySelected && discount3Count === 0}
 												>
 													{renderOptions()}
@@ -183,8 +215,10 @@ export default function TicketBuy() {
 									<br />
 									<p>
 										나우닛 가입시 중복 할인 쿠폰 제공 (단, 새싹 등급 제외)&nbsp;&nbsp;&nbsp;
-										<button className="ticket-buy3-cupPluBtn">쿠폰 받기</button>
-									</p>{" "}
+										<button className="ticket-buy3-cupPluBtn">
+											쿠폰 받기
+										</button>
+									</p>
 									<br />
 									<p>가격 선택 후 사용 가능한 쿠폰을 조회합니다.</p>
 								</div>
@@ -212,10 +246,10 @@ export default function TicketBuy() {
 											</tr>
 											<tr>
 												<th>날짜</th>
-												<td>{dummyInfo.date.toLocaleString("ko-KR")}</td>
+												<td>
+													{dummyInfo.date.toLocaleString("ko-KR")}
+												</td>
 											</tr>
-											
-
 										</tbody>
 									</table>
 								</div>
@@ -278,26 +312,27 @@ export default function TicketBuy() {
 							</Link>
 
 							<Link
-							  to={`/Ticket/Buy4/${id}`}
-							  state={{
-								seatId: selectedSeat?.dbId,
-							    selectedSeat,
-							    normalCount,
-							    discount1Count,
-							    discount2Count,
-							    discount3Count,
-							    totalPrice,
-							    basePrice,
-							    serviceFee: serviceFee,
-							    deliveryFee: deliveryFee,
-							    discountPrice,
-							    totalSeatCount,
-							    ticketDate: dummyInfo.date,
-							    ticketVenue: dummyInfo.venue,
-							    ticketTitle: ticketData?.title,
-							    ticketImage: ticketData?.image || "/images/cons.png",
-							    cancelDate: cancelDate
-							  }}
+								to={`/Ticket/Buy4/${id}`}
+								state={{
+									seatId: selectedSeat?.dbId,
+									selectedSeat,
+									normalCount,
+									discount1Count,
+									discount2Count,
+									discount3Count,
+									totalPrice,
+									basePrice: baseSeatPrice, // S/R 반영된 기본가 전달
+									serviceFee: serviceFee,
+									deliveryFee: deliveryFee,
+									discountPrice,
+									totalSeatCount,
+									ticketDate: dummyInfo.date,
+									ticketVenue: dummyInfo.venue,
+									ticketTitle: ticketData?.title,
+									ticketImage:
+										ticketData?.image || "/images/cons.png",
+									cancelDate: cancelDate,
+								}}
 								className="ticket-stage-next3"
 							>
 								다음 단계

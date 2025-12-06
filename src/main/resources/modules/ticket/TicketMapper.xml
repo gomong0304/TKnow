@@ -118,6 +118,27 @@
 			)
 		</foreach>
 	</insert>
+	    <!-- 티켓 공연 회차 일괄 저장 -->
+    <insert id="insertTicketSchedules">
+        INSERT INTO ticket_schedule (
+            ticket_id,
+            round_no,
+            show_at,
+            created_at,
+            updated_at
+        )
+        VALUES
+        <foreach collection="schedules" item="s" separator=",">
+            (
+                #{ticketId},
+                #{s.roundNo},
+                #{s.showAt},
+                NOW(),
+                NOW()
+            )
+        </foreach>
+    </insert>
+	
 
 
 	<!-- 소프트 삭제 대체: 상태를 CLOSED로 전환 <update id="softDeleteTicket" parameterType="long"> 

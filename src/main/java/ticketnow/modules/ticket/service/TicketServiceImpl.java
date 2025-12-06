@@ -1,6 +1,7 @@
 package ticketnow.modules.ticket.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -19,396 +20,428 @@ import ticketnow.modules.common.service.image.FileService;
 import ticketnow.modules.ticket.constant.TicketStatus;
 import ticketnow.modules.ticket.dto.*;
 import ticketnow.modules.ticket.mapper.TicketMapper;
-import ticketnow.modules.common.mapper.image.ImageMapper; 
+import ticketnow.modules.common.mapper.image.ImageMapper;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class TicketServiceImpl implements TicketService {
 
-	/** MyBatis Mapper (DB CRUD) */
-	private final TicketMapper ticketMapper;
+    /** MyBatis Mapper (DB CRUD) */
+    private final TicketMapper ticketMapper;
 
-	// 공통 이미지 업로드 서비스
-	private final FileService fileService;
-	
-	// 티켓 대표 이미지 조회용 Mapper
-	private final ImageMapper imageMapper;
+    // 공통 이미지 업로드 서비스
+    private final FileService fileService;
 
-	// =================================================================================
-	// 생성
-	// =================================================================================
-	// =================================================================================
-	// 생성
-	// =================================================================================
-	@Override
-	@Transactional
-	public TicketResponseDTO createTicket(TicketCreateRequestDTO req) {
-	    final long t0 = System.nanoTime(); // 경과시간 측정(성능 확인용)
-	    log.debug("[Ticket][CREATE][REQ] {}", req); // 입력 파라미터 스냅샷
+    // 티켓 대표 이미지 조회용 Mapper
+    private final ImageMapper imageMapper;
 
-	    // 방어 로직: 날짜가 null이면 바로 예외 (NPE 방지)
-	    if (req.getStartAt() == null || req.getEndAt() == null) {
-	        log.error("[Ticket][CREATE] startAt/endAt is null. req={}", req);
-	        throw new IllegalArgumentException("공연 시작/종료 일시가 올바르지 않습니다.");
-	    }
+    // =================================================================================
+    // 생성
+    // =================================================================================
+    @Override
+    @Transactional
+    public TicketResponseDTO createTicket(TicketCreateRequestDTO req) {
+        final long t0 = System.nanoTime(); // 경과시간 측정(성능 확인용)
+        log.debug("[Ticket][CREATE][REQ] {}", req); // 입력 파라미터 스냅샷
 
-	    // 현재 시각 기준으로 초기 상태 결정:
-	    // 시작 전: SCHEDULED
-	    // 시작 시각 경과: ON_SALE (좌석/판매조건에 따라 추가 정책 가능)
-	    // 시작시간 기준으로 기본 상태 보정
-	    final TicketStatus status = LocalDateTime.now().isBefore(req.getStartAt())
-	            ? TicketStatus.SCHEDULED
-	            : TicketStatus.ON_SALE;
+        TicketStatus ticketStatus = TicketStatus.SCHEDULED;
 
-	    // TicketVO를 거치지 않고 Map 파라미터로 INSERT 수행
-	    // 장점: VO 게터/세터 의존 제거, 동적 필드/부분 갱신에 유연
-	    Map<String, Object> p = new HashMap<>();
-	    p.put("title", req.getTitle());
-	    p.put("startAt", req.getStartAt());
-	    p.put("endAt", req.getEndAt());
-	    p.put("venueName", req.getVenueName());
-	    p.put("category", req.getCategory());
-	    p.put("totalSeats", req.getTotalSeats());
-	    p.put("remainingSeats", req.getTotalSeats()); // 디폴트: 남은 좌석 = 총좌석
-	    p.put("price", req.getPrice());
-	    p.put("ticketDetail", req.getTicketDetail());
+        // === 회차 목록 기반으로 startAt / endAt 자동 계산 ===
+        LocalDateTime startAt = req.getStartAt();
+        LocalDateTime endAt = req.getEndAt();
 
-	    // 생성 요청에 판매상태가 함께 온 경우 우선 사용, 아니면 날짜 기준 기본값 사용
-	    if (req.getTicketStatus() != null && !req.getTicketStatus().isBlank()) {
-	        p.put("ticketStatus", req.getTicketStatus());
-	    } else {
-	        p.put("ticketStatus", status.name());
-	    }
+        List<TicketScheduleCreateDTO> schedules = req.getSchedules();
 
-	    log.debug("[Ticket][CREATE][BEFORE] params={}", p); // INSERT 전 파라미터 확인
-	    int rows = ticketMapper.insertTicketFromMap(p); // ★ keyProperty로 ticketId 채워짐
-	    log.info("[Ticket][CREATE] rows={}, newId={}", rows, p.get("ticketId"));
+        if (schedules != null && !schedules.isEmpty()) {
+            // showAt 기준으로 최소/최대 계산
+            LocalDateTime minShowAt = schedules.stream()
+                    .filter(s -> s.getShowAt() != null)
+                    .map(TicketScheduleCreateDTO::getShowAt)
+                    .min(LocalDateTime::compareTo)
+                    .orElse(null);
 
-	    // MyBatis useGeneratedKeys로 주입된 PK를 안전하게 꺼냄
-	    Long newId = (p.get("ticketId") instanceof Number)
-	            ? ((Number) p.get("ticketId")).longValue()
-	            : null;
+            LocalDateTime maxShowAt = schedules.stream()
+                    .filter(s -> s.getShowAt() != null)
+                    .map(TicketScheduleCreateDTO::getShowAt)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
 
-	    // 🔹 티켓 생성 시 좌석 자동 생성 (여기가 새로 추가된 부분)
-	    if (newId != null) {
-	        generateSeatsForTicket(newId, req.getTotalSeats());
-	    }
+            if (minShowAt != null) {
+                startAt = minShowAt; // 공연 시작일시 = 가장 이른 회차
+            }
+            if (maxShowAt != null) {
+                // 공연 종료일시는 마지막 회차 날짜의 자정
+                LocalDate lastDate = maxShowAt.toLocalDate();
+                endAt = lastDate.atTime(23, 59, 59);
+            }
 
-	    // ★ 추가: 티켓 생성 시 이미지가 같이 넘어온 경우, 공통 FileService로 업로드
-	    if (newId != null && req.getImages() != null && !req.getImages().isEmpty()) {
-	        try {
-	            // 1) ImageListDTO 구성 (어느 티켓의 이미지인지 지정)
-	            ImageListDTO imageReq = ImageListDTO.builder()
-	                    .ticketId(newId) // ticket FK
-	                    .build();
+            // DTO에도 반영해 두면 이후 로직에서 동일 값 사용 가능
+            req.setStartAt(startAt);
+            req.setEndAt(endAt);
+        }
 
-	            // newImages 리스트 생성
-	            List<NewImageDTO> newImages = new ArrayList<>();
+        // TicketVO를 거치지 않고 Map 파라미터로 INSERT 수행
+        // 장점: VO 게터/세터 의존 제거, 동적 필드/부분 갱신에 유연
+        Map<String, Object> p = new HashMap<>();
+        p.put("title", req.getTitle());
+        p.put("startAt", req.getStartAt());
+        p.put("endAt", req.getEndAt());
+        p.put("venueName", req.getVenueName());
+        p.put("category", req.getCategory());
+        p.put("totalSeats", req.getTotalSeats());
+        p.put("remainingSeats", req.getTotalSeats()); // 디폴트: 남은 좌석 = 총좌석
+        p.put("price", req.getPrice());
+        p.put("ticketDetail", req.getTicketDetail());
 
-	            int sort = 1;
-	            for (MultipartFile file : req.getImages()) {
-	                if (file == null || file.isEmpty()) {
-	                    continue; // 빈 파일은 스킵
-	                }
+        // 생성 요청에 판매상태가 함께 온 경우 우선 사용, 아니면 날짜 기준 기본값 사용
+        if (req.getTicketStatus() != null && !req.getTicketStatus().isBlank()) {
+            p.put("ticketStatus", req.getTicketStatus());
+        } else {
+            p.put("ticketStatus", ticketStatus.name());
+        }
 
-	                newImages.add(
-	                        NewImageDTO.builder()
-	                                .file(file)
-	                                .isPrimary(sort == 1)      // 첫 번째 이미지를 대표로 설정
-	                                .imageSort(sort)           // 정렬 순서 1,2,3...
-	                                .imageType("TICKET_IMAGE") // ★ 티켓 이미지 타입 명시
-	                                .build()
-	                );
-	                sort++;
-	            }
+        log.debug("[Ticket][CREATE][BEFORE] params={}", p); // INSERT 전 파라미터 확인
+        int rows = ticketMapper.insertTicketFromMap(p); // ★ keyProperty로 ticketId 채워짐
+        log.info("[Ticket][CREATE] rows={}, newId={}", rows, p.get("ticketId"));
 
-	            imageReq.setNewImages(newImages);
+        // MyBatis useGeneratedKeys로 주입된 PK를 안전하게 꺼냄
+        Long newId = (p.get("ticketId") instanceof Number)
+                ? ((Number) p.get("ticketId")).longValue()
+                : null;
 
-	            if (!newImages.isEmpty()) {
-	                List<ImageVO> images = fileService.upsertImages(imageReq);
-	                log.debug("[Ticket][CREATE][IMAGE] uploaded {} images for ticketId={}",
-	                        images != null ? images.size() : 0, newId);
-	            } else {
-	                log.debug("[Ticket][CREATE][IMAGE] no valid image files to upload for ticketId={}", newId);
-	            }
+        // 🔹 회차(스케줄) INSERT: ticket_schedule 테이블에 저장
+        if (newId != null && schedules != null && !schedules.isEmpty()) {
+            List<ticketnow.modules.ticket.domain.TicketScheduleVO> scheduleVOs = new ArrayList<>();
+            int autoRound = 1;
 
-	        } catch (IOException e) {
-	            // 파일 처리 예외는 IllegalStateException으로 래핑해서 전파
-	            log.error("[Ticket][CREATE][IMAGE] 이미지 업로드 중 오류 발생 ticketId={}", newId, e);
-	            throw new IllegalStateException("티켓 이미지 저장 중 오류가 발생했습니다.", e);
-	        }
-	    } else {
-	        log.debug("[Ticket][CREATE][IMAGE] no images in request or ticketId is null.");
-	    }
+            for (TicketScheduleCreateDTO s : schedules) {
+                if (s == null || s.getShowAt() == null) {
+                    continue;
+                }
 
-	    // 최종 저장본을 DTO로 재조회하여 응답 (응답 일관성 보장)
-	    TicketResponseDTO saved = ticketMapper.selectTicketDTOById(newId);
-	    log.debug("[Ticket][CREATE][AFTER] {}", saved);
-	    log.debug("[Ticket][CREATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+                Integer roundNo = s.getRoundNo();
+                if (roundNo == null || roundNo <= 0) {
+                    roundNo = autoRound;
+                }
 
-	    // [DEBUG TIP] 좌석 합계/잔여 수 논리 검증이 필요하면 여기서 assert/log 추가 가능
-	    return saved;
-	}
+                scheduleVOs.add(
+                        ticketnow.modules.ticket.domain.TicketScheduleVO.builder()
+                                .ticketId(newId)
+                                .roundNo(roundNo)
+                                .showAt(s.getShowAt())
+                                .build()
+                );
+                autoRound++;
+            }
 
-	
-	/**=====================================================
-	 * 총 좌석 수에 따라 F1~F4 구역으로 좌석을 자동 생성
-	 * - 총 좌석수: totalSeats
-	 * - 구역: F1, F2, F3, F4 (4개)
-	 * - 각 구역 앞 자리 10%: S석, 나머지: R석
-	 =====================================================*/
-	private void generateSeatsForTicket(Long ticketId, int totalSeats) {
-		if (ticketId == null || totalSeats <= 0) {
-			return;
-		}
+            if (!scheduleVOs.isEmpty()) {
+                int scheduleRows = ticketMapper.insertTicketSchedules(newId, scheduleVOs);
+                log.info("[Ticket][CREATE][SCHEDULE] rows={} ticketId={}", scheduleRows, newId);
+            } else {
+                log.debug("[Ticket][CREATE][SCHEDULE] 유효한 회차가 없어 INSERT 생략 ticketId={}", newId);
+            }
+        } else {
+            log.debug("[Ticket][CREATE][SCHEDULE] 회차 정보 없음 또는 ticketId null");
+        }
 
-		final int ZONE_COUNT = 4;
-		final String[] ZONES = { "F1", "F2", "F3", "F4" };
+        // 🔹 티켓 생성 시 좌석 자동 생성
+        if (newId != null) {
+            generateSeatsForTicket(newId, req.getTotalSeats());
+        }
 
-		int basePerZone = totalSeats / ZONE_COUNT;
-		int remainder = totalSeats % ZONE_COUNT;
+        // ★ 티켓 생성 시 이미지가 같이 넘어온 경우, 공통 FileService로 업로드
+        if (newId != null && req.getImages() != null && !req.getImages().isEmpty()) {
+            try {
+                // 1) ImageListDTO 구성 (어느 티켓의 이미지인지 지정)
+                ImageListDTO imageReq = ImageListDTO.builder()
+                        .ticketId(newId) // ticket FK
+                        .build();
 
-		List<Map<String, Object>> seats = new ArrayList<>();
+                // newImages 리스트 생성
+                List<NewImageDTO> newImages = new ArrayList<>();
 
-		for (int z = 0; z < ZONE_COUNT; z++) {
-			int zoneSeats = basePerZone + (z < remainder ? 1 : 0);
-			if (zoneSeats <= 0) {
-				continue;
-			}
+                int sort = 1;
+                for (MultipartFile file : req.getImages()) {
+                    if (file == null || file.isEmpty()) {
+                        continue; // 빈 파일은 스킵
+                    }
 
-			// 앞 10%는 최소 1석은 S석으로
-			int sCount = (int) Math.ceil(zoneSeats * 0.1);
-			if (sCount < 1) {
-				sCount = 1;
-			}
+                    newImages.add(
+                            NewImageDTO.builder()
+                                    .file(file)
+                                    .isPrimary(sort == 1)      // 첫 번째 이미지를 대표로 설정
+                                    .imageSort(sort)           // 정렬 순서 1,2,3...
+                                    .imageType("TICKET_IMAGE") // 티켓 이미지 타입 명시
+                                    .build()
+                    );
+                    sort++;
+                }
 
-			for (int i = 1; i <= zoneSeats; i++) {
-				Map<String, Object> seat = new HashMap<>();
-				// 예: F1-001, F1-002 ...
-				seat.put("seatCode", ZONES[z] + "-" + String.format("%03d", i));
-				seat.put("seatStatus", "AVAILABLE");
-				seat.put("seatClass", i <= sCount ? "S" : "R");
-				seats.add(seat);
-			}
-		}
+                imageReq.setNewImages(newImages);
 
-		if (!seats.isEmpty()) {
-			ticketMapper.insertSeatsForTicket(ticketId, seats);
-		}
-	}
+                if (!newImages.isEmpty()) {
+                    List<ImageVO> images = fileService.upsertImages(imageReq);
+                    log.debug("[Ticket][CREATE][IMAGE] uploaded {} images for ticketId={}",
+                            images != null ? images.size() : 0, newId);
+                } else {
+                    log.debug("[Ticket][CREATE][IMAGE] no valid image files to upload for ticketId={}", newId);
+                }
 
-	
-	// =================================================================================
-	// 종료일시가 지난 티켓은 자동으로 CLOSED 로 변경
-	// =================================================================================
+            } catch (IOException e) {
+                // 파일 처리 예외는 IllegalStateException으로 래핑해서 전파
+                log.error("[Ticket][CREATE][IMAGE] 이미지 업로드 중 오류 발생 ticketId={}", newId, e);
+                throw new IllegalStateException("티켓 이미지 저장 중 오류가 발생했습니다.", e);
+            }
+        } else {
+            log.debug("[Ticket][CREATE][IMAGE] no images in request or ticketId is null.");
+        }
 
-	private void applyAutoClose(TicketResponseDTO dto) {
-		if (dto == null) {
-			return;
-		}
-		if (dto.getEndAt() == null) {
-			return;
-		}
-		// 이미 CLOSED 이면 처리 불필요
-		if (dto.getTicketStatus() == TicketStatus.CLOSED) {
-			return;
-		}
-		// 종료일시가 현재보다 과거이면 CLOSED 로 전환
-		if (dto.getEndAt().isBefore(LocalDateTime.now())) {
-			ticketMapper.updateTicketStatus(dto.getTicketId(), "CLOSED");
-			dto.setTicketStatus(TicketStatus.CLOSED);
-		}
-	}
+        // 최종 저장본을 DTO로 재조회하여 응답 (응답 일관성 보장)
+        TicketResponseDTO saved = ticketMapper.selectTicketDTOById(newId);
+        log.debug("[Ticket][CREATE][AFTER] {}", saved);
+        log.debug("[Ticket][CREATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
 
-	
-	// =================================================================================
-	// 단건
-	// =================================================================================
-	@Override
-	@Transactional(readOnly = true)
-	public TicketResponseDTO getTicket(Long ticketId) {
-		final long t0 = System.nanoTime();
-		log.debug("[Ticket][GET] id={}", ticketId);
+        return saved;
+    }
 
-		// DTO로 직접 조회 (컨트롤러 응답과 동일 스키마)
-		TicketResponseDTO dto = ticketMapper.selectTicketDTOById(ticketId);
-		if (dto == null) {
-			// 존재하지 않으면 도메인 예외(여기서는 IllegalStateException 사용)
-			log.warn("[Ticket][GET] not found id={}", ticketId);
-			 throw new IllegalArgumentException("티켓을 찾을 수 없습니다: id=" + ticketId);
-		}
-		 // 대표 이미지 1장(primary) 조회 → mainImageUrl 설정
-	    ImageVO primary = imageMapper.selectPrimaryImageByTicket(ticketId);
-	    if (primary != null) {
-	        dto.setMainImageUrl(primary.getImgUrl());
-	    }
-		
-		//   상품 설명용 이미지(detailImageUrl) 설정
-	    // - 같은 티켓의 모든 이미지를 가져와서
-	    //   대표이미지가 아닌 것 중 첫 번째를 detailImageUrl로 사용
-	    List<ImageVO> images = imageMapper.selectImagesByTicket(ticketId);
-	    if (images != null && !images.isEmpty()) {
-	        images.stream()
-	                .filter(img -> primary == null 
-	                        || !Objects.equals(img.getImageUuid(), primary.getImageUuid()))
-	                .findFirst()
-	                .ifPresent(detail -> dto.setDetailImageUrl(detail.getImgUrl()));
-	    }
+    /**=====================================================
+     * 총 좌석 수에 따라 F1~F4 구역으로 좌석을 자동 생성
+     * - 총 좌석수: totalSeats
+     * - 구역: F1, F2, F3, F4 (4개)
+     * - 각 구역 앞 자리 10%: S석, 나머지: R석
+     =====================================================*/
+    private void generateSeatsForTicket(Long ticketId, int totalSeats) {
+        if (ticketId == null || totalSeats <= 0) {
+            return;
+        }
 
-		// 종료일시가 지난 경우 자동으로 CLOSED 처리
-		applyAutoClose(dto);
+        final int ZONE_COUNT = 4;
+        final String[] ZONES = {"F1", "F2", "F3", "F4"};
 
-		log.debug("[Ticket][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
-		return dto;
-	}
+        int basePerZone = totalSeats / ZONE_COUNT;
+        int remainder = totalSeats % ZONE_COUNT;
 
+        List<Map<String, Object>> seats = new ArrayList<>();
 
-	// =================================================================================
-	// 페이지
-	// =================================================================================
-	@Override
-	@Transactional(readOnly = true)
-	public PageResponseDTO<TicketResponseDTO> getTicketPage(PageRequestDTO pageReq) {
-		final long t0 = System.nanoTime();
+        for (int z = 0; z < ZONE_COUNT; z++) {
+            int zoneSeats = basePerZone + (z < remainder ? 1 : 0);
+            if (zoneSeats <= 0) {
+                continue;
+            }
 
-		// 페이지 파라미터 보정(1-base page, 최소 size=1)
-		int page = Math.max(1, pageReq.getPage());
-		int size = Math.max(1, pageReq.getSize());
-		int offset = (page - 1) * size;
+            // 앞 10%는 최소 1석은 S석으로
+            int sCount = (int) Math.ceil(zoneSeats * 0.1);
+            if (sCount < 1) {
+                sCount = 1;
+            }
 
-		log.debug("[Ticket][PAGE] page={}, size={}, offset={}", page, size, offset);
+            for (int i = 1; i <= zoneSeats; i++) {
+                Map<String, Object> seat = new HashMap<>();
+                // 예: F1-001, F1-002 ...
+                seat.put("seatCode", ZONES[z] + "-" + String.format("%03d", i));
+                seat.put("seatStatus", "AVAILABLE");
+                seat.put("seatClass", i <= sCount ? "S" : "R");
+                seats.add(seat);
+            }
+        }
 
-		// 목록은 DTO로 직접 조회 (프리젠테이션 스키마에 딱 맞춤)
-		List<TicketResponseDTO> rows = ticketMapper.selectTicketDTOPage(offset, size);
-		long total = ticketMapper.countTickets();
+        if (!seats.isEmpty()) {
+            ticketMapper.insertSeatsForTicket(ticketId, seats);
+        }
+    }
 
-		//  각 항목에 대표 이미지 URL 주입
-		if (rows != null) {
-		    for (TicketResponseDTO dto : rows) {
-		        ImageVO primary = imageMapper.selectPrimaryImageByTicket(dto.getTicketId());
-		        if (primary != null && primary.getImgUrl() != null) {
-		            dto.setMainImageUrl(primary.getImgUrl());
-		        } else {
-		            dto.setMainImageUrl(""); // 없으면 프론트에서 기본 이미지 사용
-		        }
-		     // 종료일시가 지난 경우 자동으로 CLOSED 처리
-		        applyAutoClose(dto);
-		    }
-		}
+    // =================================================================================
+    // 종료일시가 지난 티켓은 자동으로 CLOSED 로 변경
+    // =================================================================================
+    private void applyAutoClose(TicketResponseDTO dto) {
+        if (dto == null) {
+            return;
+        }
+        if (dto.getEndAt() == null) {
+            return;
+        }
+        // 이미 CLOSED 이면 처리 불필요
+        if (dto.getTicketStatus() == TicketStatus.CLOSED) {
+            return;
+        }
+        // 종료일시가 현재보다 과거이면 CLOSED 로 전환
+        if (dto.getEndAt().isBefore(LocalDateTime.now())) {
+            ticketMapper.updateTicketStatus(dto.getTicketId(), "CLOSED");
+            dto.setTicketStatus(TicketStatus.CLOSED);
+        }
+    }
 
+    // =================================================================================
+    // 단건
+    // =================================================================================
+    @Override
+    @Transactional(readOnly = true)
+    public TicketResponseDTO getTicket(Long ticketId) {
+        final long t0 = System.nanoTime();
+        log.debug("[Ticket][GET] id={}", ticketId);
 
-	    // 표준 페이징 응답 조립
-	    PageResponseDTO<TicketResponseDTO> resp = new PageResponseDTO<>();
-	    resp.setList(rows);
-	    resp.setTotalCount(total);
-	    resp.setPage(page);
-	    resp.setSize(size);
+        // DTO로 직접 조회 (컨트롤러 응답과 동일 스키마)
+        TicketResponseDTO dto = ticketMapper.selectTicketDTOById(ticketId);
+        if (dto == null) {
+            log.warn("[Ticket][GET] not found id={}", ticketId);
+            throw new IllegalArgumentException("티켓을 찾을 수 없습니다: id=" + ticketId);
+        }
 
-	    log.debug("[Ticket][PAGE] total={}, totalPages={}, fetched={}", total, resp.getTotalPages(), rows.size());
-	    log.debug("[Ticket][PAGE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
-	    return resp;
-	}
+        // 대표 이미지 1장(primary) 조회 → mainImageUrl 설정
+        ImageVO primary = imageMapper.selectPrimaryImageByTicket(ticketId);
+        if (primary != null) {
+            dto.setMainImageUrl(primary.getImgUrl());
+        }
 
-	// =================================================================================
-	// 수정
-	// =================================================================================
-	@Override
-	@Transactional
-	public TicketResponseDTO updateTicket(Long ticketId, TicketUpdateRequestDTO req) {
-		final long t0 = System.nanoTime();
-		log.debug("[Ticket][UPDATE][REQ] id={}, req={}", ticketId, req);
+        // 상품 설명용 이미지(detailImageUrl) 설정
+        List<ImageVO> images = imageMapper.selectImagesByTicket(ticketId);
+        if (images != null && !images.isEmpty()) {
+            images.stream()
+                    .filter(img -> primary == null
+                            || !Objects.equals(img.getImageUuid(), primary.getImageUuid()))
+                    .findFirst()
+                    .ifPresent(detail -> dto.setDetailImageUrl(detail.getImgUrl()));
+        }
 
-		// 선 존재확인 (낙관적 업데이트 / 예외 메시지 일관성 유지)
-		if (ticketMapper.selectTicketDTOById(ticketId) == null) {
-			log.warn("[Ticket][UPDATE] not found id={}", ticketId);
-			throw new IllegalStateException("티켓이 존재하지 않습니다: " + ticketId);
-		}
+        // 종료일시가 지난 경우 자동으로 CLOSED 처리
+        applyAutoClose(dto);
 
-		// 부분 갱신을 위해 Map으로 전달(null 필드는 XML에서 무시)
-		Map<String, Object> p = new HashMap<>();
-		p.put("ticketId", ticketId);
-		p.put("title", req.getTitle());
-		p.put("startAt", req.getStartAt());
-		p.put("endAt", req.getEndAt());
-		p.put("venueName", req.getVenueName());
-		p.put("totalSeats", req.getTotalSeats());
-		p.put("remainingSeats", req.getRemainingSeats());
-		p.put("price", req.getPrice());
+        log.debug("[Ticket][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+        return dto;
+    }
 
+    // =================================================================================
+    // 페이지
+    // =================================================================================
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDTO<TicketResponseDTO> getTicketPage(PageRequestDTO pageReq) {
+        final long t0 = System.nanoTime();
 
-		if (req.getTicketStatus() != null) {
-			// ENUM 유효성은 컨트롤러/서비스단에서 미리 검증하거나 DB 제약으로 보완 가능
-			p.put("ticketStatus", req.getTicketStatus()); // 문자열 그대로(ENUM 체크는 XML/DB 제약 혹은 서비스단 validation 로커버)
-		}
+        int page = Math.max(1, pageReq.getPage());
+        int size = Math.max(1, pageReq.getSize());
+        int offset = (page - 1) * size;
 
-		int rows = ticketMapper.updateTicketFromMap(p);
-		log.info("[Ticket][UPDATE] rows={}", rows);
-		
-		// 4️⃣ 이미지 수정 로직 추가
-	    if (req.getImages() != null && !req.getImages().isEmpty()) {
-	        try {
-	            // 기존 이미지 삭제 + 새 이미지 업로드 구조라면 ImageListDTO 사용
-	            ImageListDTO imageReq = ImageListDTO.builder()
-	                    .ticketId(ticketId)
-	                    .build();
+        log.debug("[Ticket][PAGE] page={}, size={}, offset={}", page, size, offset);
 
-	            List<NewImageDTO> newImages = new ArrayList<>();
-	            int sort = 1;
-	            for (MultipartFile file : req.getImages()) {
-	                if (file == null || file.isEmpty()) continue;
+        List<TicketResponseDTO> rows = ticketMapper.selectTicketDTOPage(offset, size);
+        long total = ticketMapper.countTickets();
 
-	                newImages.add(
-	                        NewImageDTO.builder()
-	                                .file(file)
-	                                .isPrimary(sort == 1) // 첫 번째 이미지를 대표로 설정
-	                                .imageSort(sort)
-	                                .imageType("TICKET_IMAGE") // ★ 티켓 이미지 타입 명시
-	                                .build()
-	                );
-	                sort++;
-	            }
+        if (rows != null) {
+            for (TicketResponseDTO dto : rows) {
+                ImageVO primary = imageMapper.selectPrimaryImageByTicket(dto.getTicketId());
+                if (primary != null && primary.getImgUrl() != null) {
+                    dto.setMainImageUrl(primary.getImgUrl());
+                } else {
+                    dto.setMainImageUrl("");
+                }
+                applyAutoClose(dto);
+            }
+        }
 
+        PageResponseDTO<TicketResponseDTO> resp = new PageResponseDTO<>();
+        resp.setList(rows);
+        resp.setTotalCount(total);
+        resp.setPage(page);
+        resp.setSize(size);
 
-	            imageReq.setNewImages(newImages);
+        log.debug("[Ticket][PAGE] total={}, totalPages={}, fetched={}", total, resp.getTotalPages(), rows != null ? rows.size() : 0);
+        log.debug("[Ticket][PAGE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+        return resp;
+    }
 
-	            if (!newImages.isEmpty()) {
-	                List<ImageVO> uploaded = fileService.upsertImages(imageReq);
-	                log.debug("[Ticket][UPDATE][IMAGE] updated {} images for ticketId={}",
-	                        uploaded != null ? uploaded.size() : 0, ticketId);
-	            }
-	        } catch (IOException e) {
-	            log.error("[Ticket][UPDATE][IMAGE] 이미지 업로드 중 오류 ticketId={}", ticketId, e);
-	            throw new IllegalStateException("티켓 이미지 수정 중 오류가 발생했습니다.", e);
-	        }
-	    } else {
-	        log.debug("[Ticket][UPDATE][IMAGE] no new images in request for ticketId={}", ticketId);
-	    }
+    // =================================================================================
+    // 수정
+    // =================================================================================
+    @Override
+    @Transactional
+    public TicketResponseDTO updateTicket(Long ticketId, TicketUpdateRequestDTO req) {
+        final long t0 = System.nanoTime();
+        log.debug("[Ticket][UPDATE][REQ] id={}, req={}", ticketId, req);
 
-		// 갱신본 재조회 후 반환
-		TicketResponseDTO updated = ticketMapper.selectTicketDTOById(ticketId);
-		log.debug("[Ticket][UPDATE][AFTER] {}", updated);
-		log.debug("[Ticket][UPDATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+        if (ticketMapper.selectTicketDTOById(ticketId) == null) {
+            log.warn("[Ticket][UPDATE] not found id={}", ticketId);
+            throw new IllegalStateException("티켓이 존재하지 않습니다: " + ticketId);
+        }
 
-		// [DEBUG TIP] 좌석 값(total vs remaining) 일관성 체크 로깅 포인트
-		return updated;
-	}
+        Map<String, Object> p = new HashMap<>();
+        p.put("ticketId", ticketId);
+        p.put("title", req.getTitle());
+        p.put("startAt", req.getStartAt());
+        p.put("endAt", req.getEndAt());
+        p.put("venueName", req.getVenueName());
+        p.put("totalSeats", req.getTotalSeats());
+        p.put("remainingSeats", req.getRemainingSeats());
+        p.put("price", req.getPrice());
 
-	// =================================================================================
-	// 삭제
-	// =================================================================================
-	@Override
-	@Transactional
-	public void deleteTicket(Long ticketId) {
-	    final long t0 = System.nanoTime();
-	    log.debug("[Ticket][DELETE] id={}", ticketId);
+        if (req.getTicketStatus() != null) {
+            p.put("ticketStatus", req.getTicketStatus());
+        }
 
-	    // 1) 티켓에 연결된 이미지 먼저 삭제
-	    fileService.deleteAllByTicketId(ticketId);
+        int rows = ticketMapper.updateTicketFromMap(p);
+        log.info("[Ticket][UPDATE] rows={}", rows);
 
-	    // 2) 티켓 하드 삭제
-	    int rows = ticketMapper.hardDeleteTicket(ticketId);
-	    log.info("[Ticket][DELETE] hard delete rows={}, id={}", rows, ticketId);
+        if (req.getImages() != null && !req.getImages().isEmpty()) {
+            try {
+                ImageListDTO imageReq = ImageListDTO.builder()
+                        .ticketId(ticketId)
+                        .build();
 
-	    log.debug("[Ticket][DELETE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
-	}
+                List<NewImageDTO> newImages = new ArrayList<>();
+                int sort = 1;
+                for (MultipartFile file : req.getImages()) {
+                    if (file == null || file.isEmpty()) continue;
+
+                    newImages.add(
+                            NewImageDTO.builder()
+                                    .file(file)
+                                    .isPrimary(sort == 1)
+                                    .imageSort(sort)
+                                    .imageType("TICKET_IMAGE")
+                                    .build()
+                    );
+                    sort++;
+                }
+
+                imageReq.setNewImages(newImages);
+
+                if (!newImages.isEmpty()) {
+                    List<ImageVO> uploaded = fileService.upsertImages(imageReq);
+                    log.debug("[Ticket][UPDATE][IMAGE] updated {} images for ticketId={}",
+                            uploaded != null ? uploaded.size() : 0, ticketId);
+                }
+            } catch (IOException e) {
+                log.error("[Ticket][UPDATE][IMAGE] 이미지 업로드 중 오류 ticketId={}", ticketId, e);
+                throw new IllegalStateException("티켓 이미지 수정 중 오류가 발생했습니다.", e);
+            }
+        } else {
+            log.debug("[Ticket][UPDATE][IMAGE] no new images in request for ticketId={}", ticketId);
+        }
+
+        TicketResponseDTO updated = ticketMapper.selectTicketDTOById(ticketId);
+        log.debug("[Ticket][UPDATE][AFTER] {}", updated);
+        log.debug("[Ticket][UPDATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+
+        return updated;
+    }
+
+    // =================================================================================
+    // 삭제
+    // =================================================================================
+    @Override
+    @Transactional
+    public void deleteTicket(Long ticketId) {
+        final long t0 = System.nanoTime();
+        log.debug("[Ticket][DELETE] id={}", ticketId);
+
+        // 1) 티켓에 연결된 이미지 먼저 삭제
+        fileService.deleteAllByTicketId(ticketId);
+
+        // 2) 티켓 하드 삭제
+        int rows = ticketMapper.hardDeleteTicket(ticketId);
+        log.info("[Ticket][DELETE] hard delete rows={}, id={}", rows, ticketId);
+
+        log.debug("[Ticket][DELETE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+    }
 }

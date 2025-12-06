@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import ticketnow.modules.ticket.domain.TicketScheduleVO;
 import ticketnow.modules.ticket.dto.TicketResponseDTO;
 
 @Mapper
@@ -38,6 +39,11 @@ public interface TicketMapper {
     
     // 소프트 삭제 대체: 상태 CLOSED 전환
     // int softDeleteTicket(@Param("ticketId") Long ticketId);
+    
+	 // 회차 목록 INSERT
+	    int insertTicketSchedules(@Param("ticketId") Long ticketId,
+	                              @Param("schedules") List<TicketScheduleVO> schedules);
+
     
     /**
      * 티켓 물리 삭제 (DELETE FROM ticket ...)

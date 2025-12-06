@@ -120,8 +120,17 @@ export default function AdminInven() {
 			<AdminSidebar />{/* ← 공통 사이드바 호출 */}
 
 			<div className="member-right">
-				<div className="member-myTk-box2">
-					<div className="inven-main-box">
+				<div
+					className="member-myTk-box2">
+					
+					<div className="inven-main-box"
+						style={{
+						border: "none",           
+						boxShadow: "none",        
+						background: "transparent",
+						padding: 0               
+					}}
+				>
 						{error && (
 							<div style={{ color: 'red', padding: '10px', marginBottom: '10px' }}>
 								{error}
@@ -145,53 +154,32 @@ export default function AdminInven() {
 
 									<tbody>
 										{tickets.length > 0 ? (
-											tickets.map((t) => {
-												const effectiveStatus = getEffectiveStatus(t);
-												const avgPrice = calcAveragePrice(t.price);
+											tickets.map((t) => (
+												<tr
+													key={t.ticketId}
+													onClick={() => handleClick(t.ticketId)}
+													style={{ cursor: "pointer" }}
+												>
+													<td>{t.ticketId}</td>
+													<td>{t.title}</td>
+													<td>{t.price?.toLocaleString()}</td>
+													<td>{t.remainingSeats || t.totalSeats}</td>
 
-												return (
-													<tr
-														key={t.ticketId}
-														onClick={() => handleClick(t.ticketId)}
-														style={{ cursor: "pointer" }}
-													>
-														{/* (1-1) 상품번호 그대로 */}
-														<td>{t.ticketId}</td>
-
-														{/* (1-1) 콘서트명: 너무 길면 ... 처리 */}
-														<td className="admin-inven-title">{t.title}</td>
-
-														{/* (1-2) 가격(원): S석/R석 평균 가격 */}
-														<td>{avgPrice.toLocaleString()}</td>
-
-														{/* (1-3) 잔여석(개): 모든 회차 합, 0도 제대로 보이도록 */}
-														<td>
-															{t.remainingSeats !== null && t.remainingSeats !== undefined
-																? t.remainingSeats
-																: t.totalSeats}
-														</td>
-
-														{/* (1-4) 상태: 잔여석 0이면 무조건 매진 처리 */}
-														<td
-															className={
-																effectiveStatus === "ON_SALE"
-																	? "admin-con-btn"
-																	: "admin-con-btn1"
-															}
-														>
-															{statusLabel[effectiveStatus] || "알수없음"}
-														</td>
-													</tr>
-												);
-											})
+													{/* 상태 표시 부분 */}
+													<td className={
+														t.ticketStatus === "ON_SALE"
+															? "admin-con-btn"
+															: "admin-con-btn1"
+													}>
+														{statusLabel[t.ticketStatus] || "알수없음"}
+													</td>
+												</tr>
+											))
 										) : (
-											<tr>
-												<td colSpan="5">불러올 티켓이 없습니다</td>
-											</tr>
+											<tr><td colSpan="5">불러올 티켓이 없습니다</td></tr>
 										)}
 									</tbody>
 								</table>
-
 								<br /><br />
 								<div className="member-ticket-plus">
 									<strong> + </strong> <span> 티켓 목록 더 보기 </span>
@@ -202,33 +190,7 @@ export default function AdminInven() {
 				</div>
 				<br />
 
-				<div className="inven-main-box">
-					<table className="admin-member-text1">
-						<tbody>
-							<tr><th>상품명</th><th>콘서트명</th><th>가격(원)</th><th>잔여석(개)</th></tr>
-							<tr><td>TK35539</td><td>2025 AD1 단독 콘서트 〈플래닛으로</td><td>150,000</td><td>150</td>
-								<td className="admin-con-btn">정산 대기</td></tr>
 
-							<tr><td>TK35538</td><td>2025 아일릿 단독 콘서트 〈글릿과〉</td><td>150,000</td><td>120</td>
-								<td className="admin-con-btn">정산 대기</td></tr>
-
-							<tr><td>TK35537</td><td>2025 보넥도 단독 콘서트 #쁘넥도</td><td>150,000</td><td>130</td>
-								<td className="admin-con-btn">정산 중</td></tr>
-
-							<tr><td>TK35536</td><td>2025 라이즈 단독 콘서트 〈랒랒〉</td><td>150,000</td><td>0</td>
-								<td className="admin-con-btn1">정산 완료</td></tr>
-
-							<tr><td>TK35535</td><td>2025 ZB1 단독 콘서트 〈제로즈와 함께〉</td><td>150,000</td><td>0</td>
-								<td className="admin-con-btn1">정산 완료</td></tr>
-
-							<tr><td>TK35534</td><td>2025 보이즈플래닛 단독 콘서트 〈플래닛으로 1〉</td><td>150,000</td><td>0</td>
-								<td className="admin-con-btn1">정산 완료</td></tr>
-
-							<tr><td>TK35533</td><td>2025 키키 단독 콘서트 〈ㅋㅋ〉</td><td>150,000</td><td>0</td>
-								<td className="admin-con-btn1">정산 완료</td></tr>
-						</tbody>
-					</table><br /><br />
-				</div><br />
 
 				<div className="inven-main-box2">
 					<div className="admin-inven-row">

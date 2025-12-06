@@ -50,5 +50,24 @@ CREATE INDEX idx_ticket_schedule_ticket
 CREATE INDEX idx_ticket_schedule_ticket_date
   ON ticket_schedule(ticket_id, show_at);
 
+
   ============================================================= 	
+    [2025.12.06]
+  2025.12.06 seat 테이블에 round_no(회차) 추가 (공연 회차)
+  유니크 제약조건 삭제 및 새로 생성
   
+ALTER TABLE `seat`
+  ADD COLUMN `round_no` INT(11) NOT NULL DEFAULT 1 COMMENT '회차 번호' AFTER `ticket_id`,
+  ADD KEY `idx_seat_ticket_round` (`ticket_id`, `round_no`);
+
+ALTER TABLE `seat`
+  DROP INDEX `uk_seat_ticket_code`,
+  ADD UNIQUE KEY `uk_seat_ticket_code` (
+    `ticket_id`,
+    `round_no`,
+    `seat_code`
+  );
+
+
+   
+    ============================================================= 

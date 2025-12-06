@@ -492,4 +492,12 @@ public class TicketServiceImpl implements TicketService {
 
         log.debug("[Ticket][DELETE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
     }
+    @Override
+    @Transactional(readOnly = true)
+    public List<SeatStatsDTO> getSeatStats(Long ticketId) {
+        log.info("getSeatStats ticketId={}", ticketId);
+        return ticketMapper.selectSeatStatsByTicket(ticketId);
+    }
+
+    
 }

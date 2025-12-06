@@ -7,8 +7,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import ticketnow.modules.ticket.domain.TicketScheduleVO;
+import ticketnow.modules.ticket.dto.SeatStatsDTO;
 import ticketnow.modules.ticket.dto.TicketResponseDTO;
-
+import java.util.List;
 @Mapper
 public interface TicketMapper {
 
@@ -43,7 +44,7 @@ public interface TicketMapper {
 	 // 회차 목록 INSERT
 	    int insertTicketSchedules(@Param("ticketId") Long ticketId,
 	                              @Param("schedules") List<TicketScheduleVO> schedules);
-
+	  
     
     /**
      * 티켓 물리 삭제 (DELETE FROM ticket ...)
@@ -51,4 +52,10 @@ public interface TicketMapper {
      * @return 삭제된 행 수 (0 또는 1)
      */
     int hardDeleteTicket(@Param("ticketId") Long ticketId);
+    
+    /**
+     * 특정 티켓의 회차별 좌석 통계 조회
+     */
+    List<SeatStatsDTO> selectSeatStatsByTicket(@Param("ticketId") Long ticketId);
+
 }

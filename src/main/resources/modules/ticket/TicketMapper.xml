@@ -170,4 +170,26 @@
 		WHERE ticket_id = #{ticketId}
 		<!-- 만약 PK 컬럼명이 ticket_id가 아니라 id 라면: WHERE id = #{ticketId} -->
 	</delete>
+	
+	    <!-- 티켓별 회차 좌석 통계 -->
+    <select id="selectSeatStatsByTicket"
+            parameterType="long"
+            resultType="ticketnow.modules.ticket.dto.SeatStatsDTO">
+
+        SELECT
+            s.round_no      AS roundNo,
+            COUNT(*)        AS totalSeats,
+            SUM(
+                CASE
+                    WHEN s.seat_status = 'AVAILABLE' THEN 1
+                    ELSE 0
+                END
+            )               AS remainingSeats
+        FROM seat s
+        WHERE s.ticket_id = #{ticketId}
+        GROUP BY s.round_no
+        ORDER BY s.round_no
+
+    </select>
 </mapper>
+	

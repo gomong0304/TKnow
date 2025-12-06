@@ -3,6 +3,7 @@ package ticketnow.modules.ticket.service;
 import ticketnow.modules.common.dto.paging.PageRequestDTO;
 import ticketnow.modules.common.dto.paging.PageResponseDTO;
 import ticketnow.modules.ticket.dto.*;
+import java.util.List;
 
 public interface TicketService {
 	TicketResponseDTO createTicket(TicketCreateRequestDTO req);
@@ -14,4 +15,9 @@ public interface TicketService {
 	TicketResponseDTO updateTicket(Long ticketId, TicketUpdateRequestDTO req);
 
 	void deleteTicket(Long ticketId);
+	
+    
+   // 티켓별 회차 좌석 통계 조회
+    List<SeatStatsDTO> getSeatStats(Long ticketId);
+
 }

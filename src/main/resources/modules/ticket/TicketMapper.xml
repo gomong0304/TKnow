@@ -5,22 +5,38 @@
 <mapper namespace="ticketnow.modules.ticket.mapper.TicketMapper">
 
 	<!-- DTO 컬럼 매핑: DB 스키마 → TicketResponseDTO 필드 -->
-	<sql id="ticketDTOColumns">
-		t.ticket_id AS ticketId,
-		t.ticket_title AS title,
-		t.start_at AS startAt,
-		t.end_date AS endAt,
-		t.venueName AS venueName,
-		t.ticket_stock AS totalSeats,
-		t.ticket_stock AS remainingSeats,
-		t.ticket_price AS price,
-		t.ticket_category AS ticketCategory,
-		t.ticket_status AS ticketStatus,
-		t.ticket_detail AS ticketDetail,
-		t.created_at AS createdAt,
-		t.updated_at AS updatedAt,
-		NULL AS deletedAt
-	</sql>
+	<!-- 티켓 목록/단건 조회 공통 컬럼 -->
+<sql id="ticketDTOColumns">
+    t.ticket_id      AS ticketId,
+    t.ticket_title   AS title,
+    t.start_at       AS startAt,
+    t.end_date       AS endAt,
+    t.venueName      AS venueName,
+
+    <!-- 전체 회차 기준 총 좌석 수 -->
+    (
+        SELECT COUNT(*)
+        FROM seat s
+        WHERE s.ticket_id = t.ticket_id
+    )               AS totalSeats,
+
+    <!-- 전체 회차 기준 잔여 좌석 수 -->
+    (
+        SELECT COUNT(*)
+        FROM seat s
+        WHERE s.ticket_id   = t.ticket_id
+          AND s.seat_status = 'AVAILABLE'
+    )               AS remainingSeats,
+
+    t.ticket_price   AS price,
+    t.ticket_category AS ticketCategory,
+    t.ticket_status  AS ticketStatus,
+    t.ticket_detail  AS ticketDetail,
+    t.created_at     AS createdAt,
+    t.updated_at     AS updatedAt,
+    NULL             AS deletedAt
+</sql>
+
 	<!-- INSERT: Map 파라미터 기반, PK 자동 채번 -->
 		<insert id="insertTicketFromMap" parameterType="map"
 		    useGeneratedKeys="true" keyProperty="ticketId">
@@ -97,27 +113,29 @@
 		WHERE ticket_id   = #{ticketId}
 	</update>
 	<!-- 티켓 생성 시 좌석 일괄 생성 -->
-	<insert id="insertSeatsForTicket" parameterType="map">
-		INSERT INTO seat (
-			ticket_id,
-			seat_code,
-			seat_status,
-			seat_class,
-			created_at,
-			updated_at
-		)
-		VALUES
-		<foreach collection="seats" item="s" separator=",">
-			(
-				#{ticketId},
-				#{s.seatCode},
-				#{s.seatStatus},
-				#{s.seatClass},
-				NOW(),
-				NOW()
-			)
-		</foreach>
-	</insert>
+	<insert id="insertSeatsForTicket">
+    INSERT INTO seat (
+        ticket_id,
+        round_no,
+        seat_code,
+        seat_status,
+        seat_class,
+        created_at,
+        updated_at
+    )
+    VALUES
+    <foreach collection="seats" item="seat" separator=",">
+        (
+            #{ticketId},
+            #{seat.roundNo},
+            #{seat.seatCode},
+            #{seat.seatStatus},
+            #{seat.seatClass},
+            NOW(),
+            NOW()
+        )
+    </foreach>
+</insert>
 	    <!-- 티켓 공연 회차 일괄 저장 -->
     <insert id="insertTicketSchedules">
         INSERT INTO ticket_schedule (

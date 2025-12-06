@@ -3,6 +3,8 @@ package ticketnow.modules.ticket.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.*;
 import ticketnow.modules.ticket.constant.TicketStatus;
 import ticketnow.modules.ticket.constant.TicketCategory;
@@ -34,6 +36,8 @@ public class TicketResponseDTO {
     
     // 티켓 카테고리
     private TicketCategory ticketCategory;
+    // 회차 스케줄 목록
+    private List<TicketScheduleDTO> schedule;
 
     
 }

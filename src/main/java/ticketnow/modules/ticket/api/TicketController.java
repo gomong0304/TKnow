@@ -119,4 +119,16 @@ public class TicketController {
 		ticketService.deleteTicket(ticketId);
 		return ResponseEntity.ok().build();
 	}
+    /**
+     * 티켓별 회차/등급 좌석 잔여석 요약 (TicketBuy 좌석 정보 표기용)
+     */
+    @PreAuthorize("permitAll()")
+    @GetMapping("/{ticketId}/seats/summary")
+    public ResponseEntity<List<SeatSummaryDTO>> getSeatSummary(
+            @PathVariable("ticketId") Long ticketId
+    ) {
+        return ResponseEntity.ok(ticketService.getSeatSummary(ticketId));
+    }
+
+	
 }

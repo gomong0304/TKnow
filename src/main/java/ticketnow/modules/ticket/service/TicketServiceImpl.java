@@ -352,12 +352,17 @@ public class TicketServiceImpl implements TicketService {
                     .ifPresent(detail -> dto.setDetailImageUrl(detail.getImgUrl()));
         }
 
+        // === 회차 스케줄 목록 세팅 ===
+        List<TicketScheduleDTO> schedules = ticketMapper.selectTicketSchedulesByTicketId(ticketId);
+        dto.setSchedule(schedules);
+
         // 종료일시가 지난 경우 자동으로 CLOSED 처리
         applyAutoClose(dto);
 
         log.debug("[Ticket][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
         return dto;
     }
+
 
     // =================================================================================
     // 페이지
@@ -498,6 +503,12 @@ public class TicketServiceImpl implements TicketService {
         log.info("getSeatStats ticketId={}", ticketId);
         return ticketMapper.selectSeatStatsByTicket(ticketId);
     }
+    
+    @Override
+    public List<SeatSummaryDTO> getSeatSummary(Long ticketId) {
+        return ticketMapper.selectSeatSummaryByTicket(ticketId);
+    }
+
 
     
 }

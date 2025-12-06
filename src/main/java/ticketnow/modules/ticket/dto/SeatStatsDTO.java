@@ -12,10 +12,12 @@ import lombok.Setter;
 public class SeatStatsDTO {
 	 /** 회차 번호 (round_no) */
     private Integer roundNo;
+    
+    /** 좌석 등급 (R / S 등) */
+    private String seatClass;
 
     /** 해당 회차의 전체 좌석 수 */
     private Integer totalSeats;
 
-    /** 해당 회차의 남은 좌석 수 (seat_status = 'AVAILABLE') */
-    private Integer remainingSeats;
+
 }

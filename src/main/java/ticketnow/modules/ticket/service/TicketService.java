@@ -20,4 +20,6 @@ public interface TicketService {
    // 티켓별 회차 좌석 통계 조회
     List<SeatStatsDTO> getSeatStats(Long ticketId);
 
+    List<SeatSummaryDTO> getSeatSummary(Long ticketId);
+
 }

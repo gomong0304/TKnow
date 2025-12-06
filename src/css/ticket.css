@@ -607,20 +607,29 @@
 .ticket-stage-view {
 	background-color: #ffa6c9;
 	color: white;
-	padding: 30px 20px 30px 150px;
 	font-weight: bold;
 	border: none;
 	cursor: pointer;
 	width: 100%;
 	font-size: 38px;
 	border-bottom: 1px solid white;
+
+	/* 가운데 정렬용 추가 */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	/* 가로 가운데 */
+	justify-content: center;
+	/* 세로 가운데 */
+	text-align: center;
 }
+
 
 .ticket-stage-box2 {
 	height: 120px;
 	border: 1px solid #BEBEBE;
 	border-radius: 12px;
-	padding: 15px;
+	padding: 30px;
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
@@ -653,9 +662,8 @@
 }
 
 .ticket-stage-buttons {
-	justify-content: space-between;
-	justify-self: anchor-center;
-	gap: 10px;
+	display: flex;
+	justify-content: center;
 }
 
 .ticket-stage-button2 {
@@ -664,6 +672,16 @@
 	padding: 15px;
 	bottom: 50px;
 }
+
+/* ====== Buy2(좌석 선택) 전용 버튼 정렬/폭 통일 ====== */
+.ticket-seage-page .ticket-stage-buttons,
+.ticket-seage-page .ticket-stage-button2 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+
 
 .ticket-stage-back {
 	flex: 1;
@@ -790,6 +808,33 @@ map {
 	background: rgba(0, 0, 0, 0.1);
 	border: 0px solid white;
 }
+
+/* 아래쪽 F3, F4 구역 클릭 영역 */
+.zone-f3 {
+	top: 360px;
+	/* F1보다 아래쪽 */
+	left: 80px;
+	width: 210px;
+	height: 190px;
+}
+
+.zone-f3:hover {
+	background: rgba(0, 0, 0, 0.1);
+	border: 0px solid white;
+}
+
+.zone-f4 {
+	top: 360px;
+	left: 523px;
+	width: 208px;
+	height: 190px;
+}
+
+.zone-f4:hover {
+	background: rgba(0, 0, 0, 0.1);
+	border: 0px solid white;
+}
+
 
 .ticket-stage-next {
 	display: block;
@@ -1341,10 +1386,12 @@ map {
 	filter: grayscale(100%);
 	opacity: 0.6;
 }
+
 .ticket-buy-my {
-  display: block;
-  margin-bottom: 8px;   /* 제목 아래 여백 */
-  font-size: 17px;
+	display: block;
+	margin-bottom: 8px;
+	/* 제목 아래 여백 */
+	font-size: 17px;
 }
 
 .ticket-buy-table2 tbody tr {
@@ -1354,28 +1401,54 @@ map {
 	height: 28px;
 	/* 행 높이 지정   */
 }
+
 /* 제목(1번째 줄) */
 .read-table table tbody tr:nth-child(1) th {
-  font-size: 20px;       /* 폰트 크기 */
-  font-weight: 700;      /* 굵기 */
-  color: #222;           /* 폰트 색상 */
-  line-height: 1.6;      /* 줄 간격 */
-  padding-bottom: 6px;   /* 아래 여백 */
+	font-size: 20px;
+	/* 폰트 크기 */
+	font-weight: 700;
+	/* 굵기 */
+	color: #222;
+	/* 폰트 색상 */
+	line-height: 1.6;
+	/* 줄 간격 */
+	padding-bottom: 6px;
+	/* 아래 여백 */
 }
 
 /* 날짜(2번째 줄) */
 .read-table table tbody tr:nth-child(2) th {
-  font-size: 15px;
-  font-weight: 500;
-  color: #666;
-  line-height: 1.5;
-  padding-bottom: 6px;
+	font-size: 15px;
+	font-weight: 500;
+	color: #666;
+	line-height: 1.5;
+	padding-bottom: 6px;
 }
 
 /* 장소(3번째 줄) */
 .read-table table tbody tr:nth-child(3) th {
-  font-size: 16px;
-  font-weight: 600;
-  color: #444;
-  line-height: 1.5;
+	font-size: 16px;
+	font-weight: 600;
+	color: #444;
+	line-height: 1.5;
+}
+
+/* TicketBuy2에서 '이전 단계' 버튼을 단독으로 가운데 + 같은 너비로 */
+.ticket-stage-button-single {
+	display: flex;
+	justify-content: center;
+}
+
+.ticket-stage-button-single .ticket-stage-back {
+	width: 450px;
+	/* ticket-stage-next 와 동일한 폭 */
+}
+
+/* F1~F4 구역 hover 시 회색 네모가 보이지 않도록 완전 투명 처리 */
+.zone-f1:hover,
+.zone-f2:hover,
+.zone-f3:hover,
+.zone-f4:hover {
+	background: transparent !important;
+	border: 0 !important;
 }

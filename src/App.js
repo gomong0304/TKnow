@@ -18,7 +18,10 @@ import TicketBuy3 from "./Ticket/TicketBuy3";
 import TicketBuy4 from "./Ticket/TicketBuy4";
 import TicketBuy5 from "./Ticket/TicketBuy5";
 import TicketBuy6 from "./Ticket/TicketBuy6";
+import F1 from "./Ticket/FloorF1";
 import F2 from "./Ticket/FloorF2";
+import F3 from "./Ticket/FloorF3";
+import F4 from "./Ticket/FloorF4";
 import Login from "./member/Login";
 import Join from "./member/Join";
 import List from "./Ticket/List";
@@ -320,18 +323,24 @@ function App() {
 
 
 
-		// 티켓 페이지 (헤더랑 푸터 없는 화면)
+
+					          // 티켓 페이지 (헤더랑 푸터 없는 화면)
 					<Route path="/Ticket/Buy/:id" element={<TicketBuy />} />
 					<Route path="/Ticket/Buy2/:id" element={<TicketBuy2 />} />
 					<Route path="/Ticket/Buy3/:id" element={<TicketBuy3 />} />
 					<Route path="/Ticket/Buy4/:id" element={<TicketBuy4 />} />
 					<Route path="/Ticket/Buy5/:id" element={<TicketBuy5 />} />
 					<Route path="/Ticket/Buy6/:id" element={<TicketBuy6 />} />
+
+					{/* 좌석 구역별 페이지 */}
+					<Route path="/Floor/F1/:id" element={<F1 />} />
 					<Route path="/Floor/F2/:id" element={<F2 />} />
+					<Route path="/Floor/F3/:id" element={<F3 />} />
+					<Route path="/Floor/F4/:id" element={<F4 />} />
+
 					{/* 가상 카드 PG 풀스크린 페이지 */}
 					<Route path="/Ticket/CardPG/:id" element={<TicketCardPg />} />
-					<Route path="/Ticket/Buy6/:id" element={<TicketBuy6 />} />
-					<Route path="/Floor/F2/:id" element={<F2 />} />
+
 
 				</Routes>
 			</Router>

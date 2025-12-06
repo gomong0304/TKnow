@@ -24,5 +24,31 @@ ALTER TABLE ticket
   [2025.12.06]
   2025.12.06 ticket 테이블에 공연장 주소 삭제
   ALTER TABLE ticket
-	DROP COLUMN venueAddress;
+  DROP COLUMN venueAddress;
+
+  ============================================================= 
+  
+  [2025.12.06]
+  2025.12.06 ticket_schedule 테이블 추가 (공연 회차)
+CREATE TABLE ticket_schedule (
+  schedule_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  ticket_id   BIGINT       NOT NULL,
+  round_no    INT          NOT NULL,
+  show_at     DATETIME     NOT NULL,
+  created_at  DATETIME     NOT NULL DEFAULT NOW(),
+  updated_at  DATETIME     NOT NULL DEFAULT NOW(),
+
+  CONSTRAINT fk_ticket_schedule_ticket
+    FOREIGN KEY (ticket_id)
+    REFERENCES ticket(ticket_id)
+    ON DELETE CASCADE
+);
+
+CREATE INDEX idx_ticket_schedule_ticket
+  ON ticket_schedule(ticket_id);
+
+CREATE INDEX idx_ticket_schedule_ticket_date
+  ON ticket_schedule(ticket_id, show_at);
+
+  ============================================================= 	
   

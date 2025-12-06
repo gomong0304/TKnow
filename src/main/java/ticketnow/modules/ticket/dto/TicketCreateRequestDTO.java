@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.*;
 
+
 @Getter @Setter @ToString
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class TicketCreateRequestDTO {
@@ -36,7 +37,6 @@ public class TicketCreateRequestDTO {
     @NotBlank(message = "상세 설명은 필수입니다.")
     private String ticketDetail;
     
-    private String venueAddress;
 
     @Min(value = 1, message = "총 좌석 수는 1 이상이어야 합니다.")
     private int totalSeats;
@@ -50,6 +50,7 @@ public class TicketCreateRequestDTO {
     // 생성 시 선택적으로 전달하는 판매상태 (ON_SALE / SCHEDULED / CLOSED 등)
     private String ticketStatus;
     
+    private List<TicketScheduleCreateDTO> schedules; // 공연 회차
 }
 
 //================== ★ 추가한 부분: 티켓 생성 시 첨부할 이미지 파일들 ==================

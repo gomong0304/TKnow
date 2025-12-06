@@ -15,7 +15,6 @@ public class TicketResponseDTO {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private String venueName;
-    private String venueAddress;
     private int totalSeats;
     private int remainingSeats;
     private BigDecimal price;

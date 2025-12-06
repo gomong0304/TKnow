@@ -11,7 +11,6 @@
 		t.start_at AS startAt,
 		t.end_date AS endAt,
 		t.venueName AS venueName,
-		t.venueAddress AS venueAddress,
 		t.ticket_stock AS totalSeats,
 		t.ticket_stock AS remainingSeats,
 		t.ticket_price AS price,
@@ -23,28 +22,28 @@
 		NULL AS deletedAt
 	</sql>
 	<!-- INSERT: Map 파라미터 기반, PK 자동 채번 -->
-	<insert id="insertTicketFromMap" parameterType="map"
-		useGeneratedKeys="true" keyProperty="ticketId">
-		INSERT INTO ticket (
-		ticket_title, ticket_date, start_at, end_date, ticket_price, ticket_stock,
-		ticket_detail, ticket_category, ticket_status, venueName,
-		venueAddress,
-		created_at, updated_at
-		) VALUES (
-		#{title}, /* req.title */
-		#{startAt}, /* req.startAt → 관람일 기본값 */
-		#{startAt}, /* req.startAt → 공연 시작일시 */
-		#{endAt}, /* req.endAt → 공연 종료일시 */
-		#{price}, /* req.price */
-		#{totalSeats}, /* req.totalSeats */
-		#{ticketDetail}, /* req.ticketDetail */
-		#{category}, /* req.category */
-		#{ticketStatus}, /* 'SCHEDULED' 등 */
-		#{venueName},    /* venueName */
-		#{venueAddress}, /* venueAddress */
-		NOW(), NOW()
-		)
-	</insert>
+		<insert id="insertTicketFromMap" parameterType="map"
+		    useGeneratedKeys="true" keyProperty="ticketId">
+		    INSERT INTO ticket (
+		    ticket_title, ticket_date, start_at, end_date, ticket_price, ticket_stock,
+		    ticket_detail, ticket_category, ticket_status, venueName,
+		    created_at, updated_at
+		    ) VALUES (
+		    #{title}, /* req.title */
+		    #{startAt}, /* req.startAt → 관람일 기본값 */
+		    #{startAt}, /* req.startAt → 공연 시작일시 */
+		    #{endAt}, /* req.endAt → 공연 종료일시 */
+		    #{price}, /* req.price */
+		    #{totalSeats}, /* req.totalSeats */
+		    #{ticketDetail}, /* req.ticketDetail */
+		    #{category}, /* req.category */
+		    #{ticketStatus}, /* 'SCHEDULED' 등 */
+		    #{venueName},    /* venueName */
+		    NOW(), NOW()
+		    )
+		</insert>
+
+
 
 
 
@@ -119,6 +118,27 @@
 			)
 		</foreach>
 	</insert>
+	    <!-- 티켓 공연 회차 일괄 저장 -->
+    <insert id="insertTicketSchedules">
+        INSERT INTO ticket_schedule (
+            ticket_id,
+            round_no,
+            show_at,
+            created_at,
+            updated_at
+        )
+        VALUES
+        <foreach collection="schedules" item="s" separator=",">
+            (
+                #{ticketId},
+                #{s.roundNo},
+                #{s.showAt},
+                NOW(),
+                NOW()
+            )
+        </foreach>
+    </insert>
+	
 
 
 	<!-- 소프트 삭제 대체: 상태를 CLOSED로 전환 <update id="softDeleteTicket" parameterType="long"> 

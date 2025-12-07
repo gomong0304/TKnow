@@ -17,6 +17,8 @@ import ticketnow.modules.common.dto.paging.PageResponseDTO;
 import ticketnow.modules.ticket.dto.*;
 import ticketnow.modules.ticket.service.TicketService;
 import java.util.List;
+import ticketnow.modules.ticket.dto.SeatDetailDTO;
+import java.util.List;
 
 /**
  * 티켓(Ticket) CRUD REST 컨트롤러 - 계층 역할: HTTP 요청 수신 → DTO 바인딩/검증 → Service 위임 → 응답
@@ -130,5 +132,18 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.getSeatSummary(ticketId));
     }
 
-	
+    /**
+     * 좌석 상세 목록 조회 (좌석 선택 화면용)
+     * 예) GET /api/tickets/28/seats?roundNo=1&zone=F2
+     */
+    @GetMapping("/{ticketId}/seats")
+    public ResponseEntity<List<SeatDetailDTO>> getSeatsForZone(
+            @PathVariable("ticketId") Long ticketId,
+            @RequestParam(name = "roundNo", required = false) Integer roundNo,
+            @RequestParam(name = "zone") String zone
+    ) {
+        List<SeatDetailDTO> seats = ticketService.getSeatsForZone(ticketId, roundNo, zone);
+        return ResponseEntity.ok(seats);
+    }
+
 }

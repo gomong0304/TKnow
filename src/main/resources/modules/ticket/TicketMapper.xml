@@ -226,6 +226,30 @@
         ORDER BY s.round_no ASC, s.seat_class ASC
     </select>
     
+        <!--
+        좌석 상세 목록 (좌석 선택 UI용)
+        - ticketId : 티켓 ID
+        - roundNo  : 회차 (null 이면 1회차로 처리)
+        - zone     : F1 / F2 / F3 / F4
+    -->
+    <select id="selectSeatsByTicketAndRoundAndZone"
+            resultType="ticketnow.modules.ticket.dto.SeatDetailDTO">
+        SELECT
+            s.seat_id      AS seatId,
+            s.ticket_id    AS ticketId,
+            s.round_no     AS roundNo,
+            SUBSTRING_INDEX(s.seat_code, '-', 1) AS zone,
+            s.seat_code    AS seatCode,
+            s.seat_class   AS seatClass,
+            s.seat_status  AS seatStatus
+        FROM seat s
+        WHERE s.ticket_id = #{ticketId}
+          AND s.round_no  = #{roundNo}
+          AND s.seat_code LIKE CONCAT(#{zone}, '-%')
+        ORDER BY s.seat_id ASC
+    </select>
+    
+    
     
 </mapper>
 	

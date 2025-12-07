@@ -22,4 +22,9 @@ public interface TicketService {
 
     List<SeatSummaryDTO> getSeatSummary(Long ticketId);
 
+
+    // 특정 티켓 / 회차 / 구역(F1~F4) 기준 좌석 목록 조회
+    List<SeatDetailDTO> getSeatsForZone(Long ticketId, Integer roundNo, String zone);
+
+    
 }

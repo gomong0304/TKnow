@@ -1,6 +1,8 @@
 package ticketnow.modules.ticket.mapper;
 
 import java.util.List;
+
+
 import ticketnow.modules.ticket.dto.TicketScheduleDTO;
 
 import java.util.Map;
@@ -13,6 +15,7 @@ import ticketnow.modules.ticket.dto.SeatStatsDTO;
 import ticketnow.modules.ticket.dto.SeatSummaryDTO;
 import ticketnow.modules.ticket.dto.TicketResponseDTO;
 import java.util.List;
+import ticketnow.modules.ticket.dto.SeatDetailDTO;
 @Mapper
 public interface TicketMapper {
 
@@ -48,6 +51,13 @@ public interface TicketMapper {
 	    int insertTicketSchedules(@Param("ticketId") Long ticketId,
 	                              @Param("schedules") List<TicketScheduleVO> schedules);
 	  
+	   // 좌석 상세
+	    List<SeatDetailDTO> selectSeatsByTicketAndRoundAndZone(
+	            @Param("ticketId") Long ticketId,
+	            @Param("roundNo") Integer roundNo,
+	            @Param("zone") String zone
+	    );
+
     
     /**
      * 티켓 물리 삭제 (DELETE FROM ticket ...)

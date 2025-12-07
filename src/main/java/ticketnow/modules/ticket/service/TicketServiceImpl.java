@@ -21,6 +21,8 @@ import ticketnow.modules.ticket.constant.TicketStatus;
 import ticketnow.modules.ticket.dto.*;
 import ticketnow.modules.ticket.mapper.TicketMapper;
 import ticketnow.modules.common.mapper.image.ImageMapper;
+import ticketnow.modules.ticket.dto.SeatDetailDTO;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -509,6 +511,31 @@ public class TicketServiceImpl implements TicketService {
         return ticketMapper.selectSeatSummaryByTicket(ticketId);
     }
 
+    // 티켓 구역
+    @Override
+    @Transactional(readOnly = true)
+    public List<SeatDetailDTO> getSeatsForZone(Long ticketId, Integer roundNo, String zone) {
+        if (ticketId == null) {
+            return Collections.emptyList();
+        }
+
+        // 회차 선택 안 되어 있으면 1회차로 고정
+        if (roundNo == null || roundNo <= 0) {
+            roundNo = 1;
+        }
+
+        // 구역 기본값 F1
+        if (zone == null || zone.isBlank()) {
+            zone = "F1";
+        }
+        zone = zone.toUpperCase();
+
+        if (!zone.equals("F1") && !zone.equals("F2") && !zone.equals("F3") && !zone.equals("F4")) {
+            throw new IllegalArgumentException("존재하지 않는 구역입니다: " + zone);
+        }
+
+        return ticketMapper.selectSeatsByTicketAndRoundAndZone(ticketId, roundNo, zone);
+    }
 
     
 }

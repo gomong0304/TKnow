@@ -10,36 +10,38 @@ export default function TicketBuy2() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedDate, selectedSeat } = location.state || {};
+  const { selectedDate, selectedSeat, selectedRoundNo } = location.state || {};
   const prevSelectedDate = location.state?.selectedDate;
   const [ticket, setTicket] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
 
 
-  // F1 ~ F4 구역별 이동 함수
+
+    // F1 ~ F4 구역별 이동 함수
   const handleGoF1 = () => {
     navigate(`/Floor/F1/${id}`, {
-      state: { selectedSeat, selectedDate, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
     });
   };
 
   const handleGoF2 = () => {
     navigate(`/Floor/F2/${id}`, {
-      state: { selectedSeat, selectedDate, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
     });
   };
 
   const handleGoF3 = () => {
     navigate(`/Floor/F3/${id}`, {
-      state: { selectedSeat, selectedDate, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
     });
   };
 
   const handleGoF4 = () => {
     navigate(`/Floor/F4/${id}`, {
-      state: { selectedSeat, selectedDate, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
     });
   };
+
 
 
   useEffect(() => {

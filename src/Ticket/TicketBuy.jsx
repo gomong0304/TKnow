@@ -452,7 +452,7 @@ export default function TicketBuy() {
                 </div>
               </div>
 
-              <table className="ticket-buy-table2">
+                           <table className="ticket-buy-table2">
                 <tbody>
                   <strong className="ticket-buy-my">예매 정보 </strong>
                   <tr>
@@ -481,10 +481,15 @@ export default function TicketBuy() {
               
             </div>
             <br />
-            <Link to={`/Ticket/Buy2/${id}`} className="ticket-next-btn">
+            <Link
+              to={`/Ticket/Buy2/${id}`}
+              state={{ selectedDate, selectedRoundNo }}
+              className="ticket-next-btn"
+            >
               다음 단계
             </Link>
           </div>
+
         </div>
       </div>
     </div>

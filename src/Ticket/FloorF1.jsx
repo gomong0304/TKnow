@@ -12,12 +12,16 @@ export default function F1Floor() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { selectedDate, ticket } = location.state || {};
+  const { selectedDate, selectedRoundNo, ticket } = location.state || {};
   const [ticketInfo, setTicketInfo] = useState(ticket || null);
 
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSeat, setSelectedSeat] = useState(null);
+
+  // 선택된 회차가 없으면 1회차로 기본값
+  const roundNo = selectedRoundNo || 1;
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,8 +32,9 @@ export default function F1Floor() {
         }
 
         const seatRes = await api.get(`/tickets/${id}/seats`, {
-          params: { roundNo: 1, zone: "F1" },
+          params: { roundNo: roundNo, zone: "F1" },
         });
+
 
         const list = Array.isArray(seatRes.data) ? seatRes.data : [];
 
@@ -75,18 +80,14 @@ export default function F1Floor() {
 
   const handleNext = () => {
     if (!selectedSeat) {
-      alert("좌석을 선택하세요!");
+      alert("좌석을 선택해 주세요.");
       return;
     }
-
     navigate(`/Ticket/Buy3/${id}`, {
-      state: {
-        selectedSeat,
-        selectedDate,
-        ticketInfo,
-      },
+      state: { selectedSeat, selectedDate, selectedRoundNo: roundNo },
     });
   };
+
 
   const seatRows = [];
   for (let i = 0; i < seats.length; i += SEATS_PER_ROW) {
@@ -155,9 +156,8 @@ export default function F1Floor() {
                             !isReserved &&
                             handleSeatClick(seat, rowIndex, colIndex)
                           }
-                          title={`${seat.grade}석 F1구역 ${
-                            rowIndex + 1
-                          }열 ${colIndex + 1}번 (${seat.seatCode})`}
+                          title={`${seat.grade}석 F1구역 ${rowIndex + 1
+                            }열 ${colIndex + 1}번 (${seat.seatCode})`}
                         />
                       );
                     })}
@@ -201,7 +201,7 @@ export default function F1Floor() {
             <div className="ticket-stage-button2">
               <Link
                 to={`/Ticket/Buy2/${id}`}
-                state={{ selectedDate, ticketInfo }}
+                state={{ selectedDate, selectedRoundNo: roundNo, ticketInfo }}
                 className="ticket-stage-back"
               >
                 이전 단계
@@ -213,6 +213,7 @@ export default function F1Floor() {
                 좌석 다시 선택
               </button>
             </div>
+
           </div>
         </div>
       </div>

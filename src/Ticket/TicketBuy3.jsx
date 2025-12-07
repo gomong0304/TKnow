@@ -13,7 +13,8 @@ export default function TicketBuy() {
 
 	// Buy2에서 넘어온 좌석 정보
 	const selectedSeat = location.state?.selectedSeat;
-
+	const selectedDate = location.state?.selectedDate;
+	const selectedRoundNo = location.state?.selectedRoundNo;
 	// 선택한 티켓 수량
 	const [normalCount, setNormalCount] = useState(0);
 	const [discount1Count, setDiscount1Count] = useState(0);

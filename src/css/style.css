@@ -346,7 +346,6 @@
 	display: flex;
 	gap: 20px;
 	align-items: flex-start;
-	margin: 20px 0;
 }
 
 .read-right {
@@ -786,19 +785,17 @@
 .ticket-set-setting {
 	border: 1px solid #D7D7D7;
 	border-radius: 10px;
-	padding: 32px 20px 50px 20px;
 	width: 550px;
-	height: 690px;
+	height: auto;          /* ← 기존: height: 690px; */
 	min-height: 634px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	margin: 0 auto;
-	position: relative;
-	left: 0;
-	right: 0;
-	box-sizing: border-box;
+	margin-bottom: 5px;
+	margin-left: 15px;
+
 }
+
 
 .review-tol {
 	padding: -19px;
@@ -2549,4 +2546,15 @@ map {
   border-top: 1px solid #ddd;
   margin-top: 30px;
   margin-bottom: 30px;
+}
+/* F1~F4 좌석 페이지: 하단 두 버튼 가로 1줄 + 동일 너비 */
+.ticket-f2-info .ticket-stage-button2 {
+	display: flex;
+	flex-direction: row !important;  /* 전역 column 설정 무조건 덮어쓰기 */
+	justify-content: center;
+	gap: 20px;                       /* 버튼 사이 간격 */
+}
+
+.ticket-f2-info .ticket-stage-button2 .ticket-stage-back {
+	flex: 1 1 0;                     /* 두 버튼 가로 폭 동일하게 */
 }

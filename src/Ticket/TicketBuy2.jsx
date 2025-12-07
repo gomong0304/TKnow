@@ -10,46 +10,43 @@ export default function TicketBuy2() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedDate, selectedSeat, selectedRoundNo } = location.state || {};
+  const { selectedDate, selectedSeat, selectedRoundNo, ticketDate, ticket } =
+    location.state || {};
   const prevSelectedDate = location.state?.selectedDate;
-  const [ticket, setTicket] = useState(null);
+  const [ticketState, setTicketState] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
 
-
-
-    // F1 ~ F4 구역별 이동 함수
+  // F1 ~ F4 구역별 이동 함수
   const handleGoF1 = () => {
     navigate(`/Floor/F1/${id}`, {
-      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket: ticketState },
     });
   };
 
   const handleGoF2 = () => {
     navigate(`/Floor/F2/${id}`, {
-      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket: ticketState },
     });
   };
 
   const handleGoF3 = () => {
     navigate(`/Floor/F3/${id}`, {
-      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket: ticketState },
     });
   };
 
   const handleGoF4 = () => {
     navigate(`/Floor/F4/${id}`, {
-      state: { selectedSeat, selectedDate, selectedRoundNo, ticket },
+      state: { selectedSeat, selectedDate, selectedRoundNo, ticket: ticketState },
     });
   };
-
-
 
   useEffect(() => {
     api
       .get(`/tickets/${id}`)
       .then((res) => {
-        console.log(res.data);  // <-- 여기서 확인
-        setTicket(res.data);
+        console.log(res.data); // <-- 여기서 확인
+        setTicketState(res.data);
       })
       .catch((err) => console.error(err));
   }, [id]);
@@ -60,16 +57,8 @@ export default function TicketBuy2() {
     }
   };
 
-  const handleNext = () => {
-    navigate(`/Ticket/Buy3/${id}`, {
-      state: { selectedDate: prevSelectedDate, selectedSeats },
-    });
-  };
-
-
-  const basePrice = ticket?.price || 0;        // R석
-  const sPrice = ticket ? Math.floor(ticket.price * 0.92) : 0; // s석
-
+  const basePrice = ticketState?.price || 0; // R석
+  const sPrice = ticketState ? Math.floor(ticketState.price * 0.92) : 0; // s석
 
   return (
     <div className="ticket-stage-main">
@@ -95,12 +84,13 @@ export default function TicketBuy2() {
 
         <div className="ticket-stage-middle">
           <p className="ticket-stage-box">
-            원하시는 영역을 선택해 주세요. 공연장에서 위치를 클릭하거나, 오른쪽의 좌석을 선택해 주세요.
+            원하시는 영역을 선택해 주세요. 공연장에서 위치를 클릭하거나, 오른쪽의 좌석을
+            선택해 주세요.
           </p>
           <br />
           <br />
 
-                    <div
+          <div
             className="ticket-stage-map"
             style={{ position: "relative", display: "inline-block" }}
           >
@@ -113,15 +103,14 @@ export default function TicketBuy2() {
             <div className="zone zone-f4" onClick={handleGoF4}></div>
           </div>
 
-
-
           <div className="ticket-stage-info">
             <div className="ticket-stage-header">
               <button className="ticket-stage-view">
                 <span className="ticket-stage-pink">좌석 선택</span>
                 <p />
-                <span className="ticket-stage-pink2">원하는 좌석 위치를 선택하세요</span>
-             
+                <span className="ticket-stage-pink2">
+                  원하는 좌석 위치를 선택하세요
+                </span>
               </button>
               <br />
               <br />
@@ -131,7 +120,7 @@ export default function TicketBuy2() {
               <h4>좌석 등급 / 잔여석</h4>
               <br />
               <div className="ticket-stage-box2">
-                {ticket?.seats?.map((s, idx) => (
+                {ticketState?.seats?.map((s, idx) => (
                   <div key={idx}>
                     <span
                       className={`ticket-stage-color ${s.grade.toLowerCase()}`}
@@ -140,27 +129,33 @@ export default function TicketBuy2() {
                     <strong>{s.price?.toLocaleString() || "0"}원</strong>
                   </div>
                 )) || (
-                    <>
-                      <div>                    
-                        <span className="ticket-stage-color r"></span>
-                        R석 (STANDING) <strong>{basePrice.toLocaleString()}원</strong>
-                      </div>
-                      <div>
-                        <span className="ticket-stage-color s"></span>
-                        S석 (STANDING) <strong>{sPrice.toLocaleString()}원</strong>
-                      </div>
-                    </>
-                  )}
+                  <>
+                    <div>
+                      <span className="ticket-stage-color r"></span>
+                      R석 (STANDING){" "}
+                      <strong>{basePrice.toLocaleString()}원</strong>
+                    </div>
+                    <div>
+                      <span className="ticket-stage-color s"></span>
+                      S석 (STANDING) <strong>{sPrice.toLocaleString()}원</strong>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             <br />
             <br />
 
-
-                       <div className="ticket-stage-buttons">
+            <div className="ticket-stage-buttons">
               <Link
                 to={`/Ticket/Buy3/${id}`}
-                state={{ selectedDate, selectedSeat, ticket }}
+                state={{
+                  selectedDate,
+                  selectedSeat,
+                  selectedRoundNo,
+                  ticketDate,
+                  ticket: ticketState,
+                }}
                 className="ticket-stage-next"
               >
                 다음 단계
@@ -171,13 +166,12 @@ export default function TicketBuy2() {
             <div className="ticket-stage-button2 ticket-stage-button-single">
               <Link
                 to={`/Ticket/Buy/${id}`}
-                state={{ selectedDate, selectedSeat, ticket }}
+                state={{ selectedDate, selectedSeat, ticket: ticketState }}
                 className="ticket-stage-back"
               >
                 이전 단계
               </Link>
             </div>
-
           </div>
         </div>
       </div>

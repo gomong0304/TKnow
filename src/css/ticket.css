@@ -61,7 +61,8 @@
 	display: flex;
 	gap: 20px;
 	align-items: flex-start;
-	margin: 20px 0;
+	margin: 6px 0;
+	font-size: 12px;
 }
 
 .read-right {
@@ -529,16 +530,28 @@
 	border-radius: 10px;
 	padding: 32px 20px 50px 20px;
 	width: 550px;
-	height: 690px;
+	height: auto;
+	/* ← 기존: height: 690px; */
 	min-height: 634px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	margin: 0 auto;
-	position: relative;
-	left: 0;
-	right: 0;
-	box-sizing: border-box;
+}
+
+.ticket-set-setting-1 {
+	border: 1px solid #D7D7D7;
+	border-radius: 10px;
+	padding: 32px 20px 50px 20px;
+	margin-left: 15px;
+	margin-bottom: -10px;
+	margin-top: -5px;
+	width: 550px;
+	height: auto;
+	/* ← 기존: height: 690px; */
+	min-height: 634px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .review-tol {
@@ -980,9 +993,21 @@ map {
 	padding: 1px 1px 1px 10px;
 }
 
+.ticket-buy-table2-1 {
+	text-align: justify;
+	padding: 1px 1px 1px 10px;
+	line-height: 27px;
+}
+
+.ticket-buy-table2-1 th {
+	text-align: justify;
+	padding: 1px 1px 1px 10px;
+}
+
 .ticket-buy-total {
 	border-radius: 10px;
-	margin-top: 12px;
+	margin-top: 32px;
+	margin-bottom: -20px;
 	background: #eee;
 	padding: 10px 10px 10px 20px;
 	display: flex;
@@ -1394,6 +1419,19 @@ map {
 	font-size: 17px;
 }
 
+.ticket-buy-my-1 {
+	display: block;
+	margin-top: 20px;
+	margin-bottom: -10px;
+	font-size: 17px;
+}
+.ticket-buy-my-2{
+	display: block;
+	margin-top: 10px;
+	margin-bottom: 3px;
+	font-size: 17px;
+}
+
 .ticket-buy-table2 tbody tr {
 	margin-top: 10px;
 	line-height: 2.2;
@@ -1458,42 +1496,42 @@ map {
    =========================== */
 
 .seat-grid-wrapper {
-  padding: 20px 10px;
+	padding: 20px 10px;
 }
 
 .seat-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px;
+	display: flex;
+	align-items: center;
+	margin-bottom: 4px;
 }
 
 .seat-row-label {
-  width: 120px;
-  font-size: 13px;
-  color: #9f9f9f;
-  margin-right: 8px;
-  white-space: nowrap;
+	width: 120px;
+	font-size: 13px;
+	color: #9f9f9f;
+	margin-right: 8px;
+	white-space: nowrap;
 }
 
 .seat-row-seats {
-  display: flex;
-  flex-wrap: nowrap;
+	display: flex;
+	flex-wrap: nowrap;
 }
 
 .seat-box {
-  width: 18px;
-  height: 18px;
-  margin: 2px;
-  background-color: #d9d9d9;
-  border-radius: 2px;
-  box-sizing: border-box;
+	width: 18px;
+	height: 18px;
+	margin: 2px;
+	background-color: #d9d9d9;
+	border-radius: 2px;
+	box-sizing: border-box;
 }
 
 .seat-box.selected {
-  outline: 2px solid #ff6fa5;
+	outline: 2px solid #ff6fa5;
 }
 
 .seat-box.reserved {
-  background-color: #999999;
-  cursor: not-allowed;
+	background-color: #999999;
+	cursor: not-allowed;
 }

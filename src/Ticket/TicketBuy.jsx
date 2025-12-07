@@ -26,15 +26,14 @@ const formatYmd = (arr) => {
   return `${year}.${mm}.${dd}`;
 };
 
-
-
 export default function TicketBuy() {
   const { id } = useParams();
   const [ticket, setTicket] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRound, setSelectedRound] = useState(null);
   const [seatSummaryList, setSeatSummaryList] = useState([]);
-    // ─────────────────────────────────────────────
+
+  // ─────────────────────────────────────────────
   // 티켓 상세 + 회차(schedule) + 좌석 요약 로딩
   // ─────────────────────────────────────────────
   useEffect(() => {
@@ -47,7 +46,11 @@ export default function TicketBuy() {
         // 1) 백엔드 schedule → 프론트에서 쓰기 편한 구조로 변환
         let convertedSchedule = [];
 
-        if (data.schedule && Array.isArray(data.schedule) && data.schedule.length > 0) {
+        if (
+          data.schedule &&
+          Array.isArray(data.schedule) &&
+          data.schedule.length > 0
+        ) {
           convertedSchedule = data.schedule.map((s) => {
             let raw = s.showAt;
             let dt;
@@ -71,7 +74,9 @@ export default function TicketBuy() {
             const month = dt.getMonth() + 1;
             const day = dt.getDate();
             const weekdayIndex = dt.getDay();
-            const weekdayKor = ["일", "월", "화", "수", "목", "금", "토"][weekdayIndex];
+            const weekdayKor = ["일", "월", "화", "수", "목", "금", "토"][
+              weekdayIndex
+            ];
 
             const hour = String(dt.getHours()).padStart(2, "0");
             const minute = String(dt.getMinutes()).padStart(2, "0");
@@ -106,10 +111,31 @@ export default function TicketBuy() {
         };
         setTicket(nextTicket);
 
-        // 4) 기본 선택 날짜
+        // 4) 기본 선택 날짜 (선택 회차 시간까지 포함)
         if (convertedSchedule.length > 0) {
           const first = convertedSchedule[0];
-          const firstDate = new Date(first.date[0], first.date[1] - 1, first.date[2]);
+
+          // first.time 예: "19:00"
+          let hour = 0;
+          let minute = 0;
+          if (first.time) {
+            const timeParts = first.time.split(":");
+            if (timeParts.length >= 2) {
+              const h = parseInt(timeParts[0], 10);
+              const m = parseInt(timeParts[1], 10);
+              hour = Number.isNaN(h) ? 0 : h;
+              minute = Number.isNaN(m) ? 0 : m;
+            }
+          }
+
+          const firstDate = new Date(
+            first.date[0],
+            first.date[1] - 1,
+            first.date[2],
+            hour,
+            minute,
+            0
+          );
           setSelectedDate(firstDate);
         } else if (data?.startAt) {
           // 스케줄이 없으면 기존 startAt 기반으로만 설정
@@ -152,7 +178,9 @@ export default function TicketBuy() {
   // 날짜 클릭
   // ─────────────────────────────────────────────
   const handleDateClick = (day) => {
-    const isAvailable = ticket?.availableDates ? ticket.availableDates.includes(day) : true;
+    const isAvailable = ticket?.availableDates
+      ? ticket.availableDates.includes(day)
+      : true;
     if (!isAvailable) return;
 
     // 현재 선택된 날짜가 없으면 오늘 기준으로 생성
@@ -163,7 +191,7 @@ export default function TicketBuy() {
       return;
     }
 
-    // 연/월은 그대로 두고 '일'만 변경
+    // 연/월은 그대로 두고 '일'만 변경, 시간은 유지
     const newDate = new Date(
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
@@ -177,7 +205,49 @@ export default function TicketBuy() {
   // ─────────────────────────────────────────────
   // 회차 클릭
   // ─────────────────────────────────────────────
-  const handleRoundClick = (roundDisplay) => setSelectedRound(roundDisplay);
+  const handleRoundClick = (roundDisplay) => {
+    setSelectedRound(roundDisplay);
+
+    if (!ticket || !ticket.schedule || !selectedDate) return;
+
+    // 예: "1회차 19:00" 에서 회차 번호만 추출
+    const roundNo = parseInt(roundDisplay, 10);
+    if (Number.isNaN(roundNo)) return;
+
+    // 현재 선택된 날짜 + 회차가 같은 스케줄 찾기
+    const matched = ticket.schedule.find((s) => {
+      const [year, month, day] = s.date;
+      const sameDate =
+        selectedDate.getFullYear() === year &&
+        selectedDate.getMonth() + 1 === month &&
+        selectedDate.getDate() === day;
+      const sRoundNo = parseInt(s.round, 10);
+      return sameDate && sRoundNo === roundNo;
+    });
+
+    if (!matched || !matched.time) return;
+
+    const timeParts = matched.time.split(":");
+    if (timeParts.length < 2) return;
+
+    const h = parseInt(timeParts[0], 10);
+    const m = parseInt(timeParts[1], 10);
+    const hour = Number.isNaN(h) ? 0 : h;
+    const minute = Number.isNaN(m) ? 0 : m;
+
+    // 선택된 날짜 객체에 시간까지 반영
+    setSelectedDate((prev) => {
+      const base = prev || selectedDate;
+      return new Date(
+        base.getFullYear(),
+        base.getMonth(),
+        base.getDate(),
+        hour,
+        minute,
+        0
+      );
+    });
+  };
 
   if (!ticket) return <div>로딩 중...</div>;
 
@@ -242,6 +312,15 @@ export default function TicketBuy() {
     return `${y}.${m}.${dd}까지`;
   })();
 
+  // 공연 기간(시작일, 종료일)을 "YYYY.MM.DD" 형식으로 만드는 함수
+  const formatConcertDate = (dateArr) => {
+    if (!dateArr || dateArr.length < 3) return "-";
+    const [year, month, day] = dateArr;
+    const mm = String(month).padStart(2, "0");
+    const dd = String(day).padStart(2, "0");
+    return `${year}.${mm}.${dd}`;
+  };
+
   // 좌석별 금액 요약 (S석 / R석)
   const seatPriceSummary = (() => {
     if (!ticket.seats || ticket.seats.length === 0) {
@@ -276,7 +355,7 @@ export default function TicketBuy() {
     let sPrice = 0;
 
     if (basePrice > 0) {
-      rPrice = basePrice;                    // R석 = 기본가
+      rPrice = basePrice; // R석 = 기본가
       sPrice = Math.floor(basePrice * 0.92); // S석 = 약 8% 할인 (기존 비율과 맞춰 사용)
     }
 
@@ -292,15 +371,13 @@ export default function TicketBuy() {
           remaining: item.remainingSeats ?? 0,
         };
       })
-      // S석, R석 순서 정렬 (원하시면 바꾸셔도 됩니다)
+      // S석, R석 순서 정렬
       .sort((a, b) => a.grade.localeCompare(b.grade));
   })();
-
 
   // 수수료 / 할인
   const serviceFee = 2000;
   const discount = ticket.discount || 0;
-
 
   return (
     <div className="ticket-buy-main">
@@ -337,40 +414,50 @@ export default function TicketBuy() {
                 <div className="calendar1">
                   {Array.from({ length: 31 }, (_, i) => {
                     const day = i + 1;
-                    const isAvailable = ticket?.availableDates?.includes(day);
+                    const isAvailable =
+                      ticket?.availableDates?.includes(day);
                     const isSelected =
                       selectedDate && selectedDate.getDate() === day;
 
                     return (
                       <button
                         key={day}
-                        className={`calendar-day ${isSelected ? "selected" : ""}`}
+                        className={`calendar-day ${
+                          isSelected ? "selected" : ""
+                        }`}
                         style={{
                           color: isAvailable ? "#000" : "#aaa",
                           cursor: isAvailable ? "pointer" : "not-allowed",
                         }}
                         onClick={() => isAvailable && handleDateClick(day)}
                         disabled={!isAvailable}
-                        title={isAvailable ? `예매 가능: ${day}일` : `예매 불가`}
+                        title={
+                          isAvailable ? `예매 가능: ${day}일` : `예매 불가`
+                        }
                       >
                         {day}
                       </button>
                     );
                   })}
                 </div>
-                
               </div>
 
               {/* 회차 선택 */}
               <div className="ticket-buy-day2">
                 <strong>회차</strong>&nbsp;
-                <span style={{ fontSize: "16px", color: "#ffbcd4" }}>(관람 시간)</span>
+                <span
+                  style={{ fontSize: "16px", color: "#ffbcd4" }}
+                >
+                  (관람 시간)
+                </span>
                 <div className="ticket-buy-round">
                   {roundsToShow.length > 0 ? (
                     roundsToShow.map((r, idx) => (
                       <button
                         key={idx}
-                        className={`round-btn ${selectedRound === r.display ? "selected" : ""}`}
+                        className={`round-btn ${
+                          selectedRound === r.display ? "selected" : ""
+                        }`}
                         onClick={() => handleRoundClick(r.display)}
                       >
                         {r.display}
@@ -386,7 +473,8 @@ export default function TicketBuy() {
               <div className="ticket-buy-day3">
                 <strong>좌석 등급 / 잔여석</strong>
                 <div className="ticket-buy-seat">
-                  {seatSummaryForSelectedRound && seatSummaryForSelectedRound.length > 0 ? (
+                  {seatSummaryForSelectedRound &&
+                  seatSummaryForSelectedRound.length > 0 ? (
                     seatSummaryForSelectedRound.map((item, idx) => (
                       <p key={idx}>
                         {item.grade}석 {item.price.toLocaleString()}원 (잔여석{" "}
@@ -398,7 +486,6 @@ export default function TicketBuy() {
                   )}
                 </div>
               </div>
-
             </div>
 
             {/* 유의사항 */}
@@ -406,18 +493,18 @@ export default function TicketBuy() {
               <strong>유의사항</strong>
               <div className="ticket-buy-note-text">
                 <p>
-                  장애인, 국가유공자 할인 가격 예매 시 현장 수령만 가능하며, 현장에 증명서류 미지침시
-                  할인 불가합니다.
+                  장애인, 국가유공자 할인 가격 예매 시 현장 수령만 가능하며, 현장에
+                  증명서류 미지침시 할인 불가합니다.
                 </p>
                 <p>할인 쿠폰을 사용하여 예매한 티켓은 부분 취소가 불가합니다.</p>
                 <p>당일 관리 상품 예매시는 취소 불가합니다.</p>
                 <p>
-                  취소 수수료와 취소 가능일자는 상품별로 다르니, 오른쪽 하단 My 예매 정보에서 확인해
-                  주세요.
+                  취소 수수료와 취소 가능일자는 상품별로 다르니, 오른쪽 하단 My 예매
+                  정보에서 확인해 주세요.
                 </p>
                 <p>
-                  ATM 기기에서 가상 계좌 입금이 안 될 수 있으니 인터넷 / 폰 뱅킹이 어려우시면
-                  무통장 입금 외 다른 결제 수단을 선택해 주세요.
+                  ATM 기기에서 가상 계좌 입금이 안 될 수 있으니 인터넷 / 폰 뱅킹이
+                  어려우시면 무통장 입금 외 다른 결제 수단을 선택해 주세요.
                 </p>
               </div>
             </div>
@@ -441,7 +528,8 @@ export default function TicketBuy() {
                       </tr>
                       <tr>
                         <th>
-                          {formatYmd(ticket?.startAt)} ~ {formatYmd(ticket?.endAt)}
+                          {formatYmd(ticket?.startAt)} ~{" "}
+                          {formatYmd(ticket?.endAt)}
                         </th>
                       </tr>
                       <tr>
@@ -452,7 +540,7 @@ export default function TicketBuy() {
                 </div>
               </div>
 
-                           <table className="ticket-buy-table2">
+              <table className="ticket-buy-table2">
                 <tbody>
                   <strong className="ticket-buy-my">예매 정보 </strong>
                   <tr>
@@ -477,8 +565,6 @@ export default function TicketBuy() {
                   </tr>
                 </tbody>
               </table>
-
-              
             </div>
             <br />
             <Link
@@ -489,7 +575,6 @@ export default function TicketBuy() {
               다음 단계
             </Link>
           </div>
-
         </div>
       </div>
     </div>

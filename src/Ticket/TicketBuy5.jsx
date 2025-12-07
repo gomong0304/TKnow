@@ -144,24 +144,9 @@ export default function TicketBuy5() {
 		let message = "";
 		const formattedAmount = finalTotalPrice.toLocaleString();
 
-		if (paymentMethod === "카카오페이") {
-			message = `카카오페이로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else if (paymentMethod === "계좌이체") {
-			message = `계좌이체로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else if (paymentMethod === "가상계좌") {
-			message = `가상계좌로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else if (paymentMethod === "무통장") {
-			message = `무통장 입금으로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else if (paymentMethod === "토스페이") {
-			message = `토스페이로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else if (paymentMethod === "PAYCO") {
-			message = `PAYCO로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else if (paymentMethod === "휴대폰") {
-			message = `휴대폰 결제로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else if (paymentMethod === "포인트") {
-			message = `포인트로 ${formattedAmount}원 결제가 완료되었습니다!`;
-		} else {
-			message = `${formattedAmount}원 결제가 완료되었습니다!`;
+		if (paymentMethod === "무통장") {
+			message = `가상계좌가 발급되었습니다.\n` +
+				`해당 주문일의 23:59:59까지 입금이 완료되어야 예매가 확정됩니다.`;
 		}
 
 		alert(message);
@@ -292,8 +277,8 @@ export default function TicketBuy5() {
 								{/*  신용카드 선택 시 */}
 								{paymentMethod === "신용카드" && (
 									<>
-										<strong>결제 수단 입력</strong><br /><br />
-
+										<strong>결제 수단 입력</strong>
+										<br/><br/>
 										<label className="custom-radio">
 											<input
 												type="radio"
@@ -315,7 +300,7 @@ export default function TicketBuy5() {
 								{/*  무통장 입금 선택 시 */}
 								{paymentMethod === "무통장" && (
 									<>
-										<strong>결제 수단 입력</strong><br /><br />
+										<strong>결제 수단 입력</strong>
 
 										<p className="ticket-buy4-text1">
 											결제하기 버튼을 누르시면 고객님 전용 가상계좌가 발급됩니다.<br />
@@ -381,7 +366,7 @@ export default function TicketBuy5() {
 
 							<table className="ticket-buy-table2-1">
 								<tbody>
-									<strong className="ticket-buy-my-1">My 예매 정보 </strong><br />
+									<strong className="ticket-buy-my-1">My 예매 정보 </strong>
 									<tr><th>일시</th><td>{ticketDate || ""}</td></tr>
 									<tr>
 										<th>선택 좌석</th>

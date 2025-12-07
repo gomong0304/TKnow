@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import "../css/ticket.css";
 import "../css/style.css";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import F2 from "../images/f2.png";
-import axios from "axios";
 import api from "../api";
+
+const SEATS_PER_ROW = 20; // 한 줄에 표시할 좌석 개수
 
 export default function F2Floor() {
   const { id } = useParams();
@@ -13,96 +13,92 @@ export default function F2Floor() {
   const location = useLocation();
 
   const { selectedDate, ticket } = location.state || {};
-  const [selectedSeat, setSelectedSeat] = useState(null); // 좌석 선택
-  const [reservedSeats, setReservedSeats] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [ticketInfo, setTicketInfo] = useState(ticket || null);
 
-  // 좌석 데이터 생성
-  const rows = 12;
-  const cols = 13;
-  const seatWidth = 37.2;
-  const seatHeight = 34.1;
-  const seatGap = 5.1;
-  const startX = 160;
-  const startY = 0;
+  const [seats, setSeats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedSeat, setSelectedSeat] = useState(null);
 
-  const seats = [];
-  let seatDbId = 1;
-
-  // 티켓 가격 기준 (ticketInfo에서 가져오거나 기본값)
-  const basePrice = ticketInfo?.price || 100000;
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      seats.push({
-        id: `${r}-${c}`,
-        dbId: seatDbId++,        // DB FK용
-        grade: "R",
-        row: r + 1,
-        number: c + 1,
-        price: basePrice,
-        x: startX + c * (seatWidth + seatGap),
-        y: startY + r * (seatHeight + seatGap),
-      });
-    }
-  }
-
+  // 좌석 / 티켓 정보 로딩
   useEffect(() => {
-    setLoading(true);
-
-    api
-      .get(`/tickets/${id}/reserved-seats`)
-      .then((res) => setReservedSeats(res.data.reservedSeats || []))
-      .catch(() => {
-        // 임의 예약 좌석 생성
-        const randomReserved = [];
-        const reservedCount = Math.floor(Math.random() * 50) + 23;
-        for (let i = 0; i < reservedCount; i++) {
-          const randomIndex = Math.floor(Math.random() * seats.length);
-          if (!randomReserved.includes(seats[randomIndex].id)) {
-            randomReserved.push(seats[randomIndex].id);
-          }
+    const fetchData = async () => {
+      try {
+        // 티켓 기본 정보 없으면 한번 더 조회
+        if (!ticketInfo) {
+          const ticketRes = await api.get(`/tickets/${id}`);
+          setTicketInfo(ticketRes.data);
         }
-        setReservedSeats(randomReserved);
-      })
-      .finally(() => setLoading(false));
 
-    if (!ticketInfo) {
-      api
-        .get(`/tickets/${id}`)
-        .then((res) => setTicketInfo(res.data))
-        .catch((err) => console.error("공연 정보 조회 실패:", err));
-    }
+        // F2 구역 좌석 조회 (현재는 roundNo=1 고정)
+        const seatRes = await api.get(`/tickets/${id}/seats`, {
+          params: { roundNo: 1, zone: "F2" },
+        });
+
+        const list = Array.isArray(seatRes.data) ? seatRes.data : [];
+
+        // 백엔드 SeatDetailDTO -> 프론트 좌석 객체로 변환
+        const mapped = list.map((s) => ({
+          id: s.seatId,
+          dbId: s.seatId,
+          seatCode: s.seatCode,
+          grade: s.seatClass,   // S / R
+          status: s.seatStatus, // AVAILABLE / RESERVED / PAID ...
+        }));
+
+        setSeats(mapped);
+      } catch (err) {
+        console.error("F2 좌석 정보 로드 실패:", err);
+        setSeats([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // 좌석 선택
-  const handleSelectSeat = (seat) => {
-    if (reservedSeats.includes(seat.id)) {
-      alert("이미 예약된 좌석입니다.");
+  // 좌석 클릭
+  const handleSeatClick = (seat, rowIndex, colIndex) => {
+    const isReserved =
+      seat.status === "RESERVED" ||
+      seat.status === "PAID" ||
+      seat.status === "HOLD";
+
+    if (isReserved) {
+      alert("이미 예약/결제된 좌석입니다.");
       return;
     }
-    setSelectedSeat(seat); // 여기서 seat 객체 전체를 selectedSeat로 저장
-    console.log("🪑 선택한 좌석:", seat);
+
+    setSelectedSeat({
+      ...seat,
+      row: rowIndex + 1,
+      number: colIndex + 1,
+      zone: "F2",
+    });
   };
 
-  // 다음 단계
+  // 다음 단계 (가격 선택 페이지)
   const handleNext = () => {
     if (!selectedSeat) {
       alert("좌석을 선택하세요!");
       return;
     }
 
-    console.log("Buy3로 이동, 좌석 정보:", selectedSeat);
-
     navigate(`/Ticket/Buy3/${id}`, {
       state: {
-        selectedSeat,   // 좌석 전체 객체 전달 (dbId 포함)
+        selectedSeat,
         selectedDate,
         ticketInfo,
       },
     });
   };
+
+  // 1차원 seats 배열을 한 줄당 SEATS_PER_ROW 개씩 끊어서 2차원 배열로 변환
+  const seatRows = [];
+  for (let i = 0; i < seats.length; i += SEATS_PER_ROW) {
+    seatRows.push(seats.slice(i, i + SEATS_PER_ROW));
+  }
 
   return (
     <div className="ticket-stage-main">
@@ -128,35 +124,53 @@ export default function F2Floor() {
 
         <div className="ticket-stage-middle">
           {loading ? (
-            <p style={{ textAlign: "center" }}>좌석 정보를 불러오는 중입니다...</p>
+            <p style={{ textAlign: "center" }}>
+              좌석 정보를 불러오는 중입니다...
+            </p>
           ) : (
-            <div className="ticket-stage-map" style={{ position: "relative" }}>
-              <img src={F2} className="ticket-f2-img" alt="좌석 배치도" />
-              {seats.map((seat) => {
-                const isReserved = reservedSeats.includes(seat.id);
-                const isSelected = selectedSeat?.id === seat.id;
-                return (
-                  <div
-                    key={seat.id}
-                    className={`seat ${isSelected ? "selected" : ""}`}
-                    style={{
-                      position: "absolute",
-                      left: `${seat.x}px`,
-                      top: `${seat.y}px`,
-                      width: `${seatWidth}px`,
-                      height: `${seatHeight}px`,
-                      backgroundColor: isReserved
-                        ? "#999"
-                        : isSelected
-                        ? "#FFA6C9"
-                        : "#D9D9D9",
-                      cursor: isReserved ? "not-allowed" : "pointer",
-                    }}
-                    onClick={() => handleSelectSeat(seat)}
-                    title={`R석 ${seat.row}열 ${seat.number}`}
-                  />
-                );
-              })}
+            <div className="ticket-stage-map seat-grid-wrapper">
+              {seatRows.map((rowSeats, rowIndex) => (
+                <div key={rowIndex} className="seat-row">
+                  <span className="seat-row-label">F2구역 입장 번호</span>
+                  <div className="seat-row-seats">
+                    {rowSeats.map((seat, colIndex) => {
+                      const isReserved =
+                        seat.status === "RESERVED" ||
+                        seat.status === "PAID" ||
+                        seat.status === "HOLD";
+                      const isSelected =
+                        selectedSeat && selectedSeat.dbId === seat.dbId;
+
+                      let bgColor =
+                        seat.grade === "S" ? "#ffe0ea" : "#d9d9d9"; // S석은 살짝 핑크
+                      if (isReserved) {
+                        bgColor = "#999999";
+                      } else if (isSelected) {
+                        bgColor = "#FFA6C9";
+                      }
+
+                      return (
+                        <div
+                          key={seat.id}
+                          className={
+                            "seat-box" +
+                            (isReserved ? " reserved" : "") +
+                            (isSelected ? " selected" : "")
+                          }
+                          style={{ backgroundColor: bgColor }}
+                          onClick={() =>
+                            !isReserved &&
+                            handleSeatClick(seat, rowIndex, colIndex)
+                          }
+                          title={`${seat.grade}석 F2구역 ${
+                            rowIndex + 1
+                          }열 ${colIndex + 1}번 (${seat.seatCode})`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -175,7 +189,7 @@ export default function F2Floor() {
                     <td>{selectedSeat ? selectedSeat.grade : "-"}</td>
                     <td>
                       {selectedSeat
-                        ? `F2 구역 - ${selectedSeat.row}열 - ${selectedSeat.number}`
+                        ? `F2 구역 - ${selectedSeat.row}열 - ${selectedSeat.number}번`
                         : "-"}
                     </td>
                   </tr>

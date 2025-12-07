@@ -1452,3 +1452,48 @@ map {
 	background: transparent !important;
 	border: 0 !important;
 }
+
+/* ===========================
+   좌석 그리드 공통 스타일
+   =========================== */
+
+.seat-grid-wrapper {
+  padding: 20px 10px;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.seat-row-label {
+  width: 120px;
+  font-size: 13px;
+  color: #9f9f9f;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.seat-row-seats {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.seat-box {
+  width: 18px;
+  height: 18px;
+  margin: 2px;
+  background-color: #d9d9d9;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.seat-box.selected {
+  outline: 2px solid #ff6fa5;
+}
+
+.seat-box.reserved {
+  background-color: #999999;
+  cursor: not-allowed;
+}

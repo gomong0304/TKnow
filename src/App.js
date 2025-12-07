@@ -41,7 +41,7 @@ import AdminInven from "./admin/AdminInven";
 import AdminInven2 from "./admin/AdminInven2";
 import AdminInven3 from "./admin/AdminInven3";
 import TicketCardPg from "./Ticket/TicketCardPg";
-
+import MemberWithdraw from "./member/MemberWithdraw";
 
 // accessToken이 없으면 alert을 띄우고 메인으로 강제 이동
 // 비회원이 직링 이용시 마이페이지에 접속 가능한 문제 해결
@@ -321,7 +321,7 @@ function App() {
 						}
 					/>
 
-
+					<Route path="/member/Withdraw" element={<MemberWithdraw />} />
 
 
 					          // 티켓 페이지 (헤더랑 푸터 없는 화면)

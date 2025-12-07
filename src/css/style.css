@@ -346,6 +346,7 @@
 	display: flex;
 	gap: 20px;
 	align-items: flex-start;
+
 }
 
 .read-right {
@@ -1539,10 +1540,11 @@ map {
 	border: 1px solid #D9D9D9;
 	border-radius: 10px;
 	padding: 50px;
-	height: 280px;
+	height: 330px;
 	width: 800px;
 	min-width: 800px;
 }
+
 
 .member-Member-proImg {
 	border: 5px solid #D9D9D9;
@@ -1557,8 +1559,8 @@ map {
 
 .member-Member-prMod {
 	position: absolute;
-	left: 175px;
-	bottom: 55px;
+	left: 185px;
+	bottom: 100px;
 }
 
 .member-propile-table table {
@@ -2546,15 +2548,4 @@ map {
   border-top: 1px solid #ddd;
   margin-top: 30px;
   margin-bottom: 30px;
-}
-/* F1~F4 좌석 페이지: 하단 두 버튼 가로 1줄 + 동일 너비 */
-.ticket-f2-info .ticket-stage-button2 {
-	display: flex;
-	flex-direction: row !important;  /* 전역 column 설정 무조건 덮어쓰기 */
-	justify-content: center;
-	gap: 20px;                       /* 버튼 사이 간격 */
-}
-
-.ticket-f2-info .ticket-stage-button2 .ticket-stage-back {
-	flex: 1 1 0;                     /* 두 버튼 가로 폭 동일하게 */
 }

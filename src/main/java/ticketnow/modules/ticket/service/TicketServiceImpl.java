@@ -21,6 +21,8 @@ import ticketnow.modules.ticket.constant.TicketStatus;
 import ticketnow.modules.ticket.dto.*;
 import ticketnow.modules.ticket.mapper.TicketMapper;
 import ticketnow.modules.common.mapper.image.ImageMapper;
+import ticketnow.modules.ticket.dto.SeatDetailDTO;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -111,8 +113,9 @@ public class TicketServiceImpl implements TicketService {
                 : null;
 
         // 🔹 회차(스케줄) INSERT: ticket_schedule 테이블에 저장
+        List<ticketnow.modules.ticket.domain.TicketScheduleVO> scheduleVOs = new ArrayList<>();
+
         if (newId != null && schedules != null && !schedules.isEmpty()) {
-            List<ticketnow.modules.ticket.domain.TicketScheduleVO> scheduleVOs = new ArrayList<>();
             int autoRound = 1;
 
             for (TicketScheduleCreateDTO s : schedules) {
@@ -145,12 +148,14 @@ public class TicketServiceImpl implements TicketService {
             log.debug("[Ticket][CREATE][SCHEDULE] 회차 정보 없음 또는 ticketId null");
         }
 
-        // 🔹 티켓 생성 시 좌석 자동 생성
-        if (newId != null) {
-            generateSeatsForTicket(newId, req.getTotalSeats());
+     // 티켓 생성 시 좌석 자동 생성 (회차별 동일 좌석)
+        if (newId != null && req.getTotalSeats() > 0) {
+            generateSeatsForTicket(newId, req.getTotalSeats(), scheduleVOs);
         }
 
-        // ★ 티켓 생성 시 이미지가 같이 넘어온 경우, 공통 FileService로 업로드
+
+
+        //  티켓 생성 시 이미지가 같이 넘어온 경우, 공통 FileService로 업로드
         if (newId != null && req.getImages() != null && !req.getImages().isEmpty()) {
             try {
                 // 1) ImageListDTO 구성 (어느 티켓의 이미지인지 지정)
@@ -207,11 +212,14 @@ public class TicketServiceImpl implements TicketService {
 
     /**=====================================================
      * 총 좌석 수에 따라 F1~F4 구역으로 좌석을 자동 생성
-     * - 총 좌석수: totalSeats
-     * - 구역: F1, F2, F3, F4 (4개)
-     * - 각 구역 앞 자리 10%: S석, 나머지: R석
+     * - schedules 가 존재하면: 각 회차(round_no)마다 totalSeats 만큼 생성
+     * - schedules 가 비어 있으면: 기존처럼 1회차 기준으로 한 번만 생성
      =====================================================*/
-    private void generateSeatsForTicket(Long ticketId, int totalSeats) {
+    private void generateSeatsForTicket(
+            Long ticketId,
+            int totalSeats,
+            List<ticketnow.modules.ticket.domain.TicketScheduleVO> schedules
+    ) {
         if (ticketId == null || totalSeats <= 0) {
             return;
         }
@@ -219,37 +227,79 @@ public class TicketServiceImpl implements TicketService {
         final int ZONE_COUNT = 4;
         final String[] ZONES = {"F1", "F2", "F3", "F4"};
 
-        int basePerZone = totalSeats / ZONE_COUNT;
-        int remainder = totalSeats % ZONE_COUNT;
-
         List<Map<String, Object>> seats = new ArrayList<>();
 
-        for (int z = 0; z < ZONE_COUNT; z++) {
-            int zoneSeats = basePerZone + (z < remainder ? 1 : 0);
-            if (zoneSeats <= 0) {
-                continue;
+        // (1) 회차 정보가 없으면: 기존 방식 + roundNo = 1 고정
+        if (schedules == null || schedules.isEmpty()) {
+
+            int basePerZone = totalSeats / ZONE_COUNT;
+            int remainder = totalSeats % ZONE_COUNT;
+
+            for (int z = 0; z < ZONE_COUNT; z++) {
+                int zoneSeats = basePerZone + (z < remainder ? 1 : 0);
+                if (zoneSeats <= 0) {
+                    continue;
+                }
+
+                // 앞 10%는 최소 1석은 S석으로
+                int sCount = (int) Math.ceil(zoneSeats * 0.1);
+                if (sCount < 1) {
+                    sCount = 1;
+                }
+
+                for (int i = 1; i <= zoneSeats; i++) {
+                    Map<String, Object> seat = new HashMap<>();
+                    seat.put("roundNo", 1); // 회차 정보 없으면 1회차
+                    seat.put("seatCode", ZONES[z] + "-" + String.format("%03d", i));
+                    seat.put("seatStatus", "AVAILABLE");
+                    seat.put("seatClass", i <= sCount ? "S" : "R");
+                    seats.add(seat);
+                }
             }
 
-            // 앞 10%는 최소 1석은 S석으로
-            int sCount = (int) Math.ceil(zoneSeats * 0.1);
-            if (sCount < 1) {
-                sCount = 1;
-            }
+        } else {
+            // (2) 회차가 여러 개 있으면: 각 회차마다 totalSeats 만큼 동일 좌석 생성
+            for (ticketnow.modules.ticket.domain.TicketScheduleVO schedule : schedules) {
+                Integer roundNo = schedule.getRoundNo();
+                if (roundNo == null || roundNo <= 0) {
+                    roundNo = 1;
+                }
 
-            for (int i = 1; i <= zoneSeats; i++) {
-                Map<String, Object> seat = new HashMap<>();
-                // 예: F1-001, F1-002 ...
-                seat.put("seatCode", ZONES[z] + "-" + String.format("%03d", i));
-                seat.put("seatStatus", "AVAILABLE");
-                seat.put("seatClass", i <= sCount ? "S" : "R");
-                seats.add(seat);
+                int basePerZone = totalSeats / ZONE_COUNT;
+                int remainder = totalSeats % ZONE_COUNT;
+
+                for (int z = 0; z < ZONE_COUNT; z++) {
+                    int zoneSeats = basePerZone + (z < remainder ? 1 : 0);
+                    if (zoneSeats <= 0) {
+                        continue;
+                    }
+
+                    int sCount = (int) Math.ceil(zoneSeats * 0.1);
+                    if (sCount < 1) {
+                        sCount = 1;
+                    }
+
+                    for (int i = 1; i <= zoneSeats; i++) {
+                        Map<String, Object> seat = new HashMap<>();
+                        seat.put("roundNo", roundNo); // ★ 회차별로 좌석 구분
+                        seat.put("seatCode", ZONES[z] + "-" + String.format("%03d", i));
+                        seat.put("seatStatus", "AVAILABLE");
+                        seat.put("seatClass", i <= sCount ? "S" : "R");
+                        seats.add(seat);
+                    }
+                }
+
+                log.info("[Ticket][SEAT] roundNo={} 에 대해 좌석 {}개 생성 예정 (ticketId={})",
+                        roundNo, totalSeats, ticketId);
             }
         }
 
         if (!seats.isEmpty()) {
             ticketMapper.insertSeatsForTicket(ticketId, seats);
+            log.info("[Ticket][SEAT] 좌석 {}개 자동 생성 완료 - ticketId={}", seats.size(), ticketId);
         }
     }
+
 
     // =================================================================================
     // 종료일시가 지난 티켓은 자동으로 CLOSED 로 변경
@@ -304,12 +354,17 @@ public class TicketServiceImpl implements TicketService {
                     .ifPresent(detail -> dto.setDetailImageUrl(detail.getImgUrl()));
         }
 
+        // === 회차 스케줄 목록 세팅 ===
+        List<TicketScheduleDTO> schedules = ticketMapper.selectTicketSchedulesByTicketId(ticketId);
+        dto.setSchedule(schedules);
+
         // 종료일시가 지난 경우 자동으로 CLOSED 처리
         applyAutoClose(dto);
 
         log.debug("[Ticket][GET] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
         return dto;
     }
+
 
     // =================================================================================
     // 페이지
@@ -444,4 +499,43 @@ public class TicketServiceImpl implements TicketService {
 
         log.debug("[Ticket][DELETE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
     }
+    @Override
+    @Transactional(readOnly = true)
+    public List<SeatStatsDTO> getSeatStats(Long ticketId) {
+        log.info("getSeatStats ticketId={}", ticketId);
+        return ticketMapper.selectSeatStatsByTicket(ticketId);
+    }
+    
+    @Override
+    public List<SeatSummaryDTO> getSeatSummary(Long ticketId) {
+        return ticketMapper.selectSeatSummaryByTicket(ticketId);
+    }
+
+    // 티켓 구역
+    @Override
+    @Transactional(readOnly = true)
+    public List<SeatDetailDTO> getSeatsForZone(Long ticketId, Integer roundNo, String zone) {
+        if (ticketId == null) {
+            return Collections.emptyList();
+        }
+
+        // 회차 선택 안 되어 있으면 1회차로 고정
+        if (roundNo == null || roundNo <= 0) {
+            roundNo = 1;
+        }
+
+        // 구역 기본값 F1
+        if (zone == null || zone.isBlank()) {
+            zone = "F1";
+        }
+        zone = zone.toUpperCase();
+
+        if (!zone.equals("F1") && !zone.equals("F2") && !zone.equals("F3") && !zone.equals("F4")) {
+            throw new IllegalArgumentException("존재하지 않는 구역입니다: " + zone);
+        }
+
+        return ticketMapper.selectSeatsByTicketAndRoundAndZone(ticketId, roundNo, zone);
+    }
+
+    
 }

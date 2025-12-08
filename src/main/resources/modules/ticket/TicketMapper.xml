@@ -5,22 +5,38 @@
 <mapper namespace="ticketnow.modules.ticket.mapper.TicketMapper">
 
 	<!-- DTO 컬럼 매핑: DB 스키마 → TicketResponseDTO 필드 -->
-	<sql id="ticketDTOColumns">
-		t.ticket_id AS ticketId,
-		t.ticket_title AS title,
-		t.start_at AS startAt,
-		t.end_date AS endAt,
-		t.venueName AS venueName,
-		t.ticket_stock AS totalSeats,
-		t.ticket_stock AS remainingSeats,
-		t.ticket_price AS price,
-		t.ticket_category AS ticketCategory,
-		t.ticket_status AS ticketStatus,
-		t.ticket_detail AS ticketDetail,
-		t.created_at AS createdAt,
-		t.updated_at AS updatedAt,
-		NULL AS deletedAt
-	</sql>
+	<!-- 티켓 목록/단건 조회 공통 컬럼 -->
+<sql id="ticketDTOColumns">
+    t.ticket_id      AS ticketId,
+    t.ticket_title   AS title,
+    t.start_at       AS startAt,
+    t.end_date       AS endAt,
+    t.venueName      AS venueName,
+
+    <!-- 전체 회차 기준 총 좌석 수 -->
+    (
+        SELECT COUNT(*)
+        FROM seat s
+        WHERE s.ticket_id = t.ticket_id
+    )               AS totalSeats,
+
+    <!-- 전체 회차 기준 잔여 좌석 수 -->
+    (
+        SELECT COUNT(*)
+        FROM seat s
+        WHERE s.ticket_id   = t.ticket_id
+          AND s.seat_status = 'AVAILABLE'
+    )               AS remainingSeats,
+
+    t.ticket_price   AS price,
+    t.ticket_category AS ticketCategory,
+    t.ticket_status  AS ticketStatus,
+    t.ticket_detail  AS ticketDetail,
+    t.created_at     AS createdAt,
+    t.updated_at     AS updatedAt,
+    NULL             AS deletedAt
+</sql>
+
 	<!-- INSERT: Map 파라미터 기반, PK 자동 채번 -->
 		<insert id="insertTicketFromMap" parameterType="map"
 		    useGeneratedKeys="true" keyProperty="ticketId">
@@ -97,27 +113,29 @@
 		WHERE ticket_id   = #{ticketId}
 	</update>
 	<!-- 티켓 생성 시 좌석 일괄 생성 -->
-	<insert id="insertSeatsForTicket" parameterType="map">
-		INSERT INTO seat (
-			ticket_id,
-			seat_code,
-			seat_status,
-			seat_class,
-			created_at,
-			updated_at
-		)
-		VALUES
-		<foreach collection="seats" item="s" separator=",">
-			(
-				#{ticketId},
-				#{s.seatCode},
-				#{s.seatStatus},
-				#{s.seatClass},
-				NOW(),
-				NOW()
-			)
-		</foreach>
-	</insert>
+	<insert id="insertSeatsForTicket">
+    INSERT INTO seat (
+        ticket_id,
+        round_no,
+        seat_code,
+        seat_status,
+        seat_class,
+        created_at,
+        updated_at
+    )
+    VALUES
+    <foreach collection="seats" item="seat" separator=",">
+        (
+            #{ticketId},
+            #{seat.roundNo},
+            #{seat.seatCode},
+            #{seat.seatStatus},
+            #{seat.seatClass},
+            NOW(),
+            NOW()
+        )
+    </foreach>
+</insert>
 	    <!-- 티켓 공연 회차 일괄 저장 -->
     <insert id="insertTicketSchedules">
         INSERT INTO ticket_schedule (
@@ -152,4 +170,86 @@
 		WHERE ticket_id = #{ticketId}
 		<!-- 만약 PK 컬럼명이 ticket_id가 아니라 id 라면: WHERE id = #{ticketId} -->
 	</delete>
+	
+	    <!-- 티켓별 회차 좌석 통계 -->
+    <select id="selectSeatStatsByTicket"
+            parameterType="long"
+            resultType="ticketnow.modules.ticket.dto.SeatStatsDTO">
+
+        SELECT
+            s.round_no      AS roundNo,
+            COUNT(*)        AS totalSeats,
+            SUM(
+                CASE
+                    WHEN s.seat_status = 'AVAILABLE' THEN 1
+                    ELSE 0
+                END
+            )               AS remainingSeats
+        FROM seat s
+        WHERE s.ticket_id = #{ticketId}
+        GROUP BY s.round_no
+        ORDER BY s.round_no
+
+    </select>
+    
+        <!-- 단일 티켓 회차 스케줄 목록 조회 -->
+    <select id="selectTicketSchedulesByTicketId"
+            parameterType="long"
+            resultType="ticketnow.modules.ticket.dto.TicketScheduleDTO">
+
+        SELECT
+            round_no AS roundNo,
+            show_at  AS showAt
+        FROM ticket_schedule
+        WHERE ticket_id = #{ticketId}
+        ORDER BY show_at ASC, round_no ASC
+    </select>
+    
+        <!-- 좌석 등급/회차별 잔여석 요약 (티켓 예매페이지 좌석 정보 표기용) -->
+    <select id="selectSeatSummaryByTicket"
+            parameterType="long"
+            resultType="ticketnow.modules.ticket.dto.SeatSummaryDTO">
+        SELECT
+            s.ticket_id  AS ticketId,
+            s.round_no   AS roundNo,
+            s.seat_class AS seatClass,
+            COUNT(*)     AS totalSeats,
+            SUM(
+                CASE
+                    WHEN s.seat_status = 'AVAILABLE' THEN 1
+                    ELSE 0
+                END
+            )            AS remainingSeats
+        FROM seat s
+        WHERE s.ticket_id = #{ticketId}
+        GROUP BY s.ticket_id, s.round_no, s.seat_class
+        ORDER BY s.round_no ASC, s.seat_class ASC
+    </select>
+    
+        <!--
+        좌석 상세 목록 (좌석 선택 UI용)
+        - ticketId : 티켓 ID
+        - roundNo  : 회차 (null 이면 1회차로 처리)
+        - zone     : F1 / F2 / F3 / F4
+    -->
+    <select id="selectSeatsByTicketAndRoundAndZone"
+            resultType="ticketnow.modules.ticket.dto.SeatDetailDTO">
+        SELECT
+            s.seat_id      AS seatId,
+            s.ticket_id    AS ticketId,
+            s.round_no     AS roundNo,
+            SUBSTRING_INDEX(s.seat_code, '-', 1) AS zone,
+            s.seat_code    AS seatCode,
+            s.seat_class   AS seatClass,
+            s.seat_status  AS seatStatus
+        FROM seat s
+        WHERE s.ticket_id = #{ticketId}
+          AND s.round_no  = #{roundNo}
+          AND s.seat_code LIKE CONCAT(#{zone}, '-%')
+        ORDER BY s.seat_id ASC
+    </select>
+    
+    
+    
 </mapper>
+	

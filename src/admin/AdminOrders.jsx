@@ -117,7 +117,7 @@ export default function AdminOrders() {
                     <th className="admin-orders-col-title">공연명</th>
                     <th className="admin-orders-col-qty">티켓수</th>
                     <th className="admin-orders-col-amount">결제금액</th>
-                    <th className="admin-orders-col-pay">결제상태</th>
+
                     <th className="admin-orders-col-status">주문상태 변경</th>
                   </tr>
                 </thead>
@@ -146,7 +146,7 @@ export default function AdminOrders() {
                           ? order.totalAmount.toLocaleString() + "원"
                           : "-"}
                       </td>
-                      <td>{order.payStatus || "-"}</td>
+                     
                       <td className="admin-orders-status-cell">
                         <div className="admin-orders-status-actions">
                           <select

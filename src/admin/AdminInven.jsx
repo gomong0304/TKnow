@@ -319,7 +319,7 @@ export default function AdminInven() {
               {formatNumber(summary.totalCostAmount)} 원
             </span>
           </div>
-
+    
           <div className="admin-inven-row">
             <span>매출 이익</span>
             <span className="admin-inven-3">

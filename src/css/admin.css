@@ -297,6 +297,7 @@
 	border-radius: 10px;
 }
 
+
 .admin-member-memBox3 table {
 	border-spacing: 0px 15px;
 }
@@ -556,4 +557,34 @@
 	font-size: 25px;
 	color: #ee70a2;
 	font-weight: 500;
+}
+
+/* AdminInven3 - 회차별 좌석 현황 테이블 전용 스타일 */
+.admin-seat-stats-box {
+  margin-top: 10px;
+   align-items: center;
+    text-align: center !important;
+
+}
+
+/* 숫자/셀 크기를 조금 키워서 가독성 향상 */
+.admin-seat-stats-table th,
+.admin-seat-stats-table td {
+  padding: 20px 20px;
+  font-size: 20px;
+}
+
+/* 헤더는 약간 굵게 */
+.admin-seat-stats-table th {
+  font-weight: 600;
+}
+.admin-inven3-back-btn {
+  width: 150px;       /* 예: 더 넓게 */
+  height: 50px;
+  font-size: 20px;    /* 글자 조금 키우기 */
+  font-weight: 800;
+  color: rgb(255, 255, 255);
+  background-color: #f7aecb;;
+  border-radius: 8px;
+  border: 1px solid #dbdbdb;
 }

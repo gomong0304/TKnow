@@ -99,9 +99,8 @@ export default function AdminInven3() {
           <p style={{ color: "red" }}>{error}</p>
           <button
             type="button"
-            className="admin-con-btn"
+            className="admin-con-btn-4-1"
             onClick={handleBack}
-            style={{ marginTop: "10px" }}
           >
             목록으로 돌아가기
           </button>
@@ -223,53 +222,55 @@ export default function AdminInven3() {
 
             {/* 회차별 좌석 수 / 잔여 좌석 수 */}
             <h3 style={{ margin: "20px 0 10px" }}>회차별 좌석 현황</h3>
-            <table className="admin-member-text1">
-              <thead>
-                <tr>
-                  <th>회차</th>
-                  <th>총 좌석 수</th>
-                  <th>잔여 좌석 수</th>
-                </tr>
-              </thead>
-              <tbody>
-                {seatStats.length > 0 ? (
-                  <>
-                    {seatStats.map((s) => (
-                      <tr key={s.roundNo}>
-                        <td>{s.roundNo}</td>
-                        <td>{s.totalSeats}</td>
-                        <td>{s.remainingSeats}</td>
-                      </tr>
-                    ))}
-                    <tr>
-                      <td>
-                        <strong>전체</strong>
-                      </td>
-                      <td>
-                        <strong>{totalSeatsAll}</strong>
-                      </td>
-                      <td>
-                        <strong>{remainingSeatsAll}</strong>
-                      </td>
-                    </tr>
-                  </>
-                ) : (
-                  <tr>
-                    <td colSpan={3}>회차별 좌석 정보가 없습니다.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+<div className="admin-seat-stats-box">
+  <table className="admin-member-text1 admin-seat-stats-table">
+    <thead>
+      <tr>
+        <th>회차</th>
+        <th>총 좌석 수</th>
+        <th>잔여 좌석 수</th>
+      </tr>
+    </thead>
+    <tbody>
+      {seatStats.length > 0 ? (
+        <>
+          {seatStats.map((s) => (
+            <tr key={s.roundNo}>
+              <td>{s.roundNo}</td>
+              <td>{s.totalSeats}</td>
+              <td>{s.remainingSeats}</td>
+            </tr>
+          ))}
+          <tr>
+            <td>
+              <strong>전체</strong>
+            </td>
+            <td>
+              <strong>{totalSeatsAll}</strong>
+            </td>
+            <td>
+              <strong>{remainingSeatsAll}</strong>
+            </td>
+          </tr>
+        </>
+      ) : (
+        <tr>
+          <td colSpan={3}>회차별 좌석 정보가 없습니다.</td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+<div >
+  <button
+    type="button"
+    className="admin-con-btn admin-inven3-back-btn"
+    onClick={handleBack}
+  >
+    목록으로
+  </button>
+</div>
 
-            <div style={{ marginTop: "20px", textAlign: "right" }}>
-              <button
-                type="button"
-                className="admin-con-btn"
-                onClick={handleBack}
-              >
-                목록으로 돌아가기
-              </button>
-            </div>
           </div>
         </div>
       </div>

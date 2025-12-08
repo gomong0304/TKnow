@@ -2,6 +2,8 @@ package ticketnow.modules.order.api;
 
 
 import lombok.*;
+import ticketnow.modules.order.dto.admin.AdminOrdersListItemDTO;
+import ticketnow.modules.order.dto.admin.AdminOrdersStatusUpdateRequestDTO;
 import ticketnow.modules.order.dto.OrdersCreateRequestDTO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -125,6 +127,34 @@ public class OrdersController {
     public ResponseEntity<AdminSalesSummaryDTO> getAdminSummary() {
         AdminSalesSummaryDTO dto = ordersService.getAdminSalesSummary();
         return ResponseEntity.ok(dto);
+    }
+    
+    // 관리자용 주문 목록 (페이징) 
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageResponseDTO<AdminOrdersListItemDTO>> getAdminOrdersList(
+            PageRequestDTO req,
+            @RequestHeader(value="X-Request-Id", required = false) String requestId) {
+
+        log.info("[GET] /orders/admin | page={} size={} | X-Request-Id={}",
+                req.getPage(), req.getSize(), requestId);
+
+        return ResponseEntity.ok(ordersService.getAdminOrdersList(req));
+    }
+
+    //  관리자용 주문 상태 변경
+    @PatchMapping("/admin/{ordersId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateOrdersStatus(
+            @PathVariable Long ordersId,
+            @RequestBody AdminOrdersStatusUpdateRequestDTO req,
+            @RequestHeader(value="X-Request-Id", required = false) String requestId) {
+
+        log.info("[PATCH] /orders/admin/{}/status | status={} | X-Request-Id={}",
+                ordersId, req.getOrdersStatus(), requestId);
+
+        ordersService.updateOrdersStatus(ordersId, req.getOrdersStatus());
+        return ResponseEntity.noContent().build();
     }
 }
 

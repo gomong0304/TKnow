@@ -1,7 +1,7 @@
 package ticketnow.modules.order.api;
 
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import ticketnow.modules.order.dto.OrdersCreateRequestDTO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import ticketnow.modules.order.dto.receive.ReceiveOptionSubmitDTO;
 import ticketnow.modules.order.dto.OrdersListItemDTO;
 import ticketnow.modules.order.dto.OrdersDetailDTO;
 import ticketnow.modules.order.service.OrdersService;
-
+import ticketnow.modules.order.dto.admin.AdminSalesSummaryDTO;
 // 주문(Order) API
 @Slf4j
 @RestController
@@ -118,4 +118,14 @@ public class OrdersController {
     	 log.info("[GET] /orders/{} | X-Request-Id={}", ordersId, requestId); // 접근 로깅
         return ResponseEntity.ok(ordersService.getOrdersDetail(ordersId)); // 서비스 상세 DTO 반환
     }
+    
+    // 관리자: 판매 요약 통계 
+    @GetMapping("/admin/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdminSalesSummaryDTO> getAdminSummary() {
+        AdminSalesSummaryDTO dto = ordersService.getAdminSalesSummary();
+        return ResponseEntity.ok(dto);
+    }
 }
+
+

@@ -235,5 +235,43 @@
      LIMIT 1
    </select>
   
+    <!-- 8) 관리자용 전체 매출 요약 (AdminInven 통계용)
+       - 판매 티켓 수량 / 판매액 : orders_status = 'PAID'
+       - 환불 금액 : orders_status = 'REFUNDED'
+  -->
+  <select id="selectAdminSalesSummary"
+          resultType="ticketnow.modules.order.dto.admin.AdminSalesSummaryDTO">
+    SELECT
+      COALESCE(
+        SUM(
+          CASE
+            WHEN o.orders_status = 'PAID'
+              THEN o.orders_ticket_quantity
+            ELSE 0
+          END
+        ), 0
+      ) AS totalTicketQuantity,
+      COALESCE(
+        SUM(
+          CASE
+            WHEN o.orders_status = 'PAID'
+              THEN o.orders_total_amount
+            ELSE 0
+          END
+        ), 0
+      ) AS totalSalesAmount,
+      COALESCE(
+        SUM(
+          CASE
+            WHEN o.orders_status = 'REFUNDED'
+              THEN o.orders_total_amount
+            ELSE 0
+          END
+        ), 0
+      ) AS totalRefundAmount
+    FROM orders o
+  </select>
+
+  
 
 </mapper>

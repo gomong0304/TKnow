@@ -13,7 +13,7 @@ import ticketnow.modules.order.dto.OrdersDetailDTO;
 
 import org.apache.ibatis.annotations.Param;
 import ticketnow.modules.order.domain.OrdersVO;
-
+import ticketnow.modules.order.dto.admin.AdminSalesSummaryDTO;
 
 // 주문(Order) 조회 전용 Mapper
 //카멜<->스네이크 자동매핑: root-context.xml에서 mapUnderscoreToCamelCase=true 설정됨
@@ -50,4 +50,8 @@ public interface OrdersMapper {
     
     // 썸네일 조회
     Long selectTicketIdByOrdersId(@Param("ordersId") Long ordersId);
+    
+    // ====== 관리자용 전체 매출 요약 (AdminInven 하단 카드) ======
+    AdminSalesSummaryDTO selectAdminSalesSummary();
+    
 }

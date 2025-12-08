@@ -19,5 +19,6 @@ public class SeatStatsDTO {
     /** 해당 회차의 전체 좌석 수 */
     private Integer totalSeats;
 
-
+    /** 해당 회차의 잔여 좌석 수 */
+    private Integer remainingSeats;
 }

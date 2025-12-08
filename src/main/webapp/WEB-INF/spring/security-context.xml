@@ -27,15 +27,18 @@
 						</beans:property>
 
 						<!-- 허용할 HTTP 메서드 -->
-						<beans:property name="allowedMethods">
-							<beans:list>
-								<beans:value>GET</beans:value>  <!-- 조회 허용 -->
-								<beans:value>POST</beans:value> <!-- 생성/로그인 등 허용 -->
-								<beans:value>PUT</beans:value> <!-- 수정 허용 -->
-								<beans:value>DELETE</beans:value> <!-- 삭제 허용 -->
-								<beans:value>OPTIONS</beans:value>  <!-- CORS preflight(사전요청) 허용 -->
-							</beans:list>
-						</beans:property>
+						<!-- 허용할 HTTP 메서드 -->
+							<beans:property name="allowedMethods">
+							    <beans:list>
+							        <beans:value>GET</beans:value>      <!-- 조회 허용 -->
+							        <beans:value>POST</beans:value>     <!-- 생성/로그인 등 허용 -->
+							        <beans:value>PUT</beans:value>      <!-- 수정 허용 -->
+							        <beans:value>DELETE</beans:value>   <!-- 삭제 허용 -->
+							        <beans:value>OPTIONS</beans:value>  <!-- CORS preflight(사전요청) 허용 -->
+							        <beans:value>PATCH</beans:value>    <!-- 부분 수정(PATCH) 허용 -->
+							    </beans:list>
+							</beans:property>
+
 
 
 						<!-- 클라이언트가 보낼 수 있는 요청 헤더 -->

@@ -538,14 +538,22 @@
 /*=============== AdminContact2.jsx용 =============== */
 /* 전체 문의 내역 페이지는 세로 1열로 정렬 */
 .admin-contact-main-box {
-  display: block;              /* AdminMember1에서 준 flex 해제 */
+  display: block; 
+            /* AdminMember1에서 준 flex 해제 */
 }
-/* AdminInven 콘서트명 칸 말줄임 처리 */
-.admin-member-text1 .admin-inven-title {
-  max-width: 260px;      /* 필요하면 숫자만 조정 */
-  display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
+
+.inven-main-box2{
+	position: relative;
+	left: 0px;
+	width: 860px;
+	margin-top: 30px;
+	padding-right: -30px; 
+	letter-spacing: -1.4px;
+	font-size : 22px;
+}
+.admin-inven-tit{
+	margin-bottom: 30px;
+	font-size: 25px;
+	color: #ee70a2;
+	font-weight: 500;
 }

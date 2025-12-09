@@ -164,7 +164,8 @@
     WHERE o.member_id = #{memberId}
   </select>
 
-  <!-- 7) 구매내역 상세 -->
+
+    <!-- 7) 구매내역 상세 -->
   <select id="selectOrdersDetail"
           parameterType="long"
           resultType="ticketnow.modules.order.dto.OrdersDetailDTO">
@@ -177,7 +178,7 @@
       t.ticket_title         AS ticketTitle,
       DATE_FORMAT(t.ticket_date, '%Y-%m-%d') AS ticketDate,
       DATE_FORMAT(t.ticket_date, '%H:%i')    AS showStartTime,
-     t.venueName AS ticketVenue,
+      t.venueName AS ticketVenue,
 
       s.seat_class           AS seatClass,
       s.seat_code            AS seatCode,
@@ -190,11 +191,11 @@
       NULL                   AS qrCodeNumber,
 
       /* 결제/정산 */
-      o.orders_status        AS ordersStatus,
-      p.pay_status           AS payStatus,
-      p.pay_method           AS payMethod,
-      ot.order_price         AS ticketPrice,
-      0                      AS serviceFee,          -- [변경 가능]
+      o.orders_status          AS ordersStatus,
+      p.pay_status             AS payStatus,
+      p.pay_method             AS payMethod,
+      ot.order_price           AS ticketPrice,
+      0                        AS serviceFee,          -- [변경 가능]
       o.orders_ticket_quantity AS quantity,
       o.orders_total_amount    AS totalPayAmount,
 
@@ -209,9 +210,10 @@
       o.created_at           AS createdAt,
       o.updated_at           AS updatedAt,
 
-      /* 예매자 표시용 */
-      m.member_name          AS memberName,
-      m.member_phone AS memberPhone
+      /* 회원 표시 정보 */
+      m.member_name  AS memberName,
+      m.member_phone AS memberPhone,
+      m.member_email AS memberEmail
 
     FROM orders o
     JOIN order_ticket ot ON ot.orders_id = o.orders_id
@@ -223,7 +225,7 @@
     ORDER BY ot.order_ticket_id ASC
     LIMIT 1
   </select>
-  
+
    <!-- ====== 관리자용 전체 주문 목록 (페이징) ====== -->
   <select id="selectAdminOrdersList"
           resultType="ticketnow.modules.order.dto.admin.AdminOrdersListItemDTO">

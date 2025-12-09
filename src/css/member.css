@@ -19,6 +19,11 @@
 	padding: 30px;
 	width: 800px;
 	font-size: 20px;
+
+	/* MyTick 전용: 안의 요소들을 세로 1열로 쌓기 */
+	display: flex;
+	flex-direction: column; /* 위에서 아래로 세로 정렬 */
+	gap: 20px;              /* 카드 사이 간격 */
 }
 
 .member-ticket-plus {
@@ -447,4 +452,70 @@
 	display: flex;
 	justify-content: center;
 	gap: 12px;
+}
+
+.member-Member-consImg-1 {
+	width: 180px;
+	margin-top: 0;
+}
+.mytick-order-card {
+  /* 공통 카드 스타일에서 문제 되는 부분만 덮어쓰기 */
+  display: flex;          /* 이미지 + 정보 가로 정렬 */
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  min-width: 0;
+  white-space: normal;    /* 텍스트 줄바꿈 허용 */
+  margin: 0 auto;
+  padding: 30px 40px;     /* 안쪽 여백 */
+  box-sizing: border-box;
+  
+}
+
+
+/* MyTick 카드 안의 오른쪽 정보 박스 */
+.mytick-order-card .member-Member-dayBox {
+  position: static;       /* left:40px 같은 것 초기화 */
+  left: 0;
+  margin-left: 40px;      /* 이미지와의 간격 */
+ 
+}
+
+/* 나의 티켓(MyTick) - 페이징 영역 */
+.member-myTk-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* 공연 제목 / 장소 / 일시 테이블 여백 정리 */
+.mytick-order-card .member-Member-dayBoxTb {
+  margin-top: 4px;
+}
+
+.mytick-order-card .member-Member-dayBoxTb table {
+  line-height: 1.8;
+}
+
+.mytick-order-card .member-Member-dayBoxTb th {
+  font-size: 23px;
+}
+
+.mytick-order-card .member-Member-dayBoxTb td {
+  font-size: 18px;
+}
+.member-myTk-pagination button {
+  padding: 6px 16px  !important;
+  border-radius: 8px !important;
+  border: 1px solid #cccccc !important;
+  background-color: #FFFFFF !important;
+  cursor: pointer !important;
+  font-size: 18px;
+}
+
+.member-myTk-pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }

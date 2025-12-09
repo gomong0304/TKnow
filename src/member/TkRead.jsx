@@ -32,7 +32,7 @@ export default function TickRead() {
       })
       .then((res) => {
         if (res.data) {
-          console.log("📦 받은 데이터:", res.data); // ✅ 디버깅용
+          console.log("📦 받은 데이터:", res.data); // 
           setData(res.data);
         } else {
           setError("데이터가 존재하지 않습니다.");
@@ -103,27 +103,12 @@ export default function TickRead() {
     <div className="member-Member-page">
       <MemberSidebar active="myContact" />
       <div className="member-right">
-        <div className="member-myTk-box2">
+ 
           <div className="mytick-main-box">
-            <strong>예매 상세 확인 및 취소</strong>
-            <br />
-            <br />
-
-            <div className="member-tkRead-conBox">
+         
               <div className="tkRead-cons-list">
-                <strong>{data.ticketTitle}</strong>
-                <br />
-                <br />
-                <img
-                  src={ticketImg}
-                  alt="콘서트_썸네일"
-                  className="member-tkRead-consImg"
-                  onError={(e) => {
-                    e.target.src = Ticket;
-                  }}
-                />
-                <span>상세보기</span>
-              </div>
+                  <strong>{data.ticketTitle}</strong>
+  </div>
 
               <div className="member-tkRead-dayBox">
                 <div className="member-tkRead-my">
@@ -151,12 +136,9 @@ export default function TickRead() {
                         <th>좌석</th>
                         <td>{data.seatCode || "정보 없음"}</td>
                       </tr>
+                  
                       <tr>
-                        <th>티켓 수령 방법</th>
-                        <td>모바일 티켓</td>
-                      </tr>
-                      <tr>
-                        <th>받으시는 분</th>
+                        <th>예매자</th>
                         <td>{data.memberName || "정보 없음"}</td>
                       </tr>
                       <tr>
@@ -165,11 +147,21 @@ export default function TickRead() {
                           {memberPhone}
                         </td>
                       </tr>
+                      <tr>
+                       <th>티켓금액</th>
+                    <td>{ticketPrice.toLocaleString()} 원</td>
+                    </tr>
+                    <tr>                    <th>수수료</th>
+                    <td>2,000 원</td></tr>
+                    <tr>  <th>총 결제 금액</th>
+                    <td style={{ color: "#FFA6C9", fontWeight: "bold" }}>
+                      {totalAmount.toLocaleString()} 원
+                    </td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
+           
 
             <br />
             <strong>모바일 티켓 확인</strong>
@@ -222,51 +214,9 @@ export default function TickRead() {
               </div>
             </div>
 
-            <br />
-            <strong>예매 내역</strong>
-            <div className="member-tkRead-conBox4">
-              <table className="member-tkRead-text1">
-                <tbody>
-                  <tr>
-                    <th>예매 번호</th>
-                    <td>｜</td>
-                    <td>{data.orderTicketId}</td>
-                    <th>배송</th>
-                    <td>｜</td>
-                    <td>{data.deliveryType || "모바일 티켓"}</td>
-                    <th>가격 등급</th>
-                    <td>｜</td>
-                    <td>일반</td>
-                  </tr>
-                  <tr>
-                    <th>좌석번호</th>
-                    <td>｜</td>
-                    <td>{data.seatCode}</td>
-                    <th>가격</th>
-                    <td>｜</td>
-                    <td>{ticketPrice.toLocaleString()} 원</td>
-                    <th>취소 여부</th>
-                    <td>｜</td>
-                    <td>{data.cancelable ? "가능" : "불가"}</td>
-                  </tr>
-                  <tr>
-                    <th>수수료</th>
-                    <td>｜</td>
-                    <td>{fee.toLocaleString()} 원</td>
-                    <th>배송비</th>
-                    <td>｜</td>
-                    <td>{deliveryFee.toLocaleString()} 원</td>
-                    <th>총 결제 금액</th>
-                    <td>｜</td>
-                    <td style={{ color: "#FFA6C9", fontWeight: "bold" }}>
-                      {totalAmount.toLocaleString()} 원
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            
           </div>
-        </div>
+       
       </div>
     </div>
   );

@@ -174,40 +174,45 @@
 	border-radius: 0px 10px 10px 0px;
 	text-decoration: none;
 }
-
-.member-Member-page-1{
-	padding: 80px 1px 80px 1px;
-	gap: 0px;
-	display: flex;
-	align-items: flex-start;
-	box-sizing: border-box;
-	min-height: auto;
-	justify-content: flex-start;
-	width: 100%;
-	max-width: 1200px;
+/* MyContact 전용 레이아웃: 화면 폭을 넓게 써서 버튼이 가운데 올 수 있게 */
+.member-Member-page-1 {
+  padding: 80px 1px 80px 1px;
+  gap: 0px;
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-height: auto;
+  width: 100%;         /* 500px 고정 폭 → 화면 전체 사용 */
+  max-width: 1200px;   /* 마이페이지 계열과 비슷한 최대 폭 */
+  justify-content: flex-start;
 }
 
-/* MyContact 페이지 전용: 사이드바와 본문 배치 정렬 */
+/* 사이드바 박스 위치 (다른 페이지와 동일) */
 .member-Member-page-1 .member-Member-box1 {
-	left: 0;
+  position: relative;
+  left: 280px;
 }
 
+/* 본문 영역: 내 문의 내역 카드(860px)와 폭을 맞춤 */
 .member-Member-page-1 .member-right {
-	margin-left: 40px;
-	width: auto;
-	max-width: 800px;
+  flex-grow: 1;
+  margin-left: 300px;
+  width: 860px;        /* .member-myTk-box2-1 의 width와 동일 */
+  max-width: 860px;
+  flex-shrink: 0;
 }
+
 
 .member-myTk-box2-1{
-	border: 1px solid #D9D9D9;
-	border-radius: 10px;
-	padding: 20px;
-	width: 100%;
-	font-size: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-	align-items: flex-start;
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    padding: 20px;
+    width: 860px;            /* MyTick의 .member-myTk-box2와 동일 */
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
 }
 
 .member-mycont-Box-1{
@@ -494,7 +499,12 @@
   gap: 12px;
   margin-bottom: 20px;
 }
-
+/* MyContact: 문의 내역 페이징을 박스 가운데에 배치 */
+.member-myTk-box2-1 .member-myTk-pagination {
+  align-self: center;   /* 부모 flex의 왼쪽 정렬을 무시하고 가운데로 */
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
 /* 공연 제목 / 장소 / 일시 테이블 여백 정리 */
 .mytick-order-card .member-Member-dayBoxTb {
   margin-top: 4px;
@@ -788,4 +798,24 @@
     width: 100%;
     border-bottom: 1px solid #e5e5e5;
     margin: 16px 0;
+}
+/* MyContact: 문의하기 버튼 스타일 (가운데, 크기/폰트 조정) */
+.member-myCont-but1-1 {
+  display: inline-flex;              /* 텍스트를 수평·수직 가운데 정렬 */
+  justify-content: center;
+  align-items: center;
+
+  width: 260px !important;                      /* 버튼 가로 크기 */
+  height: 80px !important;                      /* 버튼 세로 크기 */
+  font-size: 22px;                   /* 폰트 크기 */
+
+  background-color: #ffffff;
+  border: 1px solid #D9D9D9;
+  color: #808080;
+  border-radius: 999px;              /* 동그란 느낌의 버튼 */
+
+  text-decoration: none;
+
+  /* 주변 정렬: 부모가 flex든 block이든 가운데로 오도록 */
+  margin: 20px auto 40px auto ;       /* 위, 좌우(auto = 가운데), 아래 여백 */
 }

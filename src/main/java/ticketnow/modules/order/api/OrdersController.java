@@ -2,6 +2,7 @@ package ticketnow.modules.order.api;
 
 
 import lombok.*;
+import ticketnow.modules.order.constant.OrdersStatus; 
 import ticketnow.modules.order.dto.admin.AdminOrdersListItemDTO;
 import ticketnow.modules.order.dto.admin.AdminOrdersStatusUpdateRequestDTO;
 import ticketnow.modules.order.dto.OrdersCreateRequestDTO;
@@ -119,6 +120,19 @@ public class OrdersController {
     		 @RequestHeader(value="X-Request-Id", required=false) String requestId) {
     	 log.info("[GET] /orders/{} | X-Request-Id={}", ordersId, requestId); // 접근 로깅
         return ResponseEntity.ok(ordersService.getOrdersDetail(ordersId)); // 서비스 상세 DTO 반환
+    }
+    
+    // 회원용 주문취소
+    @PatchMapping("/{ordersId}/cancel")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> cancelMyOrder(@PathVariable Long ordersId) {
+
+        // TODO: 필요하면 나중에 서비스에서
+        //  - 본인 주문인지,
+        //  - 공연 시간이 지났는지 등을 검증하도록 확장
+        ordersService.updateOrdersStatus(ordersId, OrdersStatus.CANCELED.name());
+
+        return ResponseEntity.noContent().build();
     }
     
     // 관리자: 판매 요약 통계 

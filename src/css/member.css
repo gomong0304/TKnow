@@ -405,9 +405,14 @@
 }
 
 .member-Member-btn-outline {
-	background-color: #fff;
-	color: #ff6fa5;
-	border: 1px solid #ff6fa5;
+	background-color: #fca5c6;
+	color: #ffffff;
+	border: 1px solid #dddddd;
+	border-radius: 8px;
+	width:100px;
+	height: 40px;
+	margin-top: 30px;
+
 }
 
 .member-Member-btn:hover {
@@ -518,4 +523,269 @@
 .member-myTk-pagination button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+/* ============================
+   TkRedad (예매 취소 페이지)
+   ============================ */
+
+.tkcancel-page {
+  background-color: #fafafa;
+}
+
+.tkcancel-main-box {
+  padding: 30px 35px 40px 35px;
+}
+
+/* 상단 MY 예매정보 카드 */
+.tkcancel-myinfo-card {
+  background: #ffffff;
+  width: 100%;                 
+  padding: 20px 24px 24px 24px;
+  margin-bottom: 24px;
+}
+.tkcancel-myinfo-header {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+.tkcancel-myinfo-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.tkcancel-myinfo-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.tkcancel-myinfo-thumb {
+  flex: 0 0 160px;
+  max-width: 160px;
+}
+
+.tkcancel-myinfo-thumb img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid #eeeeee;
+}
+
+.tkcancel-myinfo-table-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.tkcancel-myinfo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+}
+
+.tkcancel-myinfo-table th,
+.tkcancel-myinfo-table td {
+  padding: 6px 8px;
+  vertical-align: top;
+}
+
+.tkcancel-myinfo-table th {
+  width: 120px;
+  font-weight: 600;
+  color: #666666;
+  text-align: left;
+}
+
+.tkcancel-myinfo-table td {
+  color: #333333;
+  word-break: keep-all;
+}
+
+/* 주문 취소 유의사항 카드 */
+.tkcancel-notice-card {
+  background: #ffffff;
+  padding: 20px 24px 24px 24px;
+  width: 100%;      
+  text-align: center;         
+}
+
+.tkcancel-notice-title {
+    font-size: 20px !important;     /* 기존 대비 조금 더 크고 보기 좋게 */
+  font-weight: 700;
+  color: #FF7FAF !important;      /* 연핑크 포인트 */
+  margin-bottom: 18px !important;
+  align-items: center !important;
+}
+
+.tkcancel-notice-deadline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #dbdbdb;
+  margin-bottom: 25px;
+  margin-top: 30px;
+  width: 600px;
+}
+
+.tkcancel-notice-label {
+  font-weight: 600;
+  color: #ff7fb0;
+}
+
+.tkcancel-notice-deadline-text {
+  font-weight: 500;
+  color: #333333;
+}
+
+.tkcancel-notice-policy {
+  margin-bottom: 14px;
+  justify-items: center;
+
+}
+
+.tkcancel-notice-policy-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #444444;
+  margin-bottom: 6px;
+}
+
+.tkcancel-policy-list {
+  margin: 0;
+  padding-left: 18px;
+  list-style-type: disc;
+  font-size: 16px;
+  color: #555555;
+
+}
+
+.tkcancel-policy-list li + li {
+  margin-top: 3px;
+}
+
+/* "관람시간이 지난 공연..." 경고 */
+.tkcancel-notice-warning {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff1f1;
+  border: 1px solid #ffb3b3;
+  font-size: 13px;
+  color: #d63f3f;
+}
+
+/* 동의 체크 */
+.tkcancel-agree-row {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed #eeeeee;
+  justify-items: center;
+}
+
+.tkcancel-agree-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #444444;
+}
+
+.tkcancel-agree-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+/* 버튼 영역 */
+.tkcancel-button-row {
+  display: flex;
+  justify-content: center;    
+  gap: 8px;
+  margin-top: 18px;
+}
+.tkcancel-bottom-actions {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;  /* 버튼 정확한 가운데 위치 */
+  margin-top: 25px !important;
+  font-size: 20px !important;
+  
+}
+
+/* 주문 취소 버튼 비활성화 스타일 보조 */
+.tkcancel-cancel-btn {
+  min-width: 120px;
+}
+
+.tkcancel-cancel-btn-disabled,
+.tkcancel-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 로딩 / 에러 공통 */
+.tkcancel-loading,
+.tkcancel-error {
+  padding: 30px 0;
+  font-size: 15px;
+  color: #555555;
+  text-align: center;
+}
+
+.tkcancel-actions {
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* 반응형 */
+@media (max-width: 900px) {
+  .tkcancel-main-box {
+    padding: 20px;
+  }
+
+  .tkcancel-myinfo-thumb {
+    flex: 0 0 140px;
+    max-width: 140px;
+  }
+
+  .tkcancel-myinfo-thumb img {
+    height: 200px;
+  }
+
+  .tkcancel-button-row {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .tkcancel-myinfo-body {
+    flex-direction: column;
+  }
+
+  .tkcancel-myinfo-thumb {
+    max-width: 100%;
+  }
+
+  .tkcancel-myinfo-thumb img {
+    width: 100%;
+    height: auto;
+  }
+
+  .tkcancel-notice-deadline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+.my-divider {
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+    margin: 16px 0;
 }

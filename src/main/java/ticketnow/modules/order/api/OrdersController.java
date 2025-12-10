@@ -113,6 +113,25 @@ public class OrdersController {
         return ResponseEntity.ok(ordersService.getOrdersList(memberId, req)); // 서비스 페이징 결과 반환
     }
 
+ // [GET] /orders/member/{memberId} | 관리자용: 특정 회원 주문 목록 조회
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/member/{memberId}")
+    public ResponseEntity<PageResponseDTO<OrdersListItemDTO>> getOrdersListByMember(
+            @PathVariable("memberId") String memberId,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size
+    ) {
+        // PageRequestDTO 구성
+        PageRequestDTO req = new PageRequestDTO();
+        req.setPage(page);
+        req.setSize(size);
+
+        // 지정한 memberId 기준으로 주문 목록 조회
+        PageResponseDTO<OrdersListItemDTO> res = ordersService.getOrdersList(memberId, req);
+
+        return ResponseEntity.ok(res);
+    }
+
     // 구매내역 상세
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{ordersId}")

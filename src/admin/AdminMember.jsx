@@ -87,7 +87,7 @@ export default function Member() {
                       }}
                     />
                   <div className="admin-Member-Box1">
-                    <span>신규</span>
+                   
                     <div className="admin-Member-BoxTb">
                       <table>
                         <tbody>

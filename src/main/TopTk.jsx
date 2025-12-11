@@ -74,9 +74,27 @@ export default function TopTk() {
 
     return `${date.getFullYear()}.${mm}.${dd}`;
   };
- const visibleTickets = tickets.filter(
-    (t) => t.ticketStatus !== "CLOSED"
-  );
+const visibleTickets = tickets
+    .filter((t) => {
+      // 티켓 상태 문자열 통일
+      const status = (t.ticketStatus || "").toString().toUpperCase();
+
+      // 판매종료(CLOSED), 오픈예정(SCHEDULED) 제외
+      return status !== "CLOSED" && status !== "SCHEDULED";
+    })
+    .sort((a, b) => {
+      // 주문상태 PAID 기준 매출(totalPaidAmount) 높은 순 정렬
+      const paidA =
+        typeof a.totalPaidAmount === "number"
+          ? a.totalPaidAmount
+          : parseInt(a.totalPaidAmount || "0", 10);
+      const paidB =
+        typeof b.totalPaidAmount === "number"
+          ? b.totalPaidAmount
+          : parseInt(b.totalPaidAmount || "0", 10);
+
+      return paidB - paidA; // 큰 값이 먼저 오도록 내림차순
+    });
 
   return (
     <div className="toptk">

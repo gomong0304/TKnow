@@ -145,11 +145,11 @@ export default function AdminDashboard() {
             </div>
             <div className="admin-member-stats-right">
               <p>
-                최근 한달 새로운 회원이{" "}
+                최근 한달 새로운 회원이&nbsp;{" "}
                 <strong>{memberStats.newMembers} 명</strong> 가입했습니다.
               </p>
               <p>
-                같은 기간 탈퇴한 회원은{" "}
+                탈퇴한 회원은{" "}
                 <strong>{memberStats.withdrawnMembers} 명</strong> 입니다.
               </p>
             </div>

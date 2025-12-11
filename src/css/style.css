@@ -1880,6 +1880,7 @@ map {
     flex-direction: column; /* 세로 방향 정렬 */
     gap: 20px;             /* 섹션 간 간격 */
     align-items: center;   /* 자식 카드들을 가로 기준 가운데 정렬 */
+	 margin-bottom: 30px;
 }
 
 

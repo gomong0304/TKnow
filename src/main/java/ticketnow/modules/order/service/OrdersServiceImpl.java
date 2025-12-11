@@ -269,14 +269,14 @@ public class OrdersServiceImpl implements OrdersService {
 				.imageType(img.getImageType() != null ? img.getImageType().name() : null)
 				.build(); // dto생성
 		 // DTO 타입별로 알맞게 set
-	    if (targetDto instanceof ticketnow.modules.order.dto.pay.PayPageDTO) {
-	        ((ticketnow.modules.order.dto.pay.PayPageDTO) targetDto).setTicketThumbnail(imageDTO);
-	    } else if (targetDto instanceof ticketnow.modules.order.dto.OrdersDetailDTO) {
-	        ((ticketnow.modules.order.dto.OrdersDetailDTO) targetDto).setTicketThumbnail(imageDTO);
+	    if (targetDto instanceof PayPageDTO) {
+	        ((PayPageDTO) targetDto).setTicketThumbnail(imageDTO);
+	    } else if (targetDto instanceof OrdersDetailDTO) {
+	        ((OrdersDetailDTO) targetDto).setTicketThumbnail(imageDTO);
 	    } else if (targetDto instanceof ticketnow.modules.order.dto.receive.ReceiveOptionPageDTO) {
-	        ((ticketnow.modules.order.dto.receive.ReceiveOptionPageDTO) targetDto).setTicketThumbnail(imageDTO);
+	        ((ReceiveOptionPageDTO) targetDto).setTicketThumbnail(imageDTO);
 	    } else if (targetDto instanceof ticketnow.modules.order.dto.OrdersListItemDTO) {
-	        ((ticketnow.modules.order.dto.OrdersListItemDTO) targetDto).setTicketThumbnail(imageDTO);
+	        ((OrdersListItemDTO) targetDto).setTicketThumbnail(imageDTO);
 	    }
 	}
 

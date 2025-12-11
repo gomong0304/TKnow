@@ -77,11 +77,11 @@ export default function AdminDashboard() {
           <div className="member-Member-levelBox">
             <img src={User} alt="등급 아이콘" className="member-Member-heartImg" />
             <div className="admin-levelBox-text">
-              <span>새로운 회원이</span>
+              <span>최근 한 달 새로운 회원이</span>
               <strong>&nbsp;{adminInfo.newMembers || 0} 명 </strong>
               <span>가입했습니다</span>
               <br />
-              <span>기존 회원이</span>
+              <span>기존 회원은</span>
               <strong>&nbsp;{adminInfo.withdrawnMembers || 0} 명 </strong>
               <span>탈퇴하였습니다</span>
             </div>

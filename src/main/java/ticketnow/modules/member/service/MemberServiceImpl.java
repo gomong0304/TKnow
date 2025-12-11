@@ -1,6 +1,7 @@
 package ticketnow.modules.member.service;
 
 import java.time.LocalDateTime;
+import ticketnow.modules.member.dto.AdminMemberStatsDTO;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -228,44 +229,49 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public MemberResponseDTO updateMember(String memberId, MemberUpdateRequestDTO req) {
-		final long t0 = System.nanoTime();
-		debugRequest(req, "UPDATE:REQ");
-		log.debug("[MemberService][UPDATE] memberId={}", memberId);
+	    final long t0 = System.nanoTime();
+	    debugRequest(req, "UPDATE:REQ");
+	    log.debug("[MemberService][UPDATE] memberId={}", memberId);
 
-		MemberVO vo = memberMapper.selectMemberById(memberId);
-		if (vo == null) {
-			log.warn("[MemberService][UPDATE] not found memberId={}", memberId);
-			throw new IllegalStateException("회원이 존재하지 않습니다: " + memberId);
-		}
-		debugSnapshot(vo, "UPDATE:BEFORE");
+	    MemberVO vo = memberMapper.selectMemberById(memberId);
+	    if (vo == null) {
+	        log.warn("[MemberService][UPDATE] not found memberId={}", memberId);
+	        throw new IllegalStateException("회원이 존재하지 않습니다: " + memberId);
+	    }
+	    debugSnapshot(vo, "UPDATE:BEFORE");
 
-		// null 필드 무시 후 부분 갱신
-		if (req.getMemberPw() != null)
-			vo.setMemberPw(passwordEncoder.encode(req.getMemberPw()));
-		if (req.getMemberName() != null)
-			vo.setMemberName(req.getMemberName());
-		if (req.getMemberEmail() != null)
-			vo.setMemberEmail(req.getMemberEmail());
-		if (req.getMemberPhone() != null)
-			vo.setMemberPhone(req.getMemberPhone());
-		if (req.getMemberZip() != null)
-			vo.setMemberZip(req.getMemberZip());
-		if (req.getMemberAddr1() != null)
-			vo.setMemberAddr1(req.getMemberAddr1());
-		if (req.getMemberAddr2() != null)
-			vo.setMemberAddr2(req.getMemberAddr2());
+	    // null 필드 무시 후 부분 갱신
+	    if (req.getMemberPw() != null)
+	        vo.setMemberPw(passwordEncoder.encode(req.getMemberPw()));
+	    if (req.getMemberName() != null)
+	        vo.setMemberName(req.getMemberName());
+	    if (req.getMemberEmail() != null)
+	        vo.setMemberEmail(req.getMemberEmail());
+	    if (req.getMemberPhone() != null)
+	        vo.setMemberPhone(req.getMemberPhone());
+	    if (req.getMemberZip() != null)
+	        vo.setMemberZip(req.getMemberZip());
+	    if (req.getMemberAddr1() != null)
+	        vo.setMemberAddr1(req.getMemberAddr1());
+	    if (req.getMemberAddr2() != null)
+	        vo.setMemberAddr2(req.getMemberAddr2());
 
-		vo.setUpdatedAt(LocalDateTime.now());
+	    // ★ 관리자 화면에서 넘어온 memberRole 이 있으면 권한도 함께 수정
+	    if (req.getMemberRole() != null)
+	        vo.setMemberRole(req.getMemberRole());
 
-		int rows = memberMapper.updateMember(vo);
-		log.info("[MemberService][UPDATE] update rows={}", rows);
+	    vo.setUpdatedAt(LocalDateTime.now());
 
-		MemberVO updated = memberMapper.selectMemberById(memberId);
-		debugSnapshot(updated, "UPDATE:AFTER");
-		log.debug("[MemberService][UPDATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+	    int rows = memberMapper.updateMember(vo);
+	    log.info("[MemberService][UPDATE] update rows={}", rows);
 
-		return toResponse(updated);
+	    MemberVO updated = memberMapper.selectMemberById(memberId);
+	    debugSnapshot(updated, "UPDATE:AFTER");
+	    log.debug("[MemberService][UPDATE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
+
+	    return toResponse(updated);
 	}
+
 
 	// =================================================================================
 	// 삭제(소프트)
@@ -280,4 +286,23 @@ public class MemberServiceImpl implements MemberService {
 		log.info("[MemberService][DELETE] soft delete rows={}, memberId={}", rows, memberId);
 		log.debug("[MemberService][DELETE] elapsed={} ms", (System.nanoTime() - t0) / 1_000_000.0);
 	}
+	
+    // 관리자용 회원 통계
+
+    @Override
+    @Transactional(readOnly = true)
+    public AdminMemberStatsDTO getAdminMemberStatsForLastMonth() {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime from = now.minusMonths(1);
+
+        long newMembers = memberMapper.countNewMembersInPeriod(from, now);
+        long withdrawnMembers = memberMapper.countWithdrawnMembersInPeriod(from, now);
+
+        return AdminMemberStatsDTO.builder()
+                .newMembers(newMembers)
+                .withdrawnMembers(withdrawnMembers)
+                .build();
+    }
+
 }

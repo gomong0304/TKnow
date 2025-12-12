@@ -9,9 +9,12 @@
 }
 
 .admin-Member-memImg {
-	width: 110px;
+	width: 115px;
+	height: 115px;          
 	border-radius: 80px;
-	border :#D9D9D9 solid 6px;
+	border: #d6d4d4 solid 5px;
+	object-fit: cover;      
+	display: block;        
 }
 
 .admin-Member-conBox {

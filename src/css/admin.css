@@ -9,7 +9,9 @@
 }
 
 .admin-Member-memImg {
-	width: 100px;
+	width: 110px;
+	border-radius: 80px;
+	border :#D9D9D9 solid 6px;
 }
 
 .admin-Member-conBox {
@@ -1075,4 +1077,38 @@
   margin-top: 4px;
   font-size: 12px;
   color: #d9534f;
+}
+/* =========================
+   AdminMember 페이징 버튼
+   ========================= */
+.admin-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 50px 400px 30px ;
+}
+
+.admin-page-button {
+  border: none;
+  background: #FFA6C9;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-page-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.admin-page-info {
+  font-size: 14px;
+  font-weight: bold;
+  color: #808080;
+  min-width: 80px;
+  text-align: center;
 }

@@ -1,6 +1,5 @@
 package ticketnow.modules.board.service;
 
-import ticketnow.modules.board.dto.*;
 import ticketnow.modules.board.dto.inquiry.InquiryCreateRequestDTO;
 import ticketnow.modules.board.dto.inquiry.InquiryDetailDTO;
 import ticketnow.modules.board.dto.inquiry.InquiryListItemDTO;
@@ -8,7 +7,6 @@ import ticketnow.modules.board.dto.inquiry.InquiryUpdateRequestDTO;
 import ticketnow.modules.board.dto.reply.ReplyCURequestDTO;
 import ticketnow.modules.common.dto.paging.PageRequestDTO;
 import ticketnow.modules.common.dto.paging.PageResponseDTO;
-
 // 1:1 문의 서비스 인터페이스
 public interface BoardService {
 

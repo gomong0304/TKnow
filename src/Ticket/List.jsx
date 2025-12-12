@@ -31,18 +31,19 @@ export default function List() {
   // 페이징용 현재 페이지
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    api
-      .get("/tickets")
-      .then((res) => {
-        const list = res.data.data || res.data.list || [];
-        setTickets(list);
-      })
-      .catch((err) => {
-        console.error("오류:", err);
-        setTickets([]);
-      });
-  }, []);
+useEffect(() => {
+  api
+    .get("/tickets", { params: { page: 1, size: 100 } })
+    .then((res) => {
+      const list = res.data.data || res.data.list || [];
+      setTickets(list);
+    })
+    .catch((err) => {
+      console.error("오류:", err);
+      setTickets([]);
+    });
+}, []);
+
 
   // URL의 category가 바뀔 때마다 상태 갱신 + 보이는 개수 초기화
   useEffect(() => {

@@ -98,7 +98,7 @@ const visibleTickets = tickets
 
   return (
     <div className="toptk">
-      <div className="liveTopTk">실시간 예매 티켓</div>
+      <div className="liveTopTk">실시간 인기순위 티켓 TOP 5</div>
       <br />
       <br />
       <div className="tkList1">
